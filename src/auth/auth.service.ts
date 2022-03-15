@@ -1,13 +1,15 @@
 import {
   ForbiddenException,
   Injectable,
+  InternalServerErrorException,
   UnauthorizedException,
 } from '@nestjs/common';
-import { LoginDto } from './auth.dto';
+import { LoginDto, RegisterDto } from './auth.dto';
 import * as bcrypt from 'bcrypt';
 import { UsersService } from 'src/routes/users/users.service';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
+import { User } from 'src/routes/users/user.entity';
 
 @Injectable()
 export class AuthService {
@@ -30,6 +32,23 @@ export class AuthService {
       throw new ForbiddenException('Email ou senha incorreto');
     }
     return this.signToken(user.id, user.email);
+  }
+
+  async register(dto: RegisterDto) {
+    const user = new User();
+
+    user.name = dto.name;
+    user.email = dto.email;
+    user.password = await bcrypt.hash(dto.password, 10);
+
+    if (!this.usersService.create(user)) {
+      throw new InternalServerErrorException('Erro ao criar o usuário');
+    }
+
+    return {
+      status: 'success',
+      msg: 'Usuário criado com sucesso, aguarde a aprovação para acessar o sistema',
+    };
   }
 
   async signToken(
