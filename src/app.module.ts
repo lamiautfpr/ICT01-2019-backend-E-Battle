@@ -3,6 +3,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule } from '@nestjs/config';
 import { AuthModule } from './auth/auth.module';
 import { CategoriesModule } from './routes/categories/categories.module';
+import { LanguagesModule } from './routes/languages/languages.module';
 
 @Module({
   imports: [
@@ -24,6 +25,7 @@ import { CategoriesModule } from './routes/categories/categories.module';
     }),
     AuthModule,
     CategoriesModule,
+    LanguagesModule,
   ],
   controllers: [],
   providers: [],
