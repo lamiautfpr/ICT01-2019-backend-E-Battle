@@ -10,7 +10,7 @@ export class CategoriesController {
 
   @UseGuards(JwtAuthGuard)
   @Get('')
-  login() {
+  getAll() {
     return this.categoriesService.findAll();
   }
 }
