@@ -9,7 +9,7 @@ async function bootstrap() {
   const config = new DocumentBuilder()
     .setTitle('E-Battle Api')
     .setDescription('Api do projeto ICT01-2019 E-Battle')
-    .setVersion('1.0')
+    .setVersion('0.1.0')
     .addBearerAuth()
     .build();
   const document = SwaggerModule.createDocument(app, config);
