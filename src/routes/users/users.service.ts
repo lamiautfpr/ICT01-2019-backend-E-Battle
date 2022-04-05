@@ -15,7 +15,10 @@ export class UsersService {
   }
 
   findOneByEmail(email: string): Promise<User | undefined> {
-    return this.usersRepository.findOne({ where: { email: email } });
+    return this.usersRepository.findOne({
+      where: { email: email },
+      select: ['id', 'email', 'password', 'status'],
+    });
   }
 
   create(user: User) {
