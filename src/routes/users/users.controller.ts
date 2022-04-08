@@ -6,7 +6,7 @@ import {
   Request,
   UseGuards,
 } from '@nestjs/common';
-import { ApiOperation, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { JwtAuthGuard } from 'src/auth/auth.guard';
 import { ApproveUserDto } from './users.dto';
 import { UsersService } from './users.service';
@@ -15,6 +15,7 @@ import { UsersService } from './users.service';
 export class UsersController {
   constructor(private usersService: UsersService) {}
 
+  @ApiBearerAuth()
   @UseGuards(JwtAuthGuard)
   @Get('logged')
   async getLogged(@Request() req) {
