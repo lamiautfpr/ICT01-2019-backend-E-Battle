@@ -4,6 +4,7 @@ import { ConfigModule } from '@nestjs/config';
 import { AuthModule } from './auth/auth.module';
 import { CategoriesModule } from './routes/categories/categories.module';
 import { LanguagesModule } from './routes/languages/languages.module';
+import { GamesModule } from './routes/games/games.module';
 
 @Module({
   imports: [
@@ -26,6 +27,7 @@ import { LanguagesModule } from './routes/languages/languages.module';
     AuthModule,
     CategoriesModule,
     LanguagesModule,
+    GamesModule,
   ],
   controllers: [],
   providers: [],
