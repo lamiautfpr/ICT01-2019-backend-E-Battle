@@ -17,6 +17,9 @@ export class AuthController {
     return this.authService.login(dto);
   }
 
+  @ApiOperation({
+    description: 'Endpoint para registro de usúarios',
+  })
   @Post('register')
   @HttpCode(200)
   register(@Body() dto: RegisterDto) {
