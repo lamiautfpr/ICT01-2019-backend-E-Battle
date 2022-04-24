@@ -48,6 +48,10 @@ export class AuthService {
     user.educationLevel = dto.educationLevel;
     user.workType = dto.workType;
 
+    if ((await this.usersService.findOneByEmail(dto.email)) != undefined) {
+      throw new ForbiddenException('Email já cadastrado');
+    }
+
     if (!this.usersService.create(user)) {
       throw new InternalServerErrorException('Erro ao criar o usuário');
     }
