@@ -9,7 +9,7 @@ export class AuthController {
   constructor(private authService: AuthService) {}
 
   @ApiProperty({
-    description: 'Endpoint para login de usuário'
+    description: 'Endpoint para login de usuário',
   })
   @Post('login')
   @HttpCode(200)

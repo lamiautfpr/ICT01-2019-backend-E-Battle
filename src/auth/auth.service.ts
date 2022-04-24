@@ -24,16 +24,16 @@ export class AuthService {
     if (!user) {
       throw new UnauthorizedException('Email ou senha incorreto');
     }
-    
+
     const isMatch = await bcrypt.compare(dto.password, user.password);
     if (!isMatch) {
       throw new UnauthorizedException('Email ou senha incorreto');
     }
-    
+
     if (user.status == 0) {
       throw new ForbiddenException('Usuário ainda não foi aprovado');
     }
-    
+
     return this.signToken(user.id, user.email);
   }
 
@@ -43,6 +43,10 @@ export class AuthService {
     user.name = dto.name;
     user.email = dto.email;
     user.password = await bcrypt.hash(dto.password, 10);
+    user.institution = dto.institution;
+    user.city = dto.city;
+    user.educationLevel = dto.educationLevel;
+    user.workType = dto.workType;
 
     if (!this.usersService.create(user)) {
       throw new InternalServerErrorException('Erro ao criar o usuário');
