@@ -20,4 +20,16 @@ export class User {
     default: 0,
   })
   status: number;
+
+  @Column()
+  institution: string;
+
+  @Column()
+  city: string;
+
+  @Column()
+  workType: string;
+
+  @Column()
+  educationLevel: string;
 }

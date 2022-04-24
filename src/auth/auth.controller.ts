@@ -1,5 +1,5 @@
 import { Body, Controller, HttpCode, Post } from '@nestjs/common';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiProperty, ApiTags } from '@nestjs/swagger';
 import { LoginDto, RegisterDto } from './auth.dto';
 import { AuthService } from './auth.service';
 
@@ -8,6 +8,9 @@ import { AuthService } from './auth.service';
 export class AuthController {
   constructor(private authService: AuthService) {}
 
+  @ApiProperty({
+    description: 'Endpoint para login de usuário',
+  })
   @Post('login')
   @HttpCode(200)
   login(@Body() dto: LoginDto) {
