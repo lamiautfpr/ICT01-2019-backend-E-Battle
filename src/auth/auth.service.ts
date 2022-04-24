@@ -22,15 +22,18 @@ export class AuthService {
   async login(dto: LoginDto) {
     const user = await this.usersService.findOneByEmail(dto.email);
     if (!user) {
-      throw new ForbiddenException('Email ou senha incorreto');
+      throw new UnauthorizedException('Email ou senha incorreto');
     }
-    if (user.status == 0) {
-      throw new UnauthorizedException('Usuário ainda não foi aprovado');
-    }
+    
     const isMatch = await bcrypt.compare(dto.password, user.password);
     if (!isMatch) {
-      throw new ForbiddenException('Email ou senha incorreto');
+      throw new UnauthorizedException('Email ou senha incorreto');
     }
+    
+    if (user.status == 0) {
+      throw new ForbiddenException('Usuário ainda não foi aprovado');
+    }
+    
     return this.signToken(user.id, user.email);
   }
 
