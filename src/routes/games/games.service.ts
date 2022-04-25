@@ -14,7 +14,15 @@ export class GamesService {
     return this.gamesRepository.find({ where: { user: userId } });
   }
 
+  findOneByUser(id: number, userId: number): Promise<Game | undefined> {
+    return this.gamesRepository.findOne({ where: { id: id, user: userId } });
+  }
+
   create(game: Game) {
     return this.gamesRepository.save(game);
+  }
+
+  async delete(game: Game) {
+    return ((await this.gamesRepository.softDelete(game)).affected ?? 0) > 0;
   }
 }

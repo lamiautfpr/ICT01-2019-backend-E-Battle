@@ -1,12 +1,21 @@
 import {
   Body,
   Controller,
+  Delete,
+  ForbiddenException,
   Get,
+  NotFoundException,
+  Param,
   Post,
   Request,
   UseGuards,
 } from '@nestjs/common';
-import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
+import {
+  ApiBearerAuth,
+  ApiOperation,
+  ApiParam,
+  ApiTags,
+} from '@nestjs/swagger';
 import { JwtAuthGuard } from 'src/auth/auth.guard';
 import { Category } from '../categories/categories.entity';
 import { Language } from '../languages/languages.entity';
@@ -21,12 +30,36 @@ export class GamesController {
   constructor(private gamesService: GamesService) {}
 
   @UseGuards(JwtAuthGuard)
+  @ApiOperation({
+    description: 'Endpoint para listar os jogos do usuário logado',
+  })
   @Get('')
   getAll(@Request() req) {
     return this.gamesService.findByUser(req.user.id);
   }
 
   @UseGuards(JwtAuthGuard)
+  @ApiOperation({
+    description: 'Endpoint que retorna um jogo do usuário logado',
+  })
+  @ApiParam({
+    name: 'id',
+    description: 'ID do jogo',
+    required: true,
+  })
+  @Get(':id')
+  async get(@Param() params, @Request() req) {
+    const game = await this.gamesService.findOneByUser(params.id, req.user);
+    if (game === undefined) {
+      throw new NotFoundException('Jogo não encontrado');
+    }
+    return game;
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @ApiOperation({
+    description: 'Endpoint para criar um jogo para o usuário logado',
+  })
   @Post('create')
   create(@Body() dto: GameDto, @Request() req) {
     const game = new Game();
@@ -50,5 +83,27 @@ export class GamesController {
     });
 
     return this.gamesService.create(game);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @ApiOperation({
+    description: 'Endpoint para excluir um jogo do usuário logado',
+  })
+  @ApiParam({
+    name: 'id',
+    description: 'ID do jogo',
+    required: true,
+  })
+  @Delete(':id')
+  async delete(@Param() params, @Request() req) {
+    const game = new Game();
+    game.id = params.id;
+    game.user = req.user;
+
+    if (!(await this.gamesService.delete(game))) {
+      throw new ForbiddenException(
+        'Você não tem permissão para excluir este jogo',
+      );
+    }
   }
 }

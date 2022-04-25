@@ -1,4 +1,10 @@
-import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  Column,
+  DeleteDateColumn,
+  Entity,
+  ManyToOne,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
 import { Category } from '../categories/categories.entity';
 import { Language } from '../languages/languages.entity';
 import { User } from '../users/user.entity';
@@ -24,6 +30,9 @@ export class Game {
     type: 'json',
   })
   questions: Question[];
+
+  @DeleteDateColumn({ select: false })
+  deletedDate: Date;
 }
 
 export class Question {
