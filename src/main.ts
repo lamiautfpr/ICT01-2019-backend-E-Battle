@@ -8,7 +8,7 @@ async function bootstrap() {
 
   const config = new DocumentBuilder()
     .setTitle('E-Battle Api')
-    .setDescription('Api do backend do projeto ICT01-2019 E-Battle')
+    .setDescription('Api para integração de uma plataforma web com o projeto ICT01-2019 E-Battle que, por sua vez, é um jogo educacional que tem como objetivo estimular o aprendizado em sala de aula por meio da competição saudável entre os jogadores.')
     .setVersion('0.1.0')
     .addBearerAuth()
     .addTag('Development', 'APENAS PARA TESTES E DESENVOLVIMENTO')
