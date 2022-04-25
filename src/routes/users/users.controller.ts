@@ -17,6 +17,9 @@ export class UsersController {
 
   @ApiBearerAuth()
   @UseGuards(JwtAuthGuard)
+  @ApiOperation({
+    description: 'Endpoint para resgatar dados do usuário logado',
+  })
   @Get('logged')
   async getLogged(@Request() req) {
     return req.user;
