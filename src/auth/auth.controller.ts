@@ -9,7 +9,7 @@ export class AuthController {
   constructor(private authService: AuthService) {}
 
   @ApiOperation({
-    description: 'Endpoint para login de usuário',
+    description: 'Endpoint para login do usuário',
   })
   @Post('login')
   @HttpCode(200)
@@ -18,7 +18,7 @@ export class AuthController {
   }
 
   @ApiOperation({
-    description: 'Endpoint para registro de usúarios',
+    description: 'Endpoint para registro do usúarios',
   })
   @Post('register')
   @HttpCode(200)

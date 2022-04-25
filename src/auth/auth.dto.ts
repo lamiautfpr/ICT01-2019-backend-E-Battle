@@ -3,7 +3,7 @@ import { IsEmail, IsNotEmpty, IsString } from 'class-validator';
 
 export class LoginDto {
   @ApiProperty({
-    description: 'texto de teste',
+    description: 'Email do usuário a ser logado',
     example: 'teste@gmail.com',
   })
   @IsEmail()
@@ -11,9 +11,8 @@ export class LoginDto {
   email: string;
 
   @ApiProperty({
-    description:
-      'De preferência, coloque números, letras maiúsculas e minúsculas e caracteres para uma senha mais forte', // ou não?kkk  apenas, sla, numeros?
-    example: '#1A2b3c4d5%6&7!',
+    description: 'Senha do usuário a ser logado',
+    example: 'teste123',
   })
   @IsString()
   @IsNotEmpty()
@@ -22,7 +21,7 @@ export class LoginDto {
 
 export class RegisterDto {
   @ApiProperty({
-    description: 'Inserir um nome',
+    description: 'Nome do usuário a ser criado',
     example: 'João da Silva',
   })
   @IsString()
@@ -30,7 +29,7 @@ export class RegisterDto {
   name: string;
 
   @ApiProperty({
-    description: 'Inserir um e-mail',
+    description: 'E-mail do usuário a ser criado',
     example: 'testando@gmail.com',
   })
   @IsEmail()
@@ -38,7 +37,7 @@ export class RegisterDto {
   email: string;
 
   @ApiProperty({
-    description: 'Inserir uma senha',
+    description: 'Senha do usuário a ser criado',
     example: '#1A2b3c4$d7!',
   })
   @IsString()
@@ -46,7 +45,7 @@ export class RegisterDto {
   password: string;
 
   @ApiProperty({
-    description: 'Inserir uma instituição',
+    description: 'Instituição do usuário a ser criado',
     example: 'Universidade Tecnológica Federal do Swagger',
   })
   @IsNotEmpty()
@@ -54,7 +53,7 @@ export class RegisterDto {
   institution: string;
 
   @ApiProperty({
-    description: 'Inserir uma cidade',
+    description: 'Cidade do usuário a ser criado',
     example: 'Swaggernópolis',
   })
   @IsString()
@@ -62,7 +61,7 @@ export class RegisterDto {
   city: string;
 
   @ApiProperty({
-    description: 'Inserir um tipo de trabalho',
+    description: 'Tipo de ensino do usuário a ser criado',
     example: 'Ensino Fundamental',
   })
   @IsNotEmpty()
@@ -70,7 +69,7 @@ export class RegisterDto {
   workType: string;
 
   @ApiProperty({
-    description: 'Inserir grau de formação',
+    description: 'Formação do usuário a ser criado',
     example: 'Superior completo',
   })
   @IsNotEmpty()

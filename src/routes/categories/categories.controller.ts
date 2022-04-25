@@ -10,7 +10,8 @@ export class CategoriesController {
 
   @UseGuards(JwtAuthGuard)
   @ApiOperation({
-    description: 'Endpoint para serviços de categoria',
+    description:
+      'Endpoint para listar categorias disponíveis para ser utilizado no sistema',
   })
   @Get('')
   getAll() {
