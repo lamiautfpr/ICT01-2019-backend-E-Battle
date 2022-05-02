@@ -5,6 +5,7 @@ import { AuthModule } from './auth/auth.module';
 import { CategoriesModule } from './routes/categories/categories.module';
 import { LanguagesModule } from './routes/languages/languages.module';
 import { GamesModule } from './routes/games/games.module';
+import { ImagesModule } from './routes/images/images.module';
 
 @Module({
   imports: [
@@ -28,6 +29,7 @@ import { GamesModule } from './routes/games/games.module';
     CategoriesModule,
     LanguagesModule,
     GamesModule,
+    ImagesModule,
   ],
   controllers: [],
   providers: [],
