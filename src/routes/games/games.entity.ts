@@ -1,6 +1,7 @@
 import { ApiHideProperty } from '@nestjs/swagger';
 import {
   Column,
+  CreateDateColumn,
   DeleteDateColumn,
   Entity,
   ManyToOne,
@@ -31,6 +32,10 @@ export class Game {
     type: 'json',
   })
   questions: Question[];
+
+  @ApiHideProperty()
+  @CreateDateColumn({ select: false })
+  createdDate: Date;
 
   @ApiHideProperty()
   @DeleteDateColumn({ select: false })
