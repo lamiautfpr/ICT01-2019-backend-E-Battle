@@ -1,3 +1,4 @@
+import { ApiHideProperty } from '@nestjs/swagger';
 import {
   Column,
   DeleteDateColumn,
@@ -31,6 +32,7 @@ export class Game {
   })
   questions: Question[];
 
+  @ApiHideProperty()
   @DeleteDateColumn({ select: false })
   deletedDate: Date;
 }
