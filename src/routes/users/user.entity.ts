@@ -1,4 +1,10 @@
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { ApiHideProperty } from '@nestjs/swagger';
+import {
+  Column,
+  CreateDateColumn,
+  Entity,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
 
 @Entity()
 export class User {
@@ -32,4 +38,8 @@ export class User {
 
   @Column()
   educationLevel: string;
+
+  @ApiHideProperty()
+  @CreateDateColumn({ select: false })
+  createdDate: Date;
 }
