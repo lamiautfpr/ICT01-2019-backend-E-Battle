@@ -11,11 +11,17 @@ export class GamesService {
   ) {}
 
   findByUser(userId: number): Promise<Game[] | undefined> {
-    return this.gamesRepository.find({ where: { user: userId } });
+    return this.gamesRepository.find({
+      where: { user: userId },
+      relations: ['language', 'category'],
+    });
   }
 
   findOneByUser(id: number, userId: number): Promise<Game | undefined> {
-    return this.gamesRepository.findOne({ where: { id: id, user: userId } });
+    return this.gamesRepository.findOne({
+      where: { id: id, user: userId },
+      relations: ['language', 'category'],
+    });
   }
 
   create(game: Game) {
