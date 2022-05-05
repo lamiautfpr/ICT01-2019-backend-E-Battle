@@ -9,7 +9,13 @@ import {
   UseInterceptors,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { ApiBody, ApiConsumes, ApiOperation, ApiParam, ApiTags } from '@nestjs/swagger';
+import {
+  ApiBody,
+  ApiConsumes,
+  ApiOperation,
+  ApiParam,
+  ApiTags,
+} from '@nestjs/swagger';
 import { Image } from './images.entity';
 import { ImagesService } from './images.service';
 
@@ -39,7 +45,8 @@ export class ImagesController {
   }
 
   @ApiOperation({
-    description: 'Endpoint apenas para testes e desenvolvimento, Endpoint para fazer upload de imagens, o ID da imagem é retornado no corpo da resposta',
+    description:
+      'Endpoint apenas para testes e desenvolvimento, Endpoint para fazer upload de imagens, o ID da imagem é retornado no corpo da resposta',
     summary: 'APENAS PARA TESTES E DESENVOLVIMENTO',
   })
   @ApiConsumes('multipart/form-data')
