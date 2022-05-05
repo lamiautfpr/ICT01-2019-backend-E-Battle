@@ -1,4 +1,5 @@
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { ApiHideProperty } from '@nestjs/swagger';
+import { Column, CreateDateColumn, Entity, PrimaryGeneratedColumn } from 'typeorm';
 
 @Entity()
 export class Image {
@@ -12,4 +13,8 @@ export class Image {
     type: 'longblob',
   })
   data: Buffer;
+
+  @ApiHideProperty()
+  @CreateDateColumn({ select: false })
+  createdDate: Date;
 }
