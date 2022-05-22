@@ -1,5 +1,11 @@
-import { ApiOAuth2, ApiProperty } from '@nestjs/swagger';
-import { IsEnum, isNotEmpty, IsNotEmpty, isNumber, IsNumber, isPositive, IsPositive, IsString } from 'class-validator';
+import { ApiProperty } from '@nestjs/swagger';
+import {
+  IsEnum,
+  IsNotEmpty,
+  IsNumber,
+  IsPositive,
+  IsString,
+} from 'class-validator';
 
 export enum UserStatus {
   PENDING = 0,
