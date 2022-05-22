@@ -6,8 +6,25 @@ O projeto visa construir o Backend para integração de uma plataforma web com o
 ------------------
 ### Como Utilizar 
 
-Primeiramente, instale as dependências do projeto. Digite no terminal: <br/>
+* Primeiramente, instale as dependências do projeto. <br/>
+
+Precisaremos da versão 16 LTS do NodeJS, disponível no link abaixo: <br/>
+<https://nodejs.org/en/> <br/>
+
+Instale também o NestJS, por meio do comando: <br/>
+```npm i -g @nestjs/cli``` <br/>
+
+Bem como o TypeORM: <br/>
+```npm i typeorm```
+
+E por fim, o Yarn: <br/>
 ```yarn install```
+
+Não esqueça de clonar o projeto: <br/>
+SSH: ```git clone git@github.com:lamiautfpr/ICT01-2019-backend-E-Battle.git``` <br/>
+HTTP: ```git clone https://github.com/lamiautfpr/ICT01-2019-backend-E-Battle.git```
+
+---
 
 ### Para Desenvolver
 * Utilize sempre a branch qa
@@ -23,13 +40,11 @@ Digite no terminal: <br/>
 
 
 3. Ao finalizar o desenvolvimento, digite no terminal: <br/>
-```yarn run format```<br/>
 ```yarn run lint```<br/>
 Com o intuito de corrigir possíveis erros de formatação que o lint encontrar. 
 <br/>
 
 4. Após a correção, verifique mais uma vez se está nos padrões: <br/>
-```yarn run format``` <br/>
 ```yarn run lint``` <br/>
 e repita esse processo enquanto existirem erros de formatação.
 
