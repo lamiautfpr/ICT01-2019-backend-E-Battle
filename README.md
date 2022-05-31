@@ -15,14 +15,20 @@ Instale também o NestJS, por meio do comando: <br/>
 ```npm i -g @nestjs/cli``` <br/>
 
 Bem como o TypeORM: <br/>
-```npm i typeorm```
+```npm i -g typeorm```
 
 E por fim, o Yarn: <br/>
-```yarn install```
+```npm i -g yarn```
 
 Não esqueça de clonar o projeto: <br/>
 SSH: ```git clone git@github.com:lamiautfpr/ICT01-2019-backend-E-Battle.git``` <br/>
 HTTP: ```git clone https://github.com/lamiautfpr/ICT01-2019-backend-E-Battle.git```
+
+E dentro do projeto instale o pacotes necessários
+```yarn install```
+
+Copie o arquivo `.env.example` para `.env`
+E defina as variáveis de ambiente conforme necessário
 
 ---
 
@@ -46,7 +52,7 @@ Com o intuito de corrigir possíveis erros de formatação que o lint encontrar.
 
 4. Após a correção, verifique mais uma vez se está nos padrões: <br/>
 ```yarn run lint``` <br/>
-e repita esse processo enquanto existirem erros de formatação.
+e repita esse processo enquanto existirem erros.
 
 5. Se não houver mais nenhum erro, finalize o processo realizando o commit das suas alterações:<br/>
     * Commite os códigos <br/>
