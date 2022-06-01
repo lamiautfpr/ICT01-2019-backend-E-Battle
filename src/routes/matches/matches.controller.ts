@@ -7,7 +7,12 @@ import {
   Param,
   NotFoundException,
 } from '@nestjs/common';
-import { ApiBearerAuth, ApiOperation, ApiParam, ApiTags } from '@nestjs/swagger';
+import {
+  ApiBearerAuth,
+  ApiOperation,
+  ApiParam,
+  ApiTags,
+} from '@nestjs/swagger';
 import { JwtAuthGuard } from 'src/auth/auth.guard';
 import { GamesService } from '../games/games.service';
 import { MatchDto } from './matches.dto';
