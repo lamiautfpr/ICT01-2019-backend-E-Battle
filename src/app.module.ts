@@ -6,6 +6,7 @@ import { CategoriesModule } from './routes/categories/categories.module';
 import { LanguagesModule } from './routes/languages/languages.module';
 import { GamesModule } from './routes/games/games.module';
 import { ImagesModule } from './routes/images/images.module';
+import { MatchesModule } from './routes/matches/matches.module';
 
 @Module({
   imports: [
@@ -30,6 +31,7 @@ import { ImagesModule } from './routes/images/images.module';
     LanguagesModule,
     GamesModule,
     ImagesModule,
+    MatchesModule,
   ],
   controllers: [],
   providers: [],
