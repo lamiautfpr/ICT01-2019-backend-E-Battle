@@ -3,9 +3,10 @@ import { MatchesService } from './matches.service';
 import { MatchesController } from './matches.controller';
 import { Match } from './matches.entity';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { GamesModule } from '../games/games.module';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Match])],
+  imports: [TypeOrmModule.forFeature([Match]), GamesModule],
   providers: [MatchesService],
   controllers: [MatchesController],
 })

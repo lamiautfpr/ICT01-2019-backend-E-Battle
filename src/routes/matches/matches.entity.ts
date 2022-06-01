@@ -19,11 +19,13 @@ export class Match {
   @Column()
   spaces: number;
 
-  @Column()
-  groups: string[];
+  @Column({
+    type: 'json',
+  })
+  groups: Group[];
 
   @Column()
-  ramdom: boolean;
+  random: boolean;
 
   @Column()
   trivia: boolean;
@@ -31,4 +33,10 @@ export class Match {
   @ApiHideProperty()
   @CreateDateColumn({ select: false })
   createdDate: Date;
+}
+
+export class Group {
+  name: string;
+
+  players: string[];
 }

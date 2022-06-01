@@ -1,10 +1,14 @@
 import { ApiProperty } from '@nestjs/swagger';
+import { Type } from 'class-transformer';
 import {
+  ArrayMinSize,
+  IsArray,
   IsBoolean,
   IsNotEmpty,
   IsNumber,
   IsPositive,
   IsString,
+  ValidateNested,
 } from 'class-validator';
 
 export class MatchDto {
@@ -18,12 +22,14 @@ export class MatchDto {
   spaces: number;
 
   @ApiProperty({
-    description: 'Nome do game a ser criado',
-    example: 'Banco de Dados 1',
+    description: 'Lista de grupos',
   })
   @IsNotEmpty()
-  @IsString()
-  groups: string[];
+  @IsArray()
+  @ValidateNested({ each: true })
+  @Type(() => GroupDto)
+  @ArrayMinSize(1)
+  groups: GroupDto[];
 
   @ApiProperty({
     description:
@@ -32,13 +38,32 @@ export class MatchDto {
   })
   @IsNotEmpty()
   @IsBoolean()
-  ramdom: boolean;
+  random: boolean;
 
   @ApiProperty({
     description: 'Se o jogo vai ser jogado em modo trivia',
-    example: 'true',
+    example: 'false',
   })
   @IsNotEmpty()
   @IsBoolean()
   trivia: boolean;
+}
+
+export class GroupDto {
+  @ApiProperty({
+    description: 'Nome do grupo',
+    example: 'Grupo 1',
+  })
+  @IsNotEmpty()
+  @IsString()
+  name: string;
+
+  @ApiProperty({
+    description: 'Nome dos jogadores do grupo, valor pode ser null para vazio',
+    example: '["Hugo", "Guilherme", "Fernando"]',
+  })
+  @IsArray()
+  @IsString({ each: true })
+  @ArrayMinSize(0)
+  players: string[];
 }

@@ -7,7 +7,7 @@ import {
   Param,
   NotFoundException,
 } from '@nestjs/common';
-import { ApiOperation, ApiParam, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiOperation, ApiParam, ApiTags } from '@nestjs/swagger';
 import { JwtAuthGuard } from 'src/auth/auth.guard';
 import { GamesService } from '../games/games.service';
 import { MatchDto } from './matches.dto';
@@ -15,6 +15,7 @@ import { Match } from './matches.entity';
 import { MatchesService } from './matches.service';
 
 @ApiTags('Games')
+@ApiBearerAuth()
 @Controller('matches')
 export class MatchesController {
   constructor(
@@ -42,7 +43,7 @@ export class MatchesController {
     match.game = game;
     match.spaces = dto.spaces;
     match.groups = dto.groups;
-    match.ramdom = dto.ramdom;
+    match.random = dto.random;
     match.trivia = dto.trivia;
 
     return this.matchesService.create(match);
