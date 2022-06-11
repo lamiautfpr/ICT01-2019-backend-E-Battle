@@ -51,7 +51,7 @@ export class UsersController {
   @ApiOperation({
     description: 'Endpoint para alterar os dados dos usuários',
   })
-  @Get('')
+  @Post('edit')
   setLoggedUser(@Body() dto: editUserDto, @Request() req) {
     const user = new User();
 
@@ -61,5 +61,7 @@ export class UsersController {
     user.city = dto.city;
     user.workType = dto.workType;
     user.educationLevel = dto.educationLevel;
+
+    this.usersService.set(user);
   }
 }
