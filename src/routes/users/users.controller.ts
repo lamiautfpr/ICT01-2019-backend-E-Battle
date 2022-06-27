@@ -3,6 +3,7 @@ import {
   Controller,
   Get,
   Post,
+  Put,
   Request,
   UseGuards,
 } from '@nestjs/common';
@@ -12,6 +13,8 @@ import { User } from './user.entity';
 import { ApproveUserDto, editUserDto } from './users.dto';
 import { UsersService } from './users.service';
 
+@ApiTags('Users')
+@ApiBearerAuth()
 @Controller('users')
 export class UsersController {
   constructor(private usersService: UsersService) {}
@@ -24,6 +27,24 @@ export class UsersController {
   @Get('logged')
   async getLogged(@Request() req) {
     return req.user;
+  }
+
+  @ApiOperation({
+    description: 'Endpoint para alterar os dados dos usuários',
+  })
+  @UseGuards(JwtAuthGuard)
+  @Put('edit')
+  setLoggedUser(@Body() dto: editUserDto, @Request() req) {
+    const user = new User();
+
+    user.id = req.user.id;
+    user.name = dto.name;
+    user.institution = dto.institution;
+    user.city = dto.city;
+    user.workType = dto.workType;
+    user.educationLevel = dto.educationLevel;
+
+    this.usersService.set(user);
   }
 
   @ApiTags('Development')
@@ -46,22 +67,5 @@ export class UsersController {
   @Post('approve')
   approve(@Body() dto: ApproveUserDto) {
     return this.usersService.update(dto.id, dto.status);
-  }
-
-  @ApiOperation({
-    description: 'Endpoint para alterar os dados dos usuários',
-  })
-  @Post('edit')
-  setLoggedUser(@Body() dto: editUserDto, @Request() req) {
-    const user = new User();
-
-    user.id = req.user.id;
-    user.name = dto.name;
-    user.institution = dto.institution;
-    user.city = dto.city;
-    user.workType = dto.workType;
-    user.educationLevel = dto.educationLevel;
-
-    this.usersService.set(user);
   }
 }
