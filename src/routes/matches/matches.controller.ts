@@ -6,6 +6,7 @@ import {
   Request,
   Param,
   NotFoundException,
+  Get,
 } from '@nestjs/common';
 import {
   ApiBearerAuth,
@@ -19,7 +20,7 @@ import { MatchDto } from './matches.dto';
 import { Match } from './matches.entity';
 import { MatchesService } from './matches.service';
 
-@ApiTags('Games')
+@ApiTags('Matches')
 @ApiBearerAuth()
 @Controller('matches')
 export class MatchesController {
@@ -52,5 +53,25 @@ export class MatchesController {
     match.trivia = dto.trivia;
 
     return this.matchesService.create(match);
+  }
+
+  @ApiTags('Unity')
+  @UseGuards(JwtAuthGuard)
+  @ApiOperation({
+    description: 'Endpoint que retorna uma partida do usuário logado',
+  })
+  @ApiParam({
+    name: 'id',
+    description: 'ID da partida',
+    required: true,
+  })
+  @Get(':id')
+  async get(@Param() params, @Request() req) {
+    const match = await this.matchesService.findOneByUser(params.id, req.user);
+
+    if (match === undefined) {
+      throw new NotFoundException('Partida não encontrado ou não iniciada');
+    }
+    return match;
   }
 }
