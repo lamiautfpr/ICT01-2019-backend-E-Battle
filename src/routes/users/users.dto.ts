@@ -1,5 +1,11 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsEnum, IsNotEmpty, IsNumber, IsPositive } from 'class-validator';
+import {
+  IsEnum,
+  IsNotEmpty,
+  IsNumber,
+  IsPositive,
+  IsString,
+} from 'class-validator';
 
 export enum UserStatus {
   PENDING = 0,
@@ -24,4 +30,46 @@ export class ApproveUserDto {
   @IsNotEmpty()
   @IsEnum(UserStatus)
   status: number;
+}
+
+export class editUserDto {
+  @ApiProperty({
+    description: 'Nome do usuário',
+    example: 'João da Silva',
+  })
+  @IsNotEmpty()
+  @IsString()
+  name: string;
+
+  @ApiProperty({
+    description: 'Instituição onde o usuário trabalha',
+    example: 'Colégio Estadual de Exemplo',
+  })
+  @IsNotEmpty()
+  @IsString()
+  institution: string;
+
+  @ApiProperty({
+    description: 'Cidade onde o usuário está',
+    example: 'Exemplolândia do Sul',
+  })
+  @IsNotEmpty()
+  @IsString()
+  city: string;
+
+  @ApiProperty({
+    description: 'Tipo de trabalho do professor',
+    example: 'Aulas para o Ensino Fundamental',
+  })
+  @IsNotEmpty()
+  @IsString()
+  workType: string;
+
+  @ApiProperty({
+    description: 'Nível de escolaridade do professor',
+    example: 'Mestre',
+  })
+  @IsNotEmpty()
+  @IsString()
+  educationLevel: string;
 }

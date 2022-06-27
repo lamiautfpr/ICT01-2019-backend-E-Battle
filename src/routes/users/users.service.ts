@@ -33,4 +33,8 @@ export class UsersService {
   update(id: number, status: UserStatus) {
     return this.usersRepository.update(id, { status: status });
   }
+
+  set(user: User) {
+    return this.usersRepository.save(user);
+  }
 }

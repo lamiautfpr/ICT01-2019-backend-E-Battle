@@ -1,5 +1,6 @@
 # ICT01-2019-backend-E-Battle
 
+
 ## Resumo
 O projeto visa construir o Backend para integração de uma plataforma web com o projeto ICT01-2019 E-Battle que, por sua vez, é um jogo educacional que tem como objetivo estimular o aprendizado em sala de aula por meio da competição saudável entre os jogadores. <br/>
 
