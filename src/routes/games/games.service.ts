@@ -10,6 +10,12 @@ export class GamesService {
     private gamesRepository: Repository<Game>,
   ) {}
 
+  find(id: number): Promise<Game | undefined> {
+    return this.gamesRepository.findOne(id, {
+      relations: ['language', 'category'],
+    });
+  }
+
   findByUser(userId: number): Promise<Game[] | undefined> {
     return this.gamesRepository.find({
       where: { user: userId },
