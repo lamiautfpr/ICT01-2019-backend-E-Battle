@@ -106,4 +106,17 @@ export class GamesController {
       );
     }
   }
+
+  @UseGuards(JwtAuthGuard)
+  @Post('duplicate/:id')
+  async duplicate(@Param() params, @Request() req) {
+    const game = await this.gamesService.find(params.id);
+    if (game === undefined) {
+      throw new NotFoundException('Jogo não encontrado');
+    }
+    game.user = req.user.id;
+    game.id = 0;
+    const duplicateGame = await this.gamesService.create(game);
+    return this.gamesService.find(duplicateGame.id);
+  }
 }
