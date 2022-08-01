@@ -108,6 +108,14 @@ export class GamesController {
   }
 
   @UseGuards(JwtAuthGuard)
+  @ApiOperation({
+    description: 'Endpoint para duplicar um jogo do usuario logado',
+  })
+  @ApiParam({
+    name: 'id',
+    description: 'ID do jogo',
+    required: true,
+  })
   @Post('duplicate/:id')
   async duplicate(@Param() params, @Request() req) {
     const game = await this.gamesService.find(params.id);
