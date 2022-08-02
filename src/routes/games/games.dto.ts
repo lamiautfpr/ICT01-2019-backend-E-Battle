@@ -75,9 +75,8 @@ export class QuestionDto {
   })
   @IsNotEmpty()
   @IsNumber()
-  @IsPositive()
   answer: number;
-
+  
   @ApiProperty({
     description: 'Tempo em segundos para responder a pergunta',
     example: 60,
