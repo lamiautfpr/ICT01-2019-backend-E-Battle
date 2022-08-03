@@ -7,6 +7,7 @@ import {
   NotFoundException,
   Param,
   Post,
+  Put,
   Request,
   UseGuards,
 } from '@nestjs/common';
@@ -126,5 +127,31 @@ export class GamesController {
     game.id = 0;
     const duplicateGame = await this.gamesService.create(game);
     return this.gamesService.find(duplicateGame.id);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @ApiOperation({
+    description: 'Endpoint para editar um jogo do usuario logado',
+  })
+  @ApiParam({
+    name: 'id',
+    description: 'ID do jogo',
+    required: true,
+  })
+  @Put(':id')
+  async editGame(@Param() param, @Body() dto: GameDto, @Request() req) {
+    const game = await this.gamesService.findOneByUser(param.id, req.user);
+
+    if (game === undefined) {
+      throw new NotFoundException('Jogo não encontrado');
+    }
+
+    game.name = dto.name;
+    game.user = req.user.id;
+    game.language.id = dto.language;
+    game.category.id = dto.category;
+    game.questions = dto.questions;
+
+    return this.gamesService.set(game);
   }
 }

@@ -37,4 +37,8 @@ export class GamesService {
   async delete(game: Game) {
     return ((await this.gamesRepository.softDelete(game)).affected ?? 0) > 0;
   }
+
+  set(game: Game) {
+    return this.gamesRepository.save(game);
+  }
 }
