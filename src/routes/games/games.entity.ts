@@ -22,8 +22,14 @@ export class Game {
   @ManyToOne(() => Language)
   language: Language;
 
+  @Column({ name: 'languageId' })
+  languageId: number;
+
   @ManyToOne(() => Category)
   category: Category;
+
+  @Column({ name: 'categoryId' })
+  categoryId: number;
 
   @Column()
   name: string;

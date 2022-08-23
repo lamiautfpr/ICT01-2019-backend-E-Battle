@@ -8,6 +8,7 @@ import {
   Param,
   Post,
   Put,
+  Query,
   Request,
   UseGuards,
 } from '@nestjs/common';
@@ -20,7 +21,7 @@ import {
 import { JwtAuthGuard } from 'src/auth/auth.guard';
 import { Category } from '../categories/categories.entity';
 import { Language } from '../languages/languages.entity';
-import { GameDto } from './games.dto';
+import { GameDto, QueryParamsDto } from './games.dto';
 import { Game, Question } from './games.entity';
 import { GamesService } from './games.service';
 
@@ -37,6 +38,31 @@ export class GamesController {
   @Get('')
   getAll(@Request() req) {
     return this.gamesService.findByUser(req.user.id);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @ApiOperation({
+    description: 'Endpoint para pesquisar jogos por parametros',
+  })
+  @ApiParam({
+    name: 'name, language, category, limit',
+    description: 'Parametros para pesquisar um jogo sem o id (opcionais)',
+    required: false,
+  })
+  @Get('community')
+  async findByParams(@Query() queryParams: QueryParamsDto) {
+    const find = await this.gamesService.findByUserParams(
+      queryParams.name,
+      queryParams.language,
+      queryParams.category,
+      queryParams.limit,
+    );
+
+    if (find.length < 1) {
+      throw new NotFoundException('Nenhum jogo corresponde a este filtro');
+    }
+
+    return find;
   }
 
   @UseGuards(JwtAuthGuard)

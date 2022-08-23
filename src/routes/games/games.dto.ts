@@ -5,6 +5,7 @@ import {
   IsArray,
   IsNotEmpty,
   IsNumber,
+  IsOptional,
   IsPositive,
   IsString,
   ValidateNested,
@@ -85,4 +86,18 @@ export class QuestionDto {
   @IsNumber()
   @IsPositive()
   time: number;
+}
+
+export class QueryParamsDto {
+  @IsOptional()
+  name: string;
+
+  @IsOptional()
+  language: number;
+
+  @IsOptional()
+  category: number;
+
+  @IsOptional()
+  limit: number;
 }
