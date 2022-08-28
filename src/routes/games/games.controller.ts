@@ -44,11 +44,6 @@ export class GamesController {
   @ApiOperation({
     description: 'Endpoint para pesquisar jogos por parametros',
   })
-  @ApiParam({
-    name: 'name, language, category, limit',
-    description: 'Parametros para pesquisar um jogo sem o id (opcionais)',
-    required: false,
-  })
   @Get('community')
   async findByParams(@Query() queryParams: QueryParamsDto) {
     const find = await this.gamesService.findByUserParams(
@@ -57,10 +52,6 @@ export class GamesController {
       queryParams.category,
       queryParams.limit,
     );
-
-    if (find.length < 1) {
-      throw new NotFoundException('Nenhum jogo corresponde a este filtro');
-    }
 
     return find;
   }

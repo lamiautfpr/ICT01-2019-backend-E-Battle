@@ -31,7 +31,7 @@ export class GamesService {
   ): Promise<Game[] | undefined> {
     return this.gamesRepository.find({
       where: {
-        name: ILike(`%${name ?? ''}`),
+        name: ILike(`%${name ?? ''}%`),
         ...(languageId ? { languageId } : {}),
         ...(categoryId ? { categoryId } : {}),
       },

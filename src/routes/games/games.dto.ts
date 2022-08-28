@@ -89,15 +89,42 @@ export class QuestionDto {
 }
 
 export class QueryParamsDto {
+  @ApiProperty({
+    description: 'Nome do jogo/jogos que vão ser pesquisados',
+    example: 'Game',
+    required: false,
+  })
   @IsOptional()
+  @IsString()
   name: string;
 
+  @ApiProperty({
+    description: 'Id da linguagem que os jogos da busca vão ter',
+    example: 1,
+    required: false,
+  })
   @IsOptional()
+  @IsNumber()
+  @IsPositive()
   language: number;
 
+  @ApiProperty({
+    description: 'Id da categoria que os jogos da busca vão ter',
+    example: 1,
+    required: false,
+  })
   @IsOptional()
+  @IsNumber()
+  @IsPositive()
   category: number;
 
+  @ApiProperty({
+    description: 'Limite de jogos que serão pesquisados (por padrão é 5)',
+    example: 5,
+    required: false,
+  })
   @IsOptional()
+  @IsNumber()
+  @IsPositive()
   limit: number;
 }
