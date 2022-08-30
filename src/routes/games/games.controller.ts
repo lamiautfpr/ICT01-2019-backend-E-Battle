@@ -8,6 +8,7 @@ import {
   Param,
   Post,
   Put,
+  Query,
   Request,
   UseGuards,
 } from '@nestjs/common';
@@ -20,7 +21,7 @@ import {
 import { JwtAuthGuard } from 'src/auth/auth.guard';
 import { Category } from '../categories/categories.entity';
 import { Language } from '../languages/languages.entity';
-import { GameDto } from './games.dto';
+import { GameDto, QueryParamsDto } from './games.dto';
 import { Game, Question } from './games.entity';
 import { GamesService } from './games.service';
 
@@ -37,6 +38,20 @@ export class GamesController {
   @Get('')
   getAll(@Request() req) {
     return this.gamesService.findByUser(req.user.id);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @ApiOperation({
+    description: 'Endpoint para pesquisar jogos por parametros',
+  })
+  @Get('community')
+  findByParams(@Query() queryParams: QueryParamsDto) {
+    return this.gamesService.findByUserParams(
+      queryParams.name,
+      queryParams.language,
+      queryParams.category,
+      queryParams.limit,
+    );
   }
 
   @UseGuards(JwtAuthGuard)
