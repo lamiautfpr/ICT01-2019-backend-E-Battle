@@ -45,15 +45,13 @@ export class GamesController {
     description: 'Endpoint para pesquisar jogos por parametros',
   })
   @Get('community')
-  async findByParams(@Query() queryParams: QueryParamsDto) {
-    const find = await this.gamesService.findByUserParams(
+  findByParams(@Query() queryParams: QueryParamsDto) {
+    return this.gamesService.findByUserParams(
       queryParams.name,
       queryParams.language,
       queryParams.category,
       queryParams.limit,
     );
-
-    return find;
   }
 
   @UseGuards(JwtAuthGuard)
