@@ -12,16 +12,11 @@ import {
   Request,
   UseGuards,
 } from '@nestjs/common';
-import {
-  ApiBearerAuth,
-  ApiOperation,
-  ApiParam,
-  ApiTags,
-} from '@nestjs/swagger';
+import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { JwtAuthGuard } from 'src/auth/auth.guard';
 import { Category } from '../categories/categories.entity';
 import { Language } from '../languages/languages.entity';
-import { GameDto, QueryParamsDto } from './games.dto';
+import { GameDto, IdDto, QueryParamsDto } from './games.dto';
 import { Game, Question } from './games.entity';
 import { GamesService } from './games.service';
 
@@ -58,13 +53,8 @@ export class GamesController {
   @ApiOperation({
     description: 'Endpoint que retorna um jogo do usuário logado',
   })
-  @ApiParam({
-    name: 'id',
-    description: 'ID do jogo',
-    required: true,
-  })
   @Get(':id')
-  async get(@Param() params, @Request() req) {
+  async get(@Param() params: IdDto, @Request() req) {
     const game = await this.gamesService.findOneByUser(params.id, req.user);
     if (game === undefined) {
       throw new NotFoundException('Jogo não encontrado');
@@ -105,13 +95,8 @@ export class GamesController {
   @ApiOperation({
     description: 'Endpoint para excluir um jogo do usuário logado',
   })
-  @ApiParam({
-    name: 'id',
-    description: 'ID do jogo',
-    required: true,
-  })
   @Delete(':id')
-  async delete(@Param() params, @Request() req) {
+  async delete(@Param() params: IdDto, @Request() req) {
     const game = new Game();
     game.id = params.id;
     game.user = req.user;
@@ -127,13 +112,8 @@ export class GamesController {
   @ApiOperation({
     description: 'Endpoint para duplicar um jogo do usuario logado',
   })
-  @ApiParam({
-    name: 'id',
-    description: 'ID do jogo',
-    required: true,
-  })
   @Post('duplicate/:id')
-  async duplicate(@Param() params, @Request() req) {
+  async duplicate(@Param() params: IdDto, @Request() req) {
     const game = await this.gamesService.find(params.id);
     if (game === undefined) {
       throw new NotFoundException('Jogo não encontrado');
@@ -148,13 +128,8 @@ export class GamesController {
   @ApiOperation({
     description: 'Endpoint para editar um jogo do usuario logado',
   })
-  @ApiParam({
-    name: 'id',
-    description: 'ID do jogo',
-    required: true,
-  })
   @Put(':id')
-  async editGame(@Param() param, @Body() dto: GameDto, @Request() req) {
+  async editGame(@Param() param: IdDto, @Body() dto: GameDto, @Request() req) {
     const game = await this.gamesService.findOneByUser(param.id, req.user);
 
     if (game === undefined) {
