@@ -126,7 +126,7 @@ export class QueryParamsDto {
   @IsNumberString()
   limit: number;
 }
-export class idDto{
+export class idDto {
   @ApiProperty({
     name: 'id',
     description: 'ID do jogo',
