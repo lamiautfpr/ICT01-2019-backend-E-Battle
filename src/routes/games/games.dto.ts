@@ -5,6 +5,7 @@ import {
   IsArray,
   IsNotEmpty,
   IsNumber,
+  IsNumberString,
   IsOptional,
   IsPositive,
   IsString,
@@ -104,8 +105,7 @@ export class QueryParamsDto {
     required: false,
   })
   @IsOptional()
-  @IsNumber()
-  @IsPositive()
+  @IsNumberString()
   language: number;
 
   @ApiProperty({
@@ -114,8 +114,7 @@ export class QueryParamsDto {
     required: false,
   })
   @IsOptional()
-  @IsNumber()
-  @IsPositive()
+  @IsNumberString()
   category: number;
 
   @ApiProperty({
@@ -124,7 +123,15 @@ export class QueryParamsDto {
     required: false,
   })
   @IsOptional()
-  @IsNumber()
-  @IsPositive()
+  @IsNumberString()
   limit: number;
+}
+export class idDto{
+  @ApiProperty({
+    name: 'id',
+    description: 'ID do jogo',
+    required: true,
+  })
+  @IsNumberString()
+  id: number;
 }
