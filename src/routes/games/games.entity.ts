@@ -35,6 +35,11 @@ export class Game {
   name: string;
 
   @Column({
+    default: 0,
+  })
+  visibility: number;
+
+  @Column({
     type: 'json',
   })
   questions: Question[];

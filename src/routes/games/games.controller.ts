@@ -16,7 +16,7 @@ import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { JwtAuthGuard } from 'src/auth/auth.guard';
 import { Category } from '../categories/categories.entity';
 import { Language } from '../languages/languages.entity';
-import { GameDto, IdDto, QueryParamsDto } from './games.dto';
+import { GameDto, IdDto, QueryParamsDto, VisibilityGameDto } from './games.dto';
 import { Game, Question } from './games.entity';
 import { GamesService } from './games.service';
 
@@ -141,6 +141,27 @@ export class GamesController {
     game.language.id = dto.language;
     game.category.id = dto.category;
     game.questions = dto.questions;
+
+    return this.gamesService.set(game);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @ApiOperation({
+    description: 'Endpoint para editar a visibilidade de um jogo',
+  })
+  @Post('visibility/:id')
+  async setVisibility(
+    @Param() params: IdDto,
+    @Body() dto: VisibilityGameDto,
+    @Request() req,
+  ) {
+    const game = await this.gamesService.findOneByUser(params.id, req.user);
+
+    if (game === undefined) {
+      throw new NotFoundException('Jogo não encontrado');
+    }
+
+    game.visibility = dto.visibility;
 
     return this.gamesService.set(game);
   }
