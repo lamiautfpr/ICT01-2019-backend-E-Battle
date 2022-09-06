@@ -3,6 +3,7 @@ import { Type } from 'class-transformer';
 import {
   ArrayMinSize,
   IsArray,
+  IsEnum,
   IsNotEmpty,
   IsNumber,
   IsNumberString,
@@ -136,4 +137,20 @@ export class IdDto {
   @IsNumberString()
   @IsNotEmpty()
   id: number;
+}
+
+export enum GameVisibility {
+  PRIVATE = 0,
+  PUBLIC = 1,
+}
+
+export class VisibilityGameDto {
+  @ApiProperty({
+    description: 'Nova politica de visibilidade do game',
+    enumName: 'GameVisibility',
+    enum: GameVisibility,
+  })
+  @IsNotEmpty()
+  @IsEnum(GameVisibility)
+  visibility: number;
 }

@@ -34,6 +34,7 @@ export class GamesService {
         name: ILike(`%${name ?? ''}%`),
         ...(languageId ? { languageId } : {}),
         ...(categoryId ? { categoryId } : {}),
+        visibility: 1,
       },
       relations: ['language', 'category'],
       take: limit,
