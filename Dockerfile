@@ -20,7 +20,7 @@ COPY ["package.json", "yarn.json*", "./"]
 
 RUN yarn install --production
 
-COPY [".env", "./"]
+# COPY [".env", "./"]
 
 COPY --from=development /app/dist ./dist
 
