@@ -21,8 +21,16 @@ export class UsersService {
 
   findOneByEmail(email: string): Promise<User | undefined> {
     return this.usersRepository.findOne({
+      select: [
+        'name',
+        'email',
+        'password',
+        'institution',
+        'city',
+        'workType',
+        'educationLevel',
+      ],
       where: { email: email },
-      select: ['id', 'email', 'password', 'status'],
     });
   }
 
