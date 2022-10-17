@@ -34,7 +34,13 @@ export class AuthService {
       throw new ForbiddenException('Usuário ainda não foi aprovado');
     }
 
-    return this.signToken(user.id, user.email);
+    delete user.password;
+    delete user.status;
+
+    return {
+      access_token: await this.signToken(user.id, user.email),
+      ...user,
+    };
   }
 
   async register(dto: RegisterDto) {
@@ -62,10 +68,7 @@ export class AuthService {
     };
   }
 
-  async signToken(
-    userId: number,
-    email: string,
-  ): Promise<{ access_token: string }> {
+  async signToken(userId: number, email: string): Promise<string> {
     const payload = {
       sub: userId,
       email,
@@ -76,8 +79,6 @@ export class AuthService {
       secret: this.config.get('JWT_SECRET'),
     });
 
-    return {
-      access_token: token,
-    };
+    return token;
   }
 }
