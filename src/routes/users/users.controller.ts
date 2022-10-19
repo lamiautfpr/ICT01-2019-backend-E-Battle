@@ -19,16 +19,6 @@ import { UsersService } from './users.service';
 export class UsersController {
   constructor(private usersService: UsersService) {}
 
-  @ApiBearerAuth()
-  @UseGuards(JwtAuthGuard)
-  @ApiOperation({
-    description: 'Endpoint para resgatar dados do usuário logado',
-  })
-  @Get('logged')
-  async getLogged(@Request() req) {
-    return req.user;
-  }
-
   @ApiOperation({
     description: 'Endpoint para alterar os dados dos usuários',
   })
