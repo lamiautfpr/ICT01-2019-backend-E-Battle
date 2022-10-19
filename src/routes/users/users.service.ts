@@ -22,6 +22,7 @@ export class UsersService {
   findOneByEmail(email: string): Promise<User | undefined> {
     return this.usersRepository.findOne({
       select: [
+        'id',
         'name',
         'email',
         'password',
