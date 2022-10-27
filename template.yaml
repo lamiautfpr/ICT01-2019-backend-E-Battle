@@ -1,0 +1,128 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+
+Globals:
+  Function:
+    Runtime: nodejs16.x
+    Architectures:
+      - arm64
+    Handler: index.handler
+    Layers:
+      - !Ref DatabaseLayer
+    Timeout: 3
+    Tags:
+      Project: Ebattle
+  HttpApi:
+    Tags:
+      Project: Ebattle
+
+Resources:
+  LambdaRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: "Allow"
+            Principal:
+              Service:
+                - "lambda.amazonaws.com"
+            Action:
+              - sts:AssumeRole
+      ManagedPolicyArns:
+        - "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+      Tags:
+        - Key: Project
+          Value: Ebattle
+  AuthorizerFunctionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: "Allow"
+            Principal:
+              Service:
+                - "apigateway.amazonaws.com"
+            Action:
+              - sts:AssumeRole
+      Policies:
+        - PolicyName: InvokeAuthorizerFunction
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Effect: Allow
+                Action:
+                  - lambda:InvokeAsync
+                  - lambda:InvokeFunction
+                Resource: !GetAtt Authorizer.Arn
+      Tags:
+        - Key: Project
+          Value: Ebattle
+
+  DatabaseLayer:
+    Type: AWS::Serverless::LayerVersion
+    Properties:
+      LayerName: DatabaseLayer
+      ContentUri: src/shared/database
+      CompatibleRuntimes:
+        - nodejs16.x
+      RetentionPolicy: Retain
+    Metadata:
+      BuildMethod: nodejs16.x
+      BuildArchitecture: arm64
+
+  Authorizer:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: src/authorizer/
+      Role: !GetAtt LambdaRole.Arn
+
+  Games:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: src/endpoints/games/
+      Role: !GetAtt LambdaRole.Arn
+      Events:
+        EbattleApi:
+          Type: HttpApi
+          Properties:
+            ApiId: !Ref EbattleApi
+            Path: /games
+            Method: get
+            Auth:
+              Authorizer: Authorizer
+  Login:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: src/endpoints/login/
+      Role: !GetAtt LambdaRole.Arn
+      Events:
+        EbattleApi:
+          Type: HttpApi
+          Properties:
+            ApiId: !Ref EbattleApi
+            Path: /login
+            Method: post
+
+  EbattleApi:
+    Type: AWS::Serverless::HttpApi
+    Properties:
+      StageName: v1
+      CorsConfiguration:
+        AllowOrigins:
+          - "*"
+        AllowMethods:
+          - "*"
+        AllowHeaders:
+          - "*"
+      Auth:
+        Authorizers:
+          Authorizer:
+            AuthorizerPayloadFormatVersion: 2.0
+            EnableSimpleResponses: true
+            FunctionArn: !GetAtt Authorizer.Arn
+            FunctionInvokeRole: !GetAtt AuthorizerFunctionRole.Arn
+            Identity:
+              Headers:
+                - Authorization
