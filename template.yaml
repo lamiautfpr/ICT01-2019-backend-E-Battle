@@ -83,7 +83,16 @@ Resources:
     Properties:
       CodeUri: src/authorizer/
       Role: !GetAtt LambdaRole.Arn
-
+  Log:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: src/_log/
+      Role: !GetAtt LambdaRole.Arn
+      Events:
+        EbattleApi:
+          Type: HttpApi
+          Properties:
+            ApiId: !Ref EbattleApi
   Games:
     Type: AWS::Serverless::Function
     Properties:
