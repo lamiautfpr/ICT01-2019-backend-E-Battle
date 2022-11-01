@@ -6,7 +6,7 @@ exports.handler = async (event) => {
     const conn = await getConn();
     await conn.query({
         name: 'log',
-        text: 'INSERT INTO _log(`value`) VALUES ($1)',
+        text: 'INSERT INTO _log(value) VALUES ($1)',
         values: [event],
     });
     return {
