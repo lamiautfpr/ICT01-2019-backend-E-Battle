@@ -1,6 +1,27 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
 
+Parameters:
+  Environment:
+    Type: String
+    Default: dev
+    AllowedValues:
+      - dev
+      - qa
+      - v1
+  DBPassword:
+    Type: String
+    NoEcho: true
+  DBUser:
+    Type: String
+    Default: ebattle
+  DBName:
+    Type: String
+    Default: ebattle
+  DBHost:
+    Type: String
+    Default: lamiadb1.ceoy3jbkraru.us-east-1.rds.amazonaws.com
+
 Globals:
   Function:
     Runtime: nodejs16.x
@@ -74,6 +95,12 @@ Resources:
       CompatibleRuntimes:
         - nodejs16.x
       RetentionPolicy: Retain
+      Environment:
+        Variables:
+          DB_PASSWORD: !Ref DBPassword
+          DB_USER: !Ref DBUser
+          DB_NAME: !Ref DBName
+          DB_HOST: !Ref DBHost
     Metadata:
       BuildMethod: nodejs16.x
       BuildArchitecture: arm64
@@ -122,8 +149,9 @@ Resources:
 
   EbattleApi:
     Type: AWS::Serverless::HttpApi
+    DeletionPolicy: Retain
     Properties:
-      StageName: v1
+      StageName: !Ref Environment
       CorsConfiguration:
         AllowOrigins:
           - "*"
