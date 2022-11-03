@@ -149,7 +149,6 @@ Resources:
 
   EbattleApi:
     Type: AWS::Serverless::HttpApi
-    DeletionPolicy: Retain
     Properties:
       StageName: !Ref Environment
       CorsConfiguration:
