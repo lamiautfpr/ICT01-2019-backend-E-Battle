@@ -120,6 +120,18 @@ Resources:
           Type: HttpApi
           Properties:
             ApiId: !Ref EbattleApi
+  Api:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: src/documentation/
+      Role: !GetAtt LambdaRole.Arn
+      Events:
+        EbattleApi:
+          Type: HttpApi
+          Properties:
+            ApiId: !Ref EbattleApi
+            Path: /api
+            Method: GET
   Games:
     Type: AWS::Serverless::Function
     Properties:
