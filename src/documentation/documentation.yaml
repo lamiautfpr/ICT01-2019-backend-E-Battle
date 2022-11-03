@@ -39,7 +39,14 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/GamesResponse'
+      security:
+        - authToken: []
 components:
+  securitySchemes:
+    authToken:
+      type: apiKey
+      name: Authorization
+      in: header
   schemas:
     Login:
       type: object
