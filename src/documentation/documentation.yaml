@@ -1,0 +1,102 @@
+openapi: 3.0.3
+info:
+  title: Ebattle Api
+  description: Api para integração de uma plataforma web com o projeto ICT01-2019 E-Battle que, por sua vez, é um jogo educacional que tem como objetivo estimular o aprendizado em sala de aula por meio da competição saudável entre os jogadores.
+  version: 1.0.0
+servers:
+  - url: 'https'
+paths:
+  /login:
+    post:
+      tags:
+        - Authentication
+      description: Autentica um usuário no sistema
+      operationId: login
+      requestBody:
+        description: Dados de autenticação
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Login'
+        required: true
+      responses:
+        '200':
+          description: Usuário autenticado com sucesso
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LoginResponse'
+  /games:
+    get:
+      tags:
+        - Games
+      description: Retorna os jogos do usuario
+      operationId: getGames
+      responses:
+        '200':
+          description: Lista de jogos
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GamesResponse'
+      security:
+        - authToken: []
+components:
+  securitySchemes:
+    authToken:
+      type: apiKey
+      name: Authorization
+      in: header
+  schemas:
+    Login:
+      type: object
+      properties:
+        email:
+          type: string
+          description: Email do usuário
+          example: 'teste@gmail.com'
+        password:
+          type: string
+          description: Senha do usuário
+          example: '123456'
+      required:
+        - email
+        - password
+    LoginResponse:
+      type: object
+      properties:
+        name:
+          type: string
+          description: Nome do usuário
+          example: 'Teste'
+        email:
+          type: string
+          description: Email do usuário
+          example: 'teste@gmail.com'
+        token:
+          type: string
+          description: Token de autenticação
+          example: '9a4450f20304bb601af1d7a62bc450b15479bcd1364a96cabd0da1eb5c4bb667155d236e7677ef320213b78ca9c2bfae02083e5992360801e3fc50b3b55bf07d'
+    GamesResponse:
+      type: array
+      items:
+        $ref: '#/components/schemas/Game'
+    Game:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: Id do jogo
+          example: 1
+        name:
+          type: string
+          description: Nome do jogo
+          example: 'Jogo 1'
+        language:
+          type: integer
+          description: Id do idioma
+          example: 1
+        category:
+          type: integer
+          description: Id da categoria
+          example: 1
