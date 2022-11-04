@@ -114,7 +114,6 @@ components:
       items:
         $ref: '#/components/schemas/Game'
     Category:
-    Language:
       type: object
       properties:
         id:
@@ -124,7 +123,12 @@ components:
         name:
           type: string
           description: Nome da categoria
-          example: 'Português'
+          example: 'Geografia'
+    Language:
+      type: object
+      properties:
+        id:
+          type: integer
           description: Id da linguagem
           example: 1
         name:
