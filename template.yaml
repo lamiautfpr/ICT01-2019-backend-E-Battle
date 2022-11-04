@@ -158,6 +158,18 @@ Resources:
             ApiId: !Ref EbattleApi
             Path: /login
             Method: post
+  Categories:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: src/endpoints/categories/
+      Role: !GetAtt LambdaRole.Arn
+      Events:
+        EbattleApi:
+          Type: HttpApi
+          Properties:
+            ApiId: !Ref EbattleApi
+            Path: /categories
+            Method: get
 
   EbattleApi:
     Type: AWS::Serverless::HttpApi
