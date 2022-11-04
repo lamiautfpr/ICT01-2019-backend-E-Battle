@@ -32,8 +32,8 @@ Globals:
       - !Ref DatabaseLayer
     Timeout: 3
     Tags:
-      project: Ebattle
-      team: Api
+      Project: Ebattle
+      Team: Api
     Environment:
       Variables:
         DB_PASSWORD: !Ref DBPassword
@@ -42,8 +42,8 @@ Globals:
         DB_HOST: !Ref DBHost
   HttpApi:
     Tags:
-      project: Ebattle
-      team: Api
+      Project: Ebattle
+      Team: Api
 
 Resources:
   LambdaRole:
@@ -61,9 +61,9 @@ Resources:
       ManagedPolicyArns:
         - "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
       Tags:
-        - Key: project
+        - Key: Project
           Value: Ebattle
-        - Key: team
+        - Key: Team
           Value: Api
   AuthorizerFunctionRole:
     Type: AWS::IAM::Role
@@ -88,9 +88,9 @@ Resources:
                   - lambda:InvokeFunction
                 Resource: !GetAtt Authorizer.Arn
       Tags:
-        - Key: project
+        - Key: Project
           Value: Ebattle
-        - Key: team
+        - Key: Team
           Value: Api
 
   DatabaseLayer:
@@ -143,6 +143,20 @@ Resources:
           Properties:
             ApiId: !Ref EbattleApi
             Path: /games
+            Method: get
+            Auth:
+              Authorizer: Authorizer
+  Languages:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: src/endpoints/languages/
+      Role: !GetAtt LambdaRole.Arn
+      Events:
+        EbattleApi:
+          Type: HttpApi
+          Properties:
+            ApiId: !Ref EbattleApi
+            Path: /languages
             Method: get
             Auth:
               Authorizer: Authorizer
