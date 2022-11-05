@@ -138,12 +138,20 @@ Resources:
       CodeUri: src/endpoints/games/
       Role: !GetAtt LambdaRole.Arn
       Events:
-        EbattleApi:
+        EbattleApiGet:
           Type: HttpApi
           Properties:
             ApiId: !Ref EbattleApi
             Path: /games
             Method: get
+            Auth:
+              Authorizer: Authorizer
+        EbattleApiPost:
+          Type: HttpApi
+          Properties:
+            ApiId: !Ref EbattleApi
+            Path: /games
+            Method: post
             Auth:
               Authorizer: Authorizer
   Login:
