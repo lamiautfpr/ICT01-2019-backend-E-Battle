@@ -26,6 +26,30 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/LoginResponse'
+  /categories:
+    get:
+      description: Retorna as categorias do jogo
+      operationId: getCategories
+      responses:
+        '200':
+          description: Lista de categorias
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CategoriesResponse'
+  /languages:
+    get:
+      description: Retorna as linguages
+      operationId: getLanguages
+      responses:
+        '200':
+          description: Lista linguagens
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LanguagesResponse'
+      security:
+        - authToken: [ ]
   /games:
     get:
       tags:
@@ -77,10 +101,40 @@ components:
           type: string
           description: Token de autenticação
           example: '9a4450f20304bb601af1d7a62bc450b15479bcd1364a96cabd0da1eb5c4bb667155d236e7677ef320213b78ca9c2bfae02083e5992360801e3fc50b3b55bf07d'
+    CategoriesResponse:
+      type: array
+      items:
+        $ref: '#/components/schemas/Category'
+    LanguagesResponse:
+      type: array
+      items:
+        $ref: '#/components/schemas/Language'
     GamesResponse:
       type: array
       items:
         $ref: '#/components/schemas/Game'
+    Category:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: Id da categoria
+          example: 1
+        name:
+          type: string
+          description: Nome da categoria
+          example: 'Geografia'
+    Language:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: Id da linguagem
+          example: 1
+        name:
+          type: string
+          description: Nome da linguagem
+          example: 'Portugues'
     Game:
       type: object
       properties:
