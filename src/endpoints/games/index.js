@@ -44,7 +44,6 @@ exports.handler = async (event) => {
 
             for(let question of body.questions){
                 if(!(question.text && question.answer && question.answers && question.time && (question.answers.length > 1))){
-                    console.log(question.text, question.answer, question.answers, question.time, (question.answers.length > 1))
                     return {
                         statusCode: 400,
                         body: JSON.stringify({
@@ -59,7 +58,7 @@ exports.handler = async (event) => {
 
                 results = await conn.query({
                     name: "gamescreate",
-                    text: "INSERT INTO games (\"user\", \"language\", \"category\", \"name\", \"questions\") VALUES ($1, $2, $3, $4, $5)",
+                    text: "INSERT INTO games (\"user\", \"language\", \"category\", \"name\", \"questions\") VALUES ($1, $2, $3, $4, $5) RETURNING id",
                     values: [user, body.language, body.category, body.name,  JSON.stringify(body.questions)],
                 });
 
@@ -86,8 +85,14 @@ exports.handler = async (event) => {
                 }
             }
 
+            results = await conn.query({
+                text: "SELECT id, language, category, name FROM games WHERE \"id\" = $1",
+                values: [results.rows[0].id],
+            });
+
             return {
                 statusCode: 200,
+                body: JSON.stringify(results.rows[0]),
             }
 
     }
