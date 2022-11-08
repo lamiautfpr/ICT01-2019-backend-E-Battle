@@ -65,6 +65,25 @@ paths:
                 $ref: '#/components/schemas/GamesResponse'
       security:
         - authToken: []
+    post:
+      tags:
+        - Games
+      description: Cria um novo game do usuario
+      operationId: createGame
+      requestBody:
+        description: Dados do jogo a ser criado
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/createGame'
+        required: true
+      responses:
+        '200':
+          description: Game criado com sucesso
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreateGameResponse'
 components:
   securitySchemes:
     authToken:
@@ -113,6 +132,10 @@ components:
       type: array
       items:
         $ref: '#/components/schemas/Game'
+    CreateGameResponse:
+      type: array
+      items:
+        $ref: '#/components/schemas/Game'
     Category:
       type: object
       properties:
@@ -145,7 +168,7 @@ components:
         name:
           type: string
           description: Nome do jogo
-          example: 'Jogo 1'
+          example: Jogo 1
         language:
           type: integer
           description: Id do idioma
@@ -154,3 +177,46 @@ components:
           type: integer
           description: Id da categoria
           example: 1
+    createGame:
+      type: object
+      properties:
+        language:
+          type: integer
+          description: Id do idioma
+          example: 1
+        category:
+          type: integer
+          description: Id da categoria
+          example: 1
+        name:
+          type: string
+          description: Nome do jogo
+          example: Jogo 1
+        questions:
+          type: array
+          description: Questões presentes no jogo
+          items:
+            $ref: '#/components/schemas/itemsQuestions'
+    itemsQuestions:
+      type: object
+      properties:
+        text:
+          type: string
+          description: Questão do game
+          example: Quanto é 1 + 1
+        answers:
+          type: string
+          description: Respostas do jogo
+          example:
+            - "1"
+            - "2"
+            - "3"
+            - "4"
+        answer:
+          type: integer
+          description: index da posição onde se encontra a resposta do jogo
+          example: 1
+        time:
+          type: integer
+          description: Tempo em segundos para a resposta
+          example: 60
