@@ -205,9 +205,13 @@ components:
           description: Questão do game
           example: Quanto é 1 + 1
         answers:
-          type: array
+          type: string
           description: Respostas do jogo
-          example: ["1","2","3","4"]
+          example:
+            - "1"
+            - "2"
+            - "3"
+            - "4"
         answer:
           type: integer
           description: index da posição onde se encontra a resposta do jogo
