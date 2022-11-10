@@ -214,3 +214,9 @@ Resources:
             Identity:
               Headers:
                 - Authorization
+      Domain:
+        DomainName: api.ebattle.lamia-edu.com
+        CertificateArn: arn:aws:acm:us-east-1:619349481672:certificate/aff5f6d3-73ec-40dc-b943-c218c4dece6e
+        Route53:
+          HostedZoneId: Z08642582A3FQIV9BD2V3
+        BasePath: !Ref Environment
