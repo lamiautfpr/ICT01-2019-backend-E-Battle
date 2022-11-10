@@ -6,6 +6,26 @@ info:
 servers:
   - url: 'https'
 paths:
+  /register:
+    post:
+      tags:
+        - Authentication
+      description: Registra um usuário no sistema
+      operationId: register
+      requestBody:
+        description: Dados de registro
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Register'
+        required: true
+      responses:
+        '200':
+          description: Usuário registrado com sucesso
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RegisterResponse'
   /login:
     post:
       tags:
@@ -91,6 +111,45 @@ components:
       name: Authorization
       in: header
   schemas:
+    Register:
+      type: object
+      properties:
+        name:
+          type: string
+          description: Email do usuário
+          example: 'teste@gmail.com'
+        email:
+          type: string
+          description: Email do usuário
+          example: 'teste@gmail.com'
+        password:
+          type: string
+          description: Senha do usuário
+          example: '123456'
+        institution:
+          type: string
+          description: Instituição do usuário
+          example: "Universidade Tecnológica Federal do Swagger"
+        city:
+          type: string
+          description: Cidade do usuario
+          example: "Santa helena"
+        workType:
+          type: string
+          description: Tipo de trabalho
+          example: "Estudante"
+        educationLevel:
+          type: string
+          description: Nivel educacional
+          example: "Ensino medio completo"
+      required:
+        - name
+        - email
+        - password
+        - institution
+        - city
+        - workType
+        - educationLevel
     Login:
       type: object
       properties:
@@ -105,6 +164,21 @@ components:
       required:
         - email
         - password
+    RegisterResponse:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: ID do usuário
+          example: 1
+        name:
+          type: string
+          description: Nome do usuário
+          example: 'Teste'
+        email:
+          type: string
+          description: Email do usuário
+          example: 'teste@gmail.com'
     LoginResponse:
       type: object
       properties:
