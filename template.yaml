@@ -2,13 +2,6 @@ AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
 
 Parameters:
-  Environment:
-    Type: String
-    Default: dev
-    AllowedValues:
-      - dev
-      - qa
-      - v1
   DBPassword:
     Type: String
     NoEcho: true
@@ -195,8 +188,8 @@ Resources:
 
   EbattleApi:
     Type: AWS::Serverless::HttpApi
+    DeletionPolicy: Retain
     Properties:
-      StageName: !Ref Environment
       CorsConfiguration:
         AllowOrigins:
           - "*"
@@ -214,9 +207,3 @@ Resources:
             Identity:
               Headers:
                 - Authorization
-      Domain:
-        DomainName: api.ebattle.lamia-edu.com
-        CertificateArn: arn:aws:acm:us-east-1:619349481672:certificate/aff5f6d3-73ec-40dc-b943-c218c4dece6e
-        Route53:
-          HostedZoneId: Z08642582A3FQIV9BD2V3
-        BasePath: !Ref Environment
