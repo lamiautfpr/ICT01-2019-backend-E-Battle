@@ -57,6 +57,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/CategoriesResponse'
+      security:
+        - authToken: [ ]
   /languages:
     get:
       description: Retorna as linguages
@@ -68,6 +70,43 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/LanguagesResponse'
+      security:
+        - authToken: [ ]
+  /matches:
+    get:
+      tags:
+        - Matches
+      description: Retorna um match de acordo com o id
+      operationId: getMatch
+      responses:
+        '200':
+          description: Retorna o match de um game
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MatchesResponse'
+      security:
+        - authToken: []
+  /matches/start:
+    post:
+      tags:
+        - Matches
+      description: Cria um novo game do usuario
+      operationId: startMatch
+      requestBody:
+        description: Dados do jogo a ser criado
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Match'
+        required: true
+      responses:
+        '200':
+          description: Match realizado com sucesso
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MatchesResponse'
       security:
         - authToken: [ ]
   /games:
@@ -95,7 +134,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/createGame'
+              $ref: '#/components/schemas/Game'
         required: true
       responses:
         '200':
@@ -103,7 +142,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/CreateGameResponse'
+                $ref: '#/components/schemas/GamesResponse'
 components:
   securitySchemes:
     authToken:
@@ -206,10 +245,10 @@ components:
       type: array
       items:
         $ref: '#/components/schemas/Game'
-    CreateGameResponse:
+    MatchesResponse:
       type: array
       items:
-        $ref: '#/components/schemas/Game'
+        $ref: '#/components/schemas/Match'
     Category:
       type: object
       properties:
@@ -232,6 +271,51 @@ components:
           type: string
           description: Nome da linguagem
           example: 'Portugues'
+    Match:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: Id do match
+          example: 1
+        game:
+          type: array
+          description: game do match
+          items:
+            $ref: '#/components/schemas/Game'
+        groups:
+          type: array
+          description: grupos
+          items:
+            $ref: '#/components/schemas/itensGroups'
+        trivia:
+          type: boolean
+          example: false
+        random:
+          type: boolean
+          example: false
+      required:
+        - id
+        - game
+        - groups
+    itensGroups:
+      type: object
+      properties:
+        name:
+          type: string
+          description: nome do grupo
+          example: grupo 1
+        players:
+          type: string
+          description: nome dos jogadores
+          example:
+            - "Erik"
+            - "Ronaldo"
+            - "Armando"
+            - "Gustavo"
+      required:
+        - name
+        - players
     Game:
       type: object
       properties:
@@ -239,21 +323,6 @@ components:
           type: integer
           description: Id do jogo
           example: 1
-        name:
-          type: string
-          description: Nome do jogo
-          example: Jogo 1
-        language:
-          type: integer
-          description: Id do idioma
-          example: 1
-        category:
-          type: integer
-          description: Id da categoria
-          example: 1
-    createGame:
-      type: object
-      properties:
         language:
           type: integer
           description: Id do idioma
@@ -270,8 +339,14 @@ components:
           type: array
           description: Questões presentes no jogo
           items:
-            $ref: '#/components/schemas/itemsQuestions'
-    itemsQuestions:
+            $ref: '#/components/schemas/itensQuestions'
+      required:
+        - id
+        - language
+        - category
+        - name
+        - questions
+    itensQuestions:
       type: object
       properties:
         text:
@@ -294,3 +369,8 @@ components:
           type: integer
           description: Tempo em segundos para a resposta
           example: 60
+      required:
+        - text
+        - answers
+        - answer
+        - time
