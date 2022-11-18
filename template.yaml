@@ -113,6 +113,20 @@ Resources:
           Type: HttpApi
           Properties:
             ApiId: !Ref EbattleApi
+  AuthorizerLog:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: src/_log/
+      Role: !GetAtt LambdaRole.Arn
+      Events:
+        EbattleApi:
+          Type: HttpApi
+          Properties:
+            ApiId: !Ref EbattleApi
+            Path: /log/auth
+            Method: ANY
+            Auth:
+              Authorizer: Authorizer
   Api:
     Type: AWS::Serverless::Function
     Properties:
@@ -144,6 +158,28 @@ Resources:
           Properties:
             ApiId: !Ref EbattleApi
             Path: /games
+            Method: post
+            Auth:
+              Authorizer: Authorizer
+  Matches:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: src/endpoints/matches/
+      Role: !GetAtt LambdaRole.Arn
+      Events:
+        EbattleApiGet:
+          Type: HttpApi
+          Properties:
+            ApiId: !Ref EbattleApi
+            Path: /matches
+            Method: get
+            Auth:
+              Authorizer: Authorizer
+        EbattleApiPost:
+          Type: HttpApi
+          Properties:
+            ApiId: !Ref EbattleApi
+            Path: /matches/start
             Method: post
             Auth:
               Authorizer: Authorizer
@@ -185,7 +221,8 @@ Resources:
             ApiId: !Ref EbattleApi
             Path: /categories
             Method: get
-
+            Auth:
+              Authorizer: Authorizer
   EbattleApi:
     Type: AWS::Serverless::HttpApi
     DeletionPolicy: Retain
