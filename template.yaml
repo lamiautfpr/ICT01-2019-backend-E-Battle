@@ -2,6 +2,13 @@ AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
 
 Parameters:
+  Environment:
+    Type: String
+    Default: dev
+    AllowedValues:
+      - dev
+      - qa
+      - prod
   DBPassword:
     Type: String
     NoEcho: true
@@ -27,6 +34,7 @@ Globals:
     Tags:
       Project: Ebattle
       Team: Api
+      Environment: !Ref Environment
     Environment:
       Variables:
         DB_PASSWORD: !Ref DBPassword
@@ -37,6 +45,7 @@ Globals:
     Tags:
       Project: Ebattle
       Team: Api
+      Environment: !Ref Environment
 
 Resources:
   LambdaRole:
@@ -58,6 +67,8 @@ Resources:
           Value: Ebattle
         - Key: Team
           Value: Api
+        - Key: Environment
+          Value: !Ref Environment
   AuthorizerFunctionRole:
     Type: AWS::IAM::Role
     Properties:
@@ -85,6 +96,8 @@ Resources:
           Value: Ebattle
         - Key: Team
           Value: Api
+        - Key: Environment
+          Value: !Ref Environment
 
   DatabaseLayer:
     Type: AWS::Serverless::LayerVersion
@@ -118,12 +131,15 @@ Resources:
     Properties:
       CodeUri: src/documentation/
       Role: !GetAtt LambdaRole.Arn
+      Environment:
+        Variables:
+          ENVIRONMENT: !Ref Environment
       Events:
         EbattleApi:
           Type: HttpApi
           Properties:
             ApiId: !Ref EbattleApi
-            Path: /api
+            Path: /docs/api
             Method: GET
   Games:
     Type: AWS::Serverless::Function
@@ -190,6 +206,7 @@ Resources:
     Type: AWS::Serverless::HttpApi
     DeletionPolicy: Retain
     Properties:
+      StageName: !Ref Environment
       CorsConfiguration:
         AllowOrigins:
           - "*"
