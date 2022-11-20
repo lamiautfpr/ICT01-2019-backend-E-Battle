@@ -12,7 +12,7 @@ exports.handler = async (event) => {
         case 'GET':
             results = await conn.query({
                 name: "gamesget",
-                text: "SELECT id, language, category, name FROM games WHERE \"user\" = $1",
+                text: "SELECT id, language, category, name, questions FROM games WHERE \"user\" = $1",
                 values: [user],
             });
             return {
@@ -86,7 +86,7 @@ exports.handler = async (event) => {
             }
 
             results = await conn.query({
-                text: "SELECT id, language, category, name FROM games WHERE \"id\" = $1",
+                text: "SELECT id, language, category, name, questions FROM games WHERE \"id\" = $1",
                 values: [results.rows[0].id],
             });
 
