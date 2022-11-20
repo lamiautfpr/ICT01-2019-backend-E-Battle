@@ -17,7 +17,7 @@ Parameters:
     Default: ebattle
   DBName:
     Type: String
-    Default: ebattle
+    Default: ebattle_dev
   DBHost:
     Type: String
     Default: lamiadb1.ceoy3jbkraru.us-east-1.rds.amazonaws.com
