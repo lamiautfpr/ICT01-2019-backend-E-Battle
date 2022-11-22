@@ -48,6 +48,8 @@ paths:
                 $ref: '#/components/schemas/LoginResponse'
   /categories:
     get:
+      tags:
+        - Creation options
       description: Retorna as categorias do jogo
       operationId: getCategories
       responses:
@@ -61,6 +63,8 @@ paths:
         - authToken: [ ]
   /languages:
     get:
+      tags:
+        - Creation options
       description: Retorna as linguages
       operationId: getLanguages
       responses:
@@ -113,6 +117,7 @@ paths:
     get:
       tags:
         - Games
+        - Unity
       description: Retorna os jogos do usuario
       operationId: getGames
       responses:
@@ -123,7 +128,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/GamesResponse'
       security:
-        - authToken: []
+        - authToken: [ ]
     post:
       tags:
         - Games
@@ -143,6 +148,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/GamesResponse'
+      security:
+        - authToken: [ ]
 components:
   securitySchemes:
     authToken:
