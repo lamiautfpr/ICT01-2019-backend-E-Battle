@@ -177,6 +177,14 @@ Resources:
             Method: post
             Auth:
               Authorizer: Authorizer
+        EbattleApiDelete:
+          Type: HttpApi
+          Properties:
+            ApiId: !Ref EbattleApi
+            Path: /games
+            Method: delete
+            Auth:
+              Authorizer: Authorizer
   Matches:
     Type: AWS::Serverless::Function
     Properties:

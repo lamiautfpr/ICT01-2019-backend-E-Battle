@@ -95,10 +95,10 @@ paths:
     post:
       tags:
         - Matches
-      description: Cria um novo game do usuario
+      description: Inicia um match
       operationId: startMatch
       requestBody:
-        description: Dados do jogo a ser criado
+        description: Dados do match a ser criado
         content:
           application/json:
             schema:
@@ -120,13 +120,23 @@ paths:
         - Unity
       description: Retorna os jogos do usuario
       operationId: getGames
+      parameters:
+        - name: id
+          in: query
+          description: Id do game a ser deletado
+          required: true
+          schema:
+            type: number
+            example: 1
       responses:
         '200':
           description: Lista de jogos
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/GamesResponse'
+                oneOf:
+                  - $ref: '#/components/schemas/GamesResponse'
+                  - $ref: '#/components/schemas/Game'
       security:
         - authToken: [ ]
     post:
@@ -148,6 +158,24 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/GamesResponse'
+      security:
+        - authToken: [ ]
+    delete:
+      tags:
+        - Games
+      description: Deleta um jogo do usuario
+      operationId: deleteGames
+      parameters:
+        - name: id
+          in: query
+          description: Id do game a ser deletado
+          required: true
+          schema:
+            type: number
+            example: 1
+      responses:
+        '200':
+          description: Game excluido
       security:
         - authToken: [ ]
 components:
@@ -286,10 +314,9 @@ components:
           description: Id do match
           example: 1
         game:
-          type: array
-          description: game do match
-          items:
-            $ref: '#/components/schemas/Game'
+          type: integer
+          description: id do game do match
+          example: 12
         groups:
           type: array
           description: grupos
