@@ -1,6 +1,7 @@
 # compiled output
 /dist
 /node_modules
+package-lock.json
 
 # Created by https://www.gitignore.io/api/osx,node,linux,windows
 
