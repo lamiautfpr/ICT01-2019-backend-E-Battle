@@ -123,8 +123,7 @@ paths:
       parameters:
         - name: id
           in: query
-          description: Id do game a ser deletado
-          required: true
+          description: Id do game a ser buscado
           schema:
             type: number
             example: 1
