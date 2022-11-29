@@ -10,11 +10,21 @@ exports.handler = async (event) => {
 
     switch (event.requestContext.http.method) {
         case 'GET':
-            results = await conn.query({
-                name: "gamesget",
-                text: "SELECT id, language, category, name, questions FROM games WHERE \"user\" = $1",
-                values: [user],
-            });
+
+            if (!(event.queryStringParameters && event.queryStringParameters.id)){
+                results = await conn.query({
+                    name: "gamesget",
+                    text: "SELECT id, language, category, name, questions FROM games WHERE \"user\" = $1",
+                    values: [user],
+                });
+            }else{
+                results = await conn.query({
+                    name: "gamesgetone",
+                    text: "SELECT id, language, category, name, questions FROM games WHERE \"id\" = $1 and \"user\" = $2",
+                    values: [event.queryStringParameters.id, user],
+                });
+            }
+
             return {
                 statusCode: 200,
                 body: JSON.stringify(results.rows),
@@ -94,6 +104,35 @@ exports.handler = async (event) => {
                 statusCode: 200,
                 body: JSON.stringify(results.rows[0]),
             }
+        case 'DELETE':
 
+            if (!(event.queryStringParameters && event.queryStringParameters.id)){
+                return {
+                    statusCode: 400,
+                    body: JSON.stringify({
+                        errorCode: 1,
+                        errorMessage: "Falta o argumento id do game"
+                    })
+                }
+            }
+
+            results = await conn.query({
+                name: "gamesdelete",
+                text: "DELETE FROM games WHERE \"id\" = $1 and \"user\" = $2 RETURNING id",
+                values: [event.queryStringParameters.id, user],
+            });
+
+            if( results.rowCount == 0 ){
+                return {
+                    statusCode: 400,
+                    body: JSON.stringify({
+                        errorMessage: "Não foi encontrado nenhum game com esse id"
+                    })
+                }
+            }else{
+                return {
+                    statusCode: 200
+                }
+            }
     }
 }
