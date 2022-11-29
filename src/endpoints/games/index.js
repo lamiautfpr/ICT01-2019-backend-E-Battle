@@ -105,7 +105,6 @@ exports.handler = async (event) => {
                 body: JSON.stringify(results.rows[0]),
             }
         case 'DELETE':
-            console.log('Opa');
 
             if (!(event.queryStringParameters && event.queryStringParameters.id)){
                 return {
@@ -119,8 +118,8 @@ exports.handler = async (event) => {
 
             results = await conn.query({
                 name: "gamesdelete",
-                text: "DELETE FROM games WHERE \"id\" = $1 RETURNING id",
-                values: [event.queryStringParameters.id],
+                text: "DELETE FROM games WHERE \"id\" = $1 and \"user\" = $2 RETURNING id",
+                values: [event.queryStringParameters.id, user],
             });
 
             if( results.rowCount == 0 ){
@@ -132,8 +131,7 @@ exports.handler = async (event) => {
                 }
             }else{
                 return {
-                    statusCode: 200,
-                    //body: JSON.stringify(results.rows[0]),
+                    statusCode: 200
                 }
             }
     }
