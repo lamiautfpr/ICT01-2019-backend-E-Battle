@@ -14,14 +14,14 @@ exports.handler = async (event) => {
         if(results.rows.length == 1){
             const user = results.rows[0];
             return {
-                "isAuthorized": true,
-                "context": {
-                    "user": user['id']
-                }
+                isAuthorized: true,
+                context: {
+                    user: user['id'],
+                },
             };
         }
     }
     return {
-        "isAuthorized": false,
+        isAuthorized: false,
     }
 }
