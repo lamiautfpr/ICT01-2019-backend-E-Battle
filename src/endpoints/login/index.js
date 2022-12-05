@@ -40,7 +40,7 @@ exports.handler = async (event) => {
                 body: JSON.stringify({
                     statusCode: 400,
                     status: 'Bad Request',
-                    errorCodes: 1,
+                    errorCode: 1,
                     error: 'Missing or invalid parameters',
                     missing: missing,
                     invalid: [],
@@ -84,7 +84,7 @@ exports.handler = async (event) => {
         body: JSON.stringify({
             statusCode: 400,
             status: 'Bad Request',
-            errorCodes: 1,
+            errorCode: 1,
             error: 'Missing or invalid parameters',
             missing: ['email', 'password'],
             invalid: [],
