@@ -1,7 +1,7 @@
 let request = require('supertest');
 
 request = request('https://api.ebattle.lamia-edu.com');
-const stage = 'dev';
+const stage = process.env.stage ?? 'dev';
 const endpoint = '/'+stage+'/login';
 
 describe('Login', function () {
@@ -51,7 +51,7 @@ describe('Login', function () {
             .send({"email": "wrong@test.com"});
 
         expect(response.status).toEqual(400);
-        expect(response.text).toEqual(JSON.stringify({statusCode: 400, status: 'Bad Request', missing: ['password'], invalid: []}));
+        expect(response.text).toEqual(JSON.stringify({statusCode: 400, status: 'Bad Request', errorCode: 1, error: "Missing or invalid parameters", missing: ['password'], invalid: []}));
     });
 
     it('should fail only if password is sent', async () => {
@@ -60,7 +60,7 @@ describe('Login', function () {
             .send({"password": "CiCd@1.2,3"});
 
         expect(response.status).toEqual(400);
-        expect(response.text).toEqual(JSON.stringify({statusCode: 400, status: 'Bad Request', missing: ['email'], invalid: []}));
+        expect(response.text).toEqual(JSON.stringify({statusCode: 400, status: 'Bad Request', errorCode: 1, error: "Missing or invalid parameters", missing: ['email'], invalid: []}));
     });
 
     it('should fail with empty request', async () => {
@@ -68,7 +68,7 @@ describe('Login', function () {
             .post(endpoint);
 
         expect(response.status).toEqual(400);
-        expect(response.text).toEqual(JSON.stringify({statusCode: 400, status: 'Bad Request', missing: ['email', 'password'], invalid: []}));
+        expect(response.text).toEqual(JSON.stringify({statusCode: 400, status: 'Bad Request', errorCode: 1, error: "Missing or invalid parameters", missing: ['email', 'password'], invalid: []}));
     });
 });
 

@@ -19,9 +19,9 @@ exports.handler = async (event) => {
             return {
                 statusCode: 200,
                 body: JSON.stringify({
-                    'name': user['name'],
-                    'email': user['email'],
-                    'token': tk,
+                    name: user['name'],
+                    email: user['email'],
+                    token: tk,
                 }),
             };
         }
@@ -38,10 +38,12 @@ exports.handler = async (event) => {
             return {
                 statusCode: 400,
                 body: JSON.stringify({
-                    'statusCode': 400,
-                    'status': 'Bad Request',
-                    'missing': missing,
-                    'invalid': [],
+                    statusCode: 400,
+                    status: 'Bad Request',
+                    errorCodes: 1,
+                    error: 'Missing or invalid parameters',
+                    missing: missing,
+                    invalid: [],
                 }),
             };
         }
@@ -62,9 +64,9 @@ exports.handler = async (event) => {
                 return {
                     statusCode: 200,
                     body: JSON.stringify({
-                        'name': user['name'],
-                        'email': user['email'],
-                        'token': token,
+                        name: user['name'],
+                        email: user['email'],
+                        token: token,
                     }),
                 };
             }
@@ -72,8 +74,8 @@ exports.handler = async (event) => {
         return {
             statusCode: 401,
             body: JSON.stringify({
-                'statusCode': 401,
-                'status': 'Unauthorized',
+                statusCode: 401,
+                status: 'Unauthorized',
             }),
         }
     }
@@ -82,6 +84,8 @@ exports.handler = async (event) => {
         body: JSON.stringify({
             statusCode: 400,
             status: 'Bad Request',
+            errorCodes: 1,
+            error: 'Missing or invalid parameters',
             missing: ['email', 'password'],
             invalid: [],
         }),
