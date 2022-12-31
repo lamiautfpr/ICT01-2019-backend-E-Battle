@@ -126,6 +126,8 @@ Resources:
           Type: HttpApi
           Properties:
             ApiId: !Ref EbattleApi
+            Path: /log
+            Method: ANY
   AuthorizerLog:
     Type: AWS::Serverless::Function
     Properties:
