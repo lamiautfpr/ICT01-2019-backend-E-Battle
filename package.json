@@ -1,0 +1,22 @@
+{
+  "name": "tests",
+  "version": "1.0.0",
+  "devDependencies": {
+    "eslint": "^8.31.0",
+    "eslint-config-prettier": "^8.5.0",
+    "eslint-plugin-prettier": "^4.2.1",
+    "jest": "^29.3.1",
+    "prettier": "2.8.1",
+    "supertest": "^6.3.1"
+  },
+  "scripts": {
+    "test": "jest tests/*",
+    "format": "prettier --write src/**/*.js",
+    "lint:check": "eslint src/**/*.js",
+    "lint:fix": "eslint src/**/*.js --fix"
+  },
+  "prettier": {
+    "trailingComma": "all",
+    "tabWidth": 4
+  }
+}
