@@ -1,6 +1,4 @@
-'use strict';
-
-const { getConn } = require('/opt/nodejs/database');
+const { getConn } = require("/opt/nodejs/database");
 
 exports.handler = async () => {
     const conn = await getConn();
@@ -12,6 +10,6 @@ exports.handler = async () => {
 
     return {
         statusCode: 200,
-        body: JSON.stringify(results.rows)
-    }
-}
+        body: JSON.stringify(results.rows),
+    };
+};
