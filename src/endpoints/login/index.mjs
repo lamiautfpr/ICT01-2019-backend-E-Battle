@@ -1,9 +1,8 @@
-const { getConn } = require("/opt/nodejs/database");
+import { getConn } from "/opt/nodejs/database.mjs";
+import bcrypt from "bcryptjs";
+import crypto from "crypto";
 
-const bcrypt = require("bcryptjs");
-const crypto = require("crypto");
-
-exports.handler = async (event) => {
+export const handler = async (event) => {
     const conn = await getConn();
     if (event["headers"]["authorization"] != null) {
         const tk = event["headers"]["authorization"];

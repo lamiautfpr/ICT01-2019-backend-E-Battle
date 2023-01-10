@@ -24,7 +24,7 @@ Parameters:
 
 Globals:
   Function:
-    Runtime: nodejs16.x
+    Runtime: nodejs18.x
     Architectures:
       - arm64
     Handler: index.handler
@@ -105,10 +105,10 @@ Resources:
       LayerName: DatabaseLayer
       ContentUri: src/shared/database
       CompatibleRuntimes:
-        - nodejs16.x
+        - nodejs18.x
       RetentionPolicy: Retain
     Metadata:
-      BuildMethod: nodejs16.x
+      BuildMethod: nodejs18.x
       BuildArchitecture: arm64
 
   Authorizer:

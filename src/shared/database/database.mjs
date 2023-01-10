@@ -1,4 +1,5 @@
-const { Pool } = require("pg");
+import pg from 'pg';
+const { Pool } = pg
 
 const pool = new Pool({
     user: process.env.DB_USER,
@@ -8,6 +9,6 @@ const pool = new Pool({
     port: 5432,
 });
 
-exports.getConn = async () => {
+export const getConn = async () => {
     return pool;
 };

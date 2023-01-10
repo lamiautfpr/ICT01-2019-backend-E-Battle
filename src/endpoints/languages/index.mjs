@@ -1,4 +1,4 @@
-const { getConn } = require("/opt/nodejs/database");
+import { getConn } from "/opt/nodejs/database.mjs";
 
 exports.handler = async () => {
     const conn = await getConn();
