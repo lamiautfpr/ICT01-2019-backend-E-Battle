@@ -10,7 +10,7 @@ on:
       - synchronize
 
 jobs:
-  deploy:
+  test:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -35,7 +35,7 @@ jobs:
         run: sam deploy --stack-name EbattleApiStaging --s3-bucket ebattle-api-staging --capabilities CAPABILITY_IAM CAPABILITY_NAMED_IAM --no-confirm-changeset --no-fail-on-empty-changeset --on-failure DELETE --parameter-overrides DBName=ebattle_dev DBPassword=${{ secrets.DB_STAGING_PASSWORD }} Environment=staging
 
       - name: Npm install
-        run: npm ci
+        run: npm i
 
       - name: Run tests
         run: NODE_ENV=staging npm run test
