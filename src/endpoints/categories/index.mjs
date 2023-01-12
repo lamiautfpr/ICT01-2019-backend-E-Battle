@@ -1,6 +1,6 @@
 import { getConn } from "/opt/nodejs/database.mjs";
 
-exports.handler = async () => {
+export const handler = async () => {
     const conn = await getConn();
 
     const results = await conn.query({
