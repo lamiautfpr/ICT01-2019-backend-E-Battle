@@ -42,4 +42,4 @@ jobs:
 
       - name: Delete sam
         if: always()
-        run: sam delete --stack-name EbattleApiStaging --no-prompts
+        run: sam delete --region us-east-1 --stack-name EbattleApiStaging --no-prompts
