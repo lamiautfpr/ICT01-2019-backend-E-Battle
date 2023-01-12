@@ -7,6 +7,7 @@ Parameters:
     Default: dev
     AllowedValues:
       - dev
+      - staging
       - qa
       - prod
   DBPassword:
