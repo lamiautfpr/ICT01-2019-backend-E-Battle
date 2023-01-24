@@ -117,6 +117,13 @@ paths:
         - Matches
       description: Retorna um match de acordo com o id
       operationId: getMatch
+      parameters:
+        - name: id
+          in: query
+          description: Id do game para realizar o match
+          schema:
+            type: number
+            example: 1
       responses:
         '200':
           description: Retorna o match de um game
@@ -434,9 +441,9 @@ components:
     Match:
       type: object
       properties:
-        id:
+        spaces:
           type: integer
-          description: Id do match
+          description: Numero de casas do tabuleiro
           example: 1
         game:
           type: integer
@@ -444,7 +451,7 @@ components:
           example: 12
         groups:
           type: array
-          description: grupos
+          description: grupos que vão jogar
           items:
             $ref: '#/components/schemas/itensGroups'
         trivia:
@@ -454,7 +461,7 @@ components:
           type: boolean
           example: false
       required:
-        - id
+        - spaces
         - game
         - groups
     itensGroups:
