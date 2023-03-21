@@ -261,10 +261,6 @@ components:
         - name
         - email
         - password
-        - institution
-        - city
-        - workType
-        - educationLevel
     Login:
       type: object
       properties:
