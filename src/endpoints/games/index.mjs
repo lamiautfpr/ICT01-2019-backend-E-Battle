@@ -1,5 +1,5 @@
 import { getConn } from "/opt/nodejs/database.mjs";
-import {S3Client, PutObjectCommand} from "@aws-sdk/client-s3";
+import { S3Client, PutObjectCommand } from "@aws-sdk/client-s3";
 
 export const handler = async (event) => {
     const conn = await getConn();
@@ -26,9 +26,13 @@ export const handler = async (event) => {
                 });
             }
 
-            //results["rows"][0]["questions"][0]["url"] = ["http://pm1.narvii.com/6958/7525d9e88a689e16ed518a3e66cf71544794f1edr1-346-425v2_00.jpg",
-            //  "https://w0.peakpx.com/wallpaper/628/98/HD-wallpaper-attack-on-titan-founding-titan-the-rumbling-attack-on-titan.jpg",
-            //"https://images8.alphacoders.com/739/739448.png"]
+            for (let body of results.rows) {
+                for(let question of body.questions){
+                    if(question.img){
+                        question.img = 'https://static.api.ebattle.lamia-edu.com/'+question.img;
+                    }
+                }
+            }
 
             return {
                 statusCode: 200,
@@ -42,7 +46,6 @@ export const handler = async (event) => {
                 !(
                     body.language &&
                     body.category &&
-                    body.language &&
                     body.name &&
                     body.questions
                 )
@@ -66,12 +69,8 @@ export const handler = async (event) => {
                 };
             }
 
-            let questions = [];
-            const s3 = new S3Client();
-
-            let dataAtual = new Date();
-
             for (let question of body.questions) {
+
                 if (
                     !(
                         question.text &&
@@ -92,19 +91,30 @@ export const handler = async (event) => {
                 }
             }
 
+            let questions = [];
+            const s3 = new S3Client();
+
+            let dataAtual = new Date();
+
             let date = `${dataAtual.getFullYear()}/${(dataAtual.getMonth()+1).toString().padStart(2,'0')}/${dataAtual.getDate().toString().padStart(2,'0')}`
             let time = `${dataAtual.getHours().toString().padStart(2,'0')}${dataAtual.getMinutes().toString().padStart(2,'0')}${dataAtual.getSeconds().toString().padStart(2,'0')}`
 
             let keys = await Promise.all(body['questions'].map(async question => {
-                if(question.img){
+                if(question.img && question.img){
                     let key = `games/questions/${date}/${user}-${time}-${body['questions'].indexOf(question)}.png`;
                     const buf = Buffer.from(question.img.replace(/^data:image\/\w+;base64,/, ""),'base64');
+
                     await s3.send(new PutObjectCommand({
                         Bucket: 'ebattle-api-static-'+process.env.ENVIRONMENT,
                         Key: key,
                         Body: buf,
                         ContentType: 'image/png',
                     }));
+
+                    if(buf.length > (20*1024*1024)){
+                        return 'Tamanho excede o permitido'
+                    }
+
                     return key;
                 }
                 return undefined;

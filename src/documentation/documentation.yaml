@@ -177,7 +177,6 @@ paths:
               schema:
                 oneOf:
                   - $ref: '#/components/schemas/GamesResponse'
-                  - $ref: '#/components/schemas/Game'
       security:
         - authToken: [ ]
     post:
@@ -190,7 +189,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/Game'
+              $ref: '#/components/schemas/GamesCreate'
         required: true
       responses:
         '200':
@@ -407,7 +406,7 @@ components:
     GamesResponse:
       type: array
       items:
-        $ref: '#/components/schemas/Game'
+        $ref: '#/components/schemas/GameResponse'
     MatchesResponse:
       type: array
       items:
@@ -478,7 +477,7 @@ components:
       required:
         - name
         - players
-    Game:
+    GameResponse:
       type: object
       properties:
         id:
@@ -501,14 +500,14 @@ components:
           type: array
           description: Questões presentes no jogo
           items:
-            $ref: '#/components/schemas/itensQuestions'
+            $ref: '#/components/schemas/itensQuestionsResponse'
       required:
         - id
         - language
         - category
         - name
         - questions
-    itensQuestions:
+    itensQuestionsResponse:
       type: object
       properties:
         text:
@@ -531,6 +530,72 @@ components:
           type: integer
           description: Tempo em segundos para a resposta
           example: 60
+        img:
+          type: string
+          description: Imagem do game caso exista
+          example: https://static.api.ebattle.lamia-edu.com/games/questions/2023/04/09/168-202018-0.png
+      required:
+        - text
+        - answers
+        - answer
+        - time
+    GamesCreate:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: Id do jogo
+          example: 1
+        language:
+          type: integer
+          description: Id do idioma
+          example: 1
+        category:
+          type: integer
+          description: Id da categoria
+          example: 1
+        name:
+          type: string
+          description: Nome do jogo
+          example: Jogo 1
+        questions:
+          type: array
+          description: Questões presentes no jogo
+          items:
+            $ref: '#/components/schemas/itensQuestionsCreate'
+      required:
+        - id
+        - language
+        - category
+        - name
+        - questions
+    itensQuestionsCreate:
+      type: object
+      properties:
+        text:
+          type: string
+          description: Questão do game
+          example: Quanto é 1 + 1
+        answers:
+          type: string
+          description: Respostas do jogo
+          example:
+            - "1"
+            - "2"
+            - "3"
+            - "4"
+        answer:
+          type: integer
+          description: index da posição onde se encontra a resposta do jogo
+          example: 1
+        time:
+          type: integer
+          description: Tempo em segundos para a resposta
+          example: 60
+        img:
+          type: string
+          description: Base64 da imagem a ser inserida na questão
+          example: data:image/jpeg;base64,/9j/4AAQSkZJRgABAQEAYABg {...}
       required:
         - text
         - answers
