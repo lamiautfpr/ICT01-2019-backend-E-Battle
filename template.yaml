@@ -42,6 +42,7 @@ Globals:
         DB_USER: !Ref DBUser
         DB_NAME: !Ref DBName
         DB_HOST: !Ref DBHost
+        ENVIRONMENT: !Ref Environment
   HttpApi:
     Tags:
       Project: Ebattle
@@ -61,6 +62,41 @@ Resources:
                 - "lambda.amazonaws.com"
             Action:
               - sts:AssumeRole
+      ManagedPolicyArns:
+        - "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+      Tags:
+        - Key: Project
+          Value: Ebattle
+        - Key: Team
+          Value: Api
+        - Key: Environment
+          Value: !Ref Environment
+  LambdaRoleWithS3:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: "Allow"
+            Principal:
+              Service:
+                - "lambda.amazonaws.com"
+            Action:
+              - sts:AssumeRole
+      Policies:
+        - PolicyName: Ebattle-S3
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Effect: Allow
+                Action:
+                  - s3:PutObject
+                  - s3:GetObject
+                  - s3:ListBucket
+                  - s3:DeleteObject
+                Resource:
+                  - !Sub arn:aws:s3:::ebattle-api-static-${Environment}
+                  - !Sub arn:aws:s3:::ebattle-api-static-${Environment}/*
       ManagedPolicyArns:
         - "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
       Tags:
@@ -162,7 +198,8 @@ Resources:
     Type: AWS::Serverless::Function
     Properties:
       CodeUri: src/endpoints/games/
-      Role: !GetAtt LambdaRole.Arn
+      Role: !GetAtt LambdaRoleWithS3.Arn
+      MemorySize: 512
       Events:
         EbattleApiGet:
           Type: HttpApi

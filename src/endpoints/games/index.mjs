@@ -1,4 +1,5 @@
 import { getConn } from "/opt/nodejs/database.mjs";
+import { S3Client, PutObjectCommand } from "@aws-sdk/client-s3";
 
 export const handler = async (event) => {
     const conn = await getConn();
@@ -8,6 +9,7 @@ export const handler = async (event) => {
 
     switch (event.requestContext.http.method) {
         case "GET": {
+
             if (
                 !(event.queryStringParameters && event.queryStringParameters.id)
             ) {
@@ -24,6 +26,14 @@ export const handler = async (event) => {
                 });
             }
 
+            for (let body of results.rows) {
+                for(let question of body.questions){
+                    if(question.img){
+                        question.img = 'https://static.api.ebattle.lamia-edu.com/'+question.img;
+                    }
+                }
+            }
+
             return {
                 statusCode: 200,
                 body: JSON.stringify(results.rows),
@@ -36,7 +46,6 @@ export const handler = async (event) => {
                 !(
                     body.language &&
                     body.category &&
-                    body.language &&
                     body.name &&
                     body.questions
                 )
@@ -61,6 +70,7 @@ export const handler = async (event) => {
             }
 
             for (let question of body.questions) {
+
                 if (
                     !(
                         question.text &&
@@ -81,6 +91,45 @@ export const handler = async (event) => {
                 }
             }
 
+            let questions = [];
+            const s3 = new S3Client();
+
+            let dataAtual = new Date();
+
+            let date = `${dataAtual.getFullYear()}/${(dataAtual.getMonth()+1).toString().padStart(2,'0')}/${dataAtual.getDate().toString().padStart(2,'0')}`
+            let time = `${dataAtual.getHours().toString().padStart(2,'0')}${dataAtual.getMinutes().toString().padStart(2,'0')}${dataAtual.getSeconds().toString().padStart(2,'0')}`
+
+            let keys = await Promise.all(body['questions'].map(async question => {
+                if(question.img && question.img){
+                    let key = `games/questions/${date}/${user}-${time}-${body['questions'].indexOf(question)}.png`;
+                    const buf = Buffer.from(question.img.replace(/^data:image\/\w+;base64,/, ""),'base64');
+
+                    await s3.send(new PutObjectCommand({
+                        Bucket: 'ebattle-api-static-'+process.env.ENVIRONMENT,
+                        Key: key,
+                        Body: buf,
+                        ContentType: 'image/png',
+                    }));
+
+                    if(buf.length > (20*1024*1024)){
+                        return 'Tamanho excede o permitido'
+                    }
+
+                    return key;
+                }
+                return undefined;
+            }));
+
+            for (let question of body.questions) {
+                questions.push({
+                    "text":question.text,
+                    "answer":question.answer,
+                    "time":question.time ,
+                    "answers":question.answers,
+                    "img": keys[body.questions.indexOf(question)],
+                });
+            }
+
             try {
                 results = await conn.query({
                     name: "gamescreate",
@@ -90,13 +139,12 @@ export const handler = async (event) => {
                         body.language,
                         body.category,
                         body.name,
-                        JSON.stringify(body.questions),
+                        JSON.stringify(questions),
                     ],
                 });
             } catch (e) {
                 if (
-                    e.message ==
-                    'insert or update on table "games" violates foreign key constraint "games_categories_fk"'
+                    e.message == 'insert or update on table "games" violates foreign key constraint "games_categories_fk"'
                 ) {
                     return {
                         statusCode: 400,
