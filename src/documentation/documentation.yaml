@@ -133,6 +133,33 @@ paths:
                 $ref: '#/components/schemas/MatchesResponse'
       security:
         - authToken: []
+    put:
+      tags:
+        - Matches
+      description: Salva as informações ao final do jogo
+      operationId: putMatch
+      requestBody:
+        description: Dados do jogo a ser criado
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SaveMatch'
+        required: true
+      parameters:
+        - name: id
+          in: query
+          description: Id da match que esta guardando as informações
+          schema:
+            type: number
+            example: 33
+      responses:
+        '200':
+          description: Retorna 1 quando é salvo com sucesso
+          content:
+            int:
+              example: 1
+      security:
+        - authToken: []
   /matches/start:
     post:
       tags:
@@ -459,6 +486,69 @@ components:
         - spaces
         - game
         - groups
+    SaveMatch:
+      type: object
+      properties:
+        podium:
+          type: array
+          description: Posições dos grupos no pódio
+          items:
+            type: object
+            properties:
+              group:
+                type: integer
+                description: Número do grupo
+                example: 2
+              position:
+                type: integer
+                description: Posição ao fim do jogo
+                example: 24
+          required:
+            - group
+            - position
+        turns:
+          type: array
+          description: Rodadas que tiveram no jogo
+          items:
+            type: object
+            properties:
+              question:
+                type: integer
+                description: Questão da rodada
+                example: 2
+              group:
+                type: integer
+                description: Número do grupo
+                example: 1
+              response:
+                type: integer
+                description: Resposta do grupo
+                example: 2
+              time:
+                type: integer
+                description: Tempo em segundos que o grupo demorou pra responder
+                example: 129
+              powers:
+                type: array
+                description: Poderes
+                items:
+                  type: object
+                  properties:
+                    name:
+                      type: string
+                      description: Nome do poder
+                      example: Estender o tempo
+              walked:
+                type: integer
+                description: Valor que o dado deu ao acertar a questão
+                example: 5
+          required:
+            - group
+            - response
+            - time
+      required:
+        - podium
+        - turns
     itensGroups:
       type: object
       properties:

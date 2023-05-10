@@ -51,6 +51,100 @@ export const handler = async (event) => {
                 body: JSON.stringify(results.rows),
             };
         }
+        case "PUT": {
+            if (
+                !(event.queryStringParameters && event.queryStringParameters.id)
+            ) {
+                return {
+                    statusCode: 400,
+                    body: JSON.stringify({
+                        errorCode: 1,
+                        errorMessage: "Falta o argumento id do match",
+                    }),
+                };
+            }
+
+            const id = event.queryStringParameters.id
+
+            try{
+                results = await conn.query({
+                    name: "matchesget",
+                    text: 'SELECT id FROM matches WHERE "id" = $1',
+                    values: [id],
+                });
+            }catch(e){
+                return e
+            }
+
+            if(!results.rows.length){
+                return {
+                    statusCode: 400,
+                    body: JSON.stringify({
+                        errorCode: 2,
+                        errorMessage: "Match não encontrado",
+                    }),
+                };
+            }
+
+            const body = JSON.parse(event.body);
+
+            if(!(body.podium && body.turns)){
+                return {
+                    statusCode: 400,
+                    body: JSON.stringify({
+                        errorCode: 3,
+                        errorMessage:
+                            "Faltam dados na requisição, consulte a documentação",
+                    }),
+                };
+            }
+
+            for (let groups of body.podium){
+                if (!(groups.group && groups.position)){
+                    return {
+                        statusCode: 400,
+                        body: JSON.stringify({
+                            errorCode: 4,
+                            errorMessage:
+                                "Faltam dados no podium do game, consulte a documentação",
+                        }),
+                    };
+                }
+            }
+
+            for (let turn of body.turns){
+                if (!(turn.group && turn.response && turn.time)){
+                    return {
+                        statusCode: 400,
+                        body: JSON.stringify({
+                            errorCode: 5,
+                            errorMessage:
+                                "Faltam dados nos turnos do game, consulte a documentação",
+                        }),
+                    };
+                }
+            }
+
+            try{
+                results = await conn.query({
+                    name: "matchesput",
+                    text: 'UPDATE matches SET "closedAt" = $1,  podium = $2, turns = $3 WHERE id = $4',
+                    values: [
+                        new Date(),
+                        JSON.stringify(body.podium),
+                        JSON.stringify(body.turns),
+                        id
+                    ],
+                });
+            }catch (e){
+                return e.message
+            }
+
+            return {
+                statusCode: 200,
+                body: JSON.stringify(results.rowCount),
+            };
+        }
         case "POST": {
             const body = JSON.parse(event.body);
 
