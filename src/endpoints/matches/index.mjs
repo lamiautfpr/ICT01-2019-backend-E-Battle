@@ -24,16 +24,24 @@ export const handler = async (event) => {
 
             results = await conn.query({
                 name: "matchesget",
-                text: `SELECT 
-                    	    m.id, m.game, m.spaces,	m.groups, m.random, m.trivia, 
-                    	    g.user, g.visibility, g.language, g.category, g.name, g.questions
-                       FROM matches m
-                       INNER JOIN games g ON g.id = m.game
-                       WHERE m.id = $1 AND g.user = $2`,
+                text: `SELECT
+                           matches.id, matches.game, matches.spaces, matches.groups, matches.random, matches.trivia,
+                           json_build_object(
+                                   'user', games.user,
+                                   'visibility', games.visibility,
+                                   'language', games.language,
+                                   'category', games.category,
+                                   'name', games.name,
+                                   'questions', games.questions
+                               ) AS game
+                       FROM matches
+                                INNER JOIN games ON games.id = matches.game
+                       WHERE
+                           matches.id = $1 AND games.user = $2;`,
                 values: [id, user],
             });
 
-            if (results.rows.length == 0) {
+            if (results.rows.length != 1) {
                 return {
                     statusCode: 400,
                     body: JSON.stringify({
@@ -50,8 +58,8 @@ export const handler = async (event) => {
         case "POST": {
             const body = JSON.parse(event.body);
 
-            switch (event.rawPath){
-                case "/dev/matches/start":{
+            switch (event.routeKey){
+                case "POST /matches/start":{
 
                     if (!(body.game && body.spaces && body.groups)) {
                         return {
@@ -75,32 +83,21 @@ export const handler = async (event) => {
                         };
                     }
 
-                    let validate = null;
-                    try {
-                        validate = await conn.query({
-                            name: "validatematch",
-                            text: 'SELECT g.id, g.user FROM games g WHERE g.id = $1 and g.user = $2',
-                            values: [
-                                body.game,
-                                user,
-                            ],
-                        });
+                    results = await conn.query({
+                        name: "validatecreatematch",
+                        text: "SELECT games.id, games.user FROM games WHERE games.id = $1 and games.user = $2",
+                        values: [
+                            body.game,
+                            user,
+                        ],
+                    });
 
-                        if(!validate.rows.length){
-                            return {
-                                statusCode: 400,
-                                body: JSON.stringify({
-                                    errorCode: 2,
-                                    errorMessage: "Jogo não encontrado",
-                                }),
-                            };
-                        }
-                    } catch (e) {
+                    if(results.rows.length != 1){
                         return {
-                            statusCode: 500,
+                            statusCode: 400,
                             body: JSON.stringify({
-                                errorCode: 0,
-                                errorMessage: "Match não foi invalido",
+                                errorCode: 2,
+                                errorMessage: "Jogo não encontrado",
                             }),
                         };
                     }
@@ -125,68 +122,55 @@ export const handler = async (event) => {
                         })
                     }
 
-                    try {
-                        results = await conn.query({
-                            name: "creatematches",
-                            text: 'INSERT INTO matches ("game", "spaces", "groups", "random", "trivia") VALUES ($1, $2, $3, $4, $5) RETURNING id',
-                            values: [
-                                body.game,
-                                body.spaces,
-                                JSON.stringify(groups),
-                                body.random ?? false,
-                                body.trivia ?? false,
-                            ],
-                        });
-                    } catch (e) {
-                        if (
-                            e.message == 'insert or update on table "matches" violates foreign key constraint "matches_games_fk"'
-                        ) {
-                            return {
-                                statusCode: 400,
-                                body: JSON.stringify({
-                                    errorCode: 1,
-                                    errorMessage: "game não encontrado",
-                                }),
-                            };
-                        }
+                    results = await conn.query({
+                        name: "creatematches",
+                        text: 'INSERT INTO matches ("game", "spaces", "groups", "random", "trivia") VALUES ($1, $2, $3, $4, $5) RETURNING id',
+                        values: [
+                            body.game,
+                            body.spaces,
+                            JSON.stringify(groups),
+                            body.random ?? false,
+                            body.trivia ?? false,
+                        ],
+                    });
 
-                        if (e.message.split(" ")[0] == "invalid") {
-                            return {
-                                statusCode: 400,
-                                body: JSON.stringify({
-                                    errorMessage: "Forbidden",
-                                }),
-                            };
-                        }
-
-                        if (e.message == "permission denied for table matches") {
-                            return {
-                                statusCode: 400,
-                                body: JSON.stringify({
-                                    errorCode: 1,
-                                    errorMessage: "Permissão negada",
-                                }),
-                            };
-                        }
+                    if(results.rows.length != 1){
+                        return {
+                            statusCode: 400,
+                            body: JSON.stringify({
+                                errorCode: 1,
+                                errorMessage: "Não foi possivel realizar o match",
+                            }),
+                        };
                     }
 
                     results = await conn.query({
-                        name: "matchesget",
-                        text: `SELECT 
-                            	    m.id, m.game, m.spaces,	m.groups, m.random, m.trivia, 
-                            	    g.user, g.visibility, g.language, g.category, g.name, g.questions
-                               FROM matches m
-                               INNER JOIN games g ON g.id = m.game
-                               WHERE m.id = $1`,
-                        values: [results.rows[0].id],
+                        name: "matchesreturn",
+                        text: `SELECT
+                                    matches.id, matches.game, matches.spaces, matches.groups, matches.random, matches.trivia,
+                                    json_build_object(
+                                        'user', games.user,
+                                        'visibility', games.visibility,
+                                        'language', games.language,
+                                        'category', games.category,
+                                        'name', games.name,
+                                        'questions', games.questions
+                                    ) AS game
+                                FROM matches
+                                INNER JOIN games ON games.id = matches.game
+                                WHERE
+                                    matches.id = $1 AND games.user = $2;`,
+                        values: [results.rows[0].id, user],
                     });
 
                     return {
                         statusCode: 200,
                         body: JSON.stringify(results.rows[0]),
                     };
+
                 }
-                case "/dev/matches":{
+                case "POST /matches":{
+
                     if(!(body.match && body.podium && body.turns)){
                         return {
                             statusCode: 400,
@@ -242,56 +226,41 @@ export const handler = async (event) => {
 
                     }
 
-                    let validate = null;
-                    try{
-                        results = await conn.query({
-                            name: "validatematch",
-                            text: `SELECT
-                                        m.id
-                                    FROM
-                                        matches m
-                                        INNER JOIN games g ON g.id = m.game
-                                        INNER JOIN users u ON u.id = g.user
-                                    WHERE
-                                    	u.id = $1 AND m.id = $2`,
-                            values: [user,body.match],
-                        });
+                    results = await conn.query({
+                        name: "validateupdatematch",
+                        text: `SELECT matches.id
+                                FROM matches
+                                INNER JOIN games ON games.id = matches.game
+                                WHERE games.user = $1 AND matches.id = $2`,
+                        values: [user,body.match],
+                    });
 
-                        if(!results.rows.length){
-                            return {
-                                statusCode: 400,
-                                body: JSON.stringify({
-                                    errorCode: 2,
-                                    errorMessage: "Match não encontrado",
-                                }),
-                            };
-                        }
-                    }catch(e){
+                    if(results.rows.length != 1){
                         return {
-                            statusCode: 510,
+                            statusCode: 400,
                             body: JSON.stringify({
-                                errorCode: 0,
-                                errorMessage: "Match não foi validado",
+                                errorCode: 2,
+                                errorMessage: "Match não encontrado",
                             }),
                         };
                     }
 
-                    try{
-                        results = await conn.query({
-                            name: "matchesput",
-                            text: 'UPDATE matches SET "closedAt" = CURRENT_TIMESTAMP,  podium = $1, turns = $2 WHERE id = $3',
-                            values: [
-                                JSON.stringify(podium),
-                                JSON.stringify(turns),
-                                body.match
-                            ],
-                        });
-                    }catch (e){
+                    results = await conn.query({
+                        name: "matchesput",
+                        text: 'UPDATE matches SET "closedAt" = CURRENT_TIMESTAMP,  podium = $1, turns = $2 WHERE id = $3',
+                        values: [
+                            JSON.stringify(podium),
+                            JSON.stringify(turns),
+                            body.match
+                        ],
+                    });
+
+                    if(results.rowCount != 1){
                         return {
-                            statusCode: 500,
+                            statusCode: 400,
                             body: JSON.stringify({
-                                errorCode: 0,
-                                errorMessage: "Não foi possivel salvar os dados da partida",
+                                errorCode: 2,
+                                errorMessage: "Não foi possivel salvar as informações",
                             }),
                         };
                     }
