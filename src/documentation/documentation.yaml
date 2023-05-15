@@ -111,21 +111,6 @@ paths:
                 $ref: '#/components/schemas/EditUserResponse'
       security:
         - authToken: [ ]
-  /matches/result:
-    get:
-      tags:
-        - Matches
-      description: Inicia um match
-      operationId: getMatchResult
-      responses:
-        '200':
-          description: Dados do resultado do match
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/MatchesResultResponse'
-      security:
-        - authToken: [ ]
   /matches:
     get:
       tags:
@@ -306,6 +291,36 @@ components:
       required:
         - email
         - password
+    RegisterResponse:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: ID do usuário
+          example: 1
+        name:
+          type: string
+          description: Nome do usuário
+          example: 'Teste'
+        email:
+          type: string
+          description: Email do usuário
+          example: 'teste@gmail.com'
+    LoginResponse:
+      type: object
+      properties:
+        name:
+          type: string
+          description: Nome do usuário
+          example: 'Teste'
+        email:
+          type: string
+          description: Email do usuário
+          example: 'teste@gmail.com'
+        token:
+          type: string
+          description: Token de autenticação
+          example: '9a4450f20304bb601af1d7a62bc450b15479bcd1364a96cabd0da1eb5c4bb667155d236e7677ef320213b78ca9c2bfae02083e5992360801e3fc50b3b55bf07d'
     EditUser:
       type: object
       properties:
@@ -335,6 +350,84 @@ components:
         - city
         - workType
         - educationLevel
+    SelectUserResponse:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: id do usuario logado
+          example: 7
+        status:
+          type: integer
+          description: status do usuario logado
+          example: 0
+        name:
+          type: string
+          description: Nome do usuario
+          example: João
+        email:
+          type: string
+          description: Email do usuario
+          example: joao@teste
+        institution:
+          type: string
+          description: Instituição do usuário
+          example: "Universidade Tecnológica Federal do Swagger"
+        city:
+          type: string
+          description: Cidade do usuario
+          example: "Santa helena"
+        workType:
+          type: string
+          description: Tipo de trabalho
+          example: "Estudante"
+        educationLevel:
+          type: string
+          description: Nivel educacional
+          example: "Ensino medio completo"
+    EditUserResponse:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: id do usuario que foi editado
+          example: 7
+        name:
+          type: string
+          description: Nome do usuario
+          example: João
+        institution:
+          type: string
+          description: Instituição do usuário
+          example: "Universidade Tecnológica Federal do Swagger"
+        city:
+          type: string
+          description: Cidade do usuario
+          example: "Santa helena"
+        workType:
+          type: string
+          description: Tipo de trabalho
+          example: "Estudante"
+        educationLevel:
+          type: string
+          description: Nivel educacional
+          example: "Ensino medio completo"
+    CategoriesResponse:
+      type: array
+      items:
+        $ref: '#/components/schemas/Category'
+    LanguagesResponse:
+      type: array
+      items:
+        $ref: '#/components/schemas/Language'
+    GamesResponse:
+      type: array
+      items:
+        $ref: '#/components/schemas/GameResponse'
+    MatchesResponse:
+      type: array
+      items:
+        $ref: '#/components/schemas/Match'
     Category:
       type: object
       properties:
@@ -372,23 +465,7 @@ components:
           type: array
           description: grupos que vão jogar
           items:
-            type: object
-            properties:
-              name:
-                type: string
-                description: nome do grupo
-                example: grupo 1
-              players:
-                type: string
-                description: nome dos jogadores
-                example:
-                  - "Erik"
-                  - "Ronaldo"
-                  - "Armando"
-                  - "Gustavo"
-            required:
-              - name
-              - players
+            $ref: '#/components/schemas/itensGroups'
         trivia:
           type: boolean
           example: false
@@ -466,6 +543,86 @@ components:
       required:
         - podium
         - turns
+    itensGroups:
+      type: object
+      properties:
+        name:
+          type: string
+          description: nome do grupo
+          example: grupo 1
+        players:
+          type: string
+          description: nome dos jogadores
+          example:
+            - "Erik"
+            - "Ronaldo"
+            - "Armando"
+            - "Gustavo"
+      required:
+        - name
+        - players
+    GameResponse:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: Id do jogo
+          example: 1
+        language:
+          type: integer
+          description: Id do idioma
+          example: 1
+        category:
+          type: integer
+          description: Id da categoria
+          example: 1
+        name:
+          type: string
+          description: Nome do jogo
+          example: Jogo 1
+        questions:
+          type: array
+          description: Questões presentes no jogo
+          items:
+            $ref: '#/components/schemas/itensQuestionsResponse'
+      required:
+        - id
+        - language
+        - category
+        - name
+        - questions
+    itensQuestionsResponse:
+      type: object
+      properties:
+        text:
+          type: string
+          description: Questão do game
+          example: Quanto é 1 + 1
+        answers:
+          type: string
+          description: Respostas do jogo
+          example:
+            - "1"
+            - "2"
+            - "3"
+            - "4"
+        answer:
+          type: integer
+          description: index da posição onde se encontra a resposta do jogo
+          example: 1
+        time:
+          type: integer
+          description: Tempo em segundos para a resposta
+          example: 60
+        img:
+          type: string
+          description: Imagem do game caso exista
+          example: https://static.api.ebattle.lamia-edu.com/games/questions/2023/04/09/168-202018-0.png
+      required:
+        - text
+        - answers
+        - answer
+        - time
     GamesCreate:
       type: object
       properties:
@@ -489,264 +646,42 @@ components:
           type: array
           description: Questões presentes no jogo
           items:
-            type: object
-            properties:
-              text:
-                type: string
-                description: Questão do game
-                example: Quanto é 1 + 1
-              answers:
-                type: string
-                description: Respostas do jogo
-                example:
-                  - "1"
-                  - "2"
-                  - "3"
-                  - "4"
-              answer:
-                type: integer
-                description: index da posição onde se encontra a resposta do jogo
-                example: 1
-              time:
-                type: integer
-                description: Tempo em segundos para a resposta
-                example: 60
-              img:
-                type: string
-                description: Base64 da imagem a ser inserida na questão
-                example: data:image/jpeg;base64,/9j/4AAQSkZJRgABAQEAYABg {...}
-            required:
-              - text
-              - answers
-              - answer
-              - time
+            $ref: '#/components/schemas/itensQuestionsCreate'
       required:
         - id
         - language
         - category
         - name
         - questions
-
-    RegisterResponse:
+    itensQuestionsCreate:
       type: object
       properties:
-        id:
+        text:
+          type: string
+          description: Questão do game
+          example: Quanto é 1 + 1
+        answers:
+          type: string
+          description: Respostas do jogo
+          example:
+            - "1"
+            - "2"
+            - "3"
+            - "4"
+        answer:
           type: integer
-          description: ID do usuário
+          description: index da posição onde se encontra a resposta do jogo
           example: 1
-        name:
-          type: string
-          description: Nome do usuário
-          example: 'Teste'
-        email:
-          type: string
-          description: Email do usuário
-          example: 'teste@gmail.com'
-    LoginResponse:
-      type: object
-      properties:
-        name:
-          type: string
-          description: Nome do usuário
-          example: 'Teste'
-        email:
-          type: string
-          description: Email do usuário
-          example: 'teste@gmail.com'
-        token:
-          type: string
-          description: Token de autenticação
-          example: '9a4450f20304bb601af1d7a62bc450b15479bcd1364a96cabd0da1eb5c4bb667155d236e7677ef320213b78ca9c2bfae02083e5992360801e3fc50b3b55bf07d'
-    SelectUserResponse:
-      type: object
-      properties:
-        id:
+        time:
           type: integer
-          description: id do usuario logado
-          example: 7
-        status:
-          type: integer
-          description: status do usuario logado
-          example: 0
-        name:
+          description: Tempo em segundos para a resposta
+          example: 60
+        img:
           type: string
-          description: Nome do usuario
-          example: João
-        email:
-          type: string
-          description: Email do usuario
-          example: joao@teste
-        institution:
-          type: string
-          description: Instituição do usuário
-          example: "Universidade Tecnológica Federal do Swagger"
-        city:
-          type: string
-          description: Cidade do usuario
-          example: "Santa helena"
-        workType:
-          type: string
-          description: Tipo de trabalho
-          example: "Estudante"
-        educationLevel:
-          type: string
-          description: Nivel educacional
-          example: "Ensino medio completo"
-    EditUserResponse:
-      type: object
-      properties:
-        id:
-          type: integer
-          description: id do usuario que foi editado
-          example: 7
-        name:
-          type: string
-          description: Nome do usuario
-          example: João
-        institution:
-          type: string
-          description: Instituição do usuário
-          example: "Universidade Tecnológica Federal do Swagger"
-        city:
-          type: string
-          description: Cidade do usuario
-          example: "Santa helena"
-        workType:
-          type: string
-          description: Tipo de trabalho
-          example: "Estudante"
-        educationLevel:
-          type: string
-          description: Nivel educacional
-          example: "Ensino medio completo"
-    CategoriesResponse:
-      type: array
-      items:
-        $ref: '#/components/schemas/Category'
-    LanguagesResponse:
-      type: array
-      items:
-        $ref: '#/components/schemas/Language'
-    MatchesResponse:
-      type: array
-      items:
-        $ref: '#/components/schemas/Match'
-    MatchesResultResponse:
-      type: object
-      properties:
-        match:
-          type: integer
-          description: Pontuação do jogo
-          example: 75
-        game:
-          type: integer
-          description: Id do jogo
-          example: 90
-        name:
-          type: string
-          description: Nome do jogo
-          example: Profissionais C#
-        createdAt:
-          type: string
-          format: date-time
-          description: Data de criação do jogo padrão UTC
-          example: '2023-05-13T20:43:38.264Z'
-        timeduration:
-          type: number
-          description: Duração do jogo em segundos
-          example: 162105.514785
-        groups:
-          type: array
-          description: Grupos do jogo
-          items:
-            type: object
-            properties:
-              name:
-                type: string
-                description: Nome do grupo
-                example: Grupo 1
-              players:
-                type: array
-                description: Jogadores do grupo
-                items:
-                  type: string
-                  example:
-                    - Erik
-                    - Guilherme
-                    - Henrique
-        podium:
-          type: array
-          description: Posições no pódio
-          items:
-            type: object
-            properties:
-              group:
-                type: integer
-                description: Número do grupo
-                example: 2
-              position:
-                type: integer
-                description: Posição no pódio
-                example: 24
-    GamesResponse:
-      type: array
-      items:
-        type: object
-        properties:
-          id:
-            type: integer
-            description: Id do jogo
-            example: 1
-          language:
-            type: integer
-            description: Id do idioma
-            example: 1
-          category:
-            type: integer
-            description: Id da categoria
-            example: 1
-          name:
-            type: string
-            description: Nome do jogo
-            example: Jogo 1
-          questions:
-            type: array
-            description: Questões presentes no jogo
-            items:
-              type: object
-              properties:
-                text:
-                  type: string
-                  description: Questão do game
-                  example: Quanto é 1 + 1
-                answers:
-                  type: string
-                  description: Respostas do jogo
-                  example:
-                    - "1"
-                    - "2"
-                    - "3"
-                    - "4"
-                answer:
-                  type: integer
-                  description: index da posição onde se encontra a resposta do jogo
-                  example: 1
-                time:
-                  type: integer
-                  description: Tempo em segundos para a resposta
-                  example: 60
-                img:
-                  type: string
-                  description: Imagem do game caso exista
-                  example: https://static.api.ebattle.lamia-edu.com/games/questions/2023/04/09/168-202018-0.png
-              required:
-                - text
-                - answers
-                - answer
-                - time
-        required:
-          - id
-          - language
-          - category
-          - name
-          - questions
+          description: Base64 da imagem a ser inserida na questão
+          example: data:image/jpeg;base64,/9j/4AAQSkZJRgABAQEAYABg {...}
+      required:
+        - text
+        - answers
+        - answer
+        - time

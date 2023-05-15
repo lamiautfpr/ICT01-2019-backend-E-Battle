@@ -239,7 +239,7 @@ Resources:
             Method: get
             Auth:
               Authorizer: Authorizer
-        EbattleApiSave:
+        EbattleApiPut:
           Type: HttpApi
           Properties:
             ApiId: !Ref EbattleApi
@@ -253,14 +253,6 @@ Resources:
             ApiId: !Ref EbattleApi
             Path: /matches/start
             Method: post
-            Auth:
-              Authorizer: Authorizer
-        EbattleApiResults:
-          Type: HttpApi
-          Properties:
-            ApiId: !Ref EbattleApi
-            Path: /matches/result
-            Method: get
             Auth:
               Authorizer: Authorizer
   Languages:
