@@ -41,6 +41,7 @@ export const handler = async (event) => {
                                    matches.id = $1 AND games.user = $2;`,
                         values: [id, user],
                     });
+                    break;
                 }
                 case "GET /matches/result":{
                     results = await conn.query({
@@ -60,6 +61,7 @@ export const handler = async (event) => {
                                 WHERE matches.id = $1 AND games.user = $2 AND matches.closedAt IS NOT NULL;`,
                         values: [id, user],
                     });
+                    break;
                 }
             }
 
