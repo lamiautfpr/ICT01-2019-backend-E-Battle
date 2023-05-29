@@ -28,13 +28,13 @@ export const handler = async (event) => {
                         text: `SELECT
                                    matches.id, matches.game, matches.spaces, matches.groups, matches.random, matches.trivia,
                                    json_build_object(
-                                           'user', games.user,
-                                           'visibility', games.visibility,
-                                           'language', games.language,
-                                           'category', games.category,
-                                           'name', games.name,
-                                           'questions', games.questions
-                                       ) AS game
+                                       'user', games.user,
+                                       'visibility', games.visibility,
+                                       'language', games.language,
+                                       'category', games.category,
+                                       'name', games.name,
+                                       'questions', games.questions
+                                   ) AS game
                                FROM matches
                                         INNER JOIN games ON games.id = matches.game
                                WHERE
@@ -55,12 +55,14 @@ export const handler = async (event) => {
                                         epoch FROM (matches."closedAt" - matches."createdAt")
                                     ) as timeDuration,
                                     matches.groups,
-                                    matches.podium
+                                    matches.podium,
+                                    matches.turns
                                 FROM matches
                                 INNER JOIN games ON games.id = matches.game
-                                WHERE matches.id = $1 AND games.user = $2 AND matches.closedAt IS NOT NULL;`,
+                                WHERE matches.id = $1 AND games.user = $2 AND matches."closedAt" IS NOT NULL;`,
                         values: [id, user],
                     });
+
                     break;
                 }
             }
@@ -204,9 +206,10 @@ export const handler = async (event) => {
                         };
                     }
 
+
                     let podium = [];
                     for (let groups of body.podium){
-                        if (!(groups.group && groups.position)){
+                        if (!(`${groups.group}` && `${groups.position}`)){
                             return {
                                 statusCode: 400,
                                 body: JSON.stringify({
@@ -226,7 +229,9 @@ export const handler = async (event) => {
 
                     let turns = []
                     for (let turn of body.turns){
-                        if (!(turn.group && turn.response && turn.time)){
+                        if (
+                            !( `${turn.group}` && `${turn.response}` && `${turn.time}`)
+                        ){
                             return {
                                 statusCode: 400,
                                 body: JSON.stringify({
