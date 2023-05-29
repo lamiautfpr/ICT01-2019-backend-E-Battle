@@ -126,7 +126,7 @@ paths:
             example: 1
       responses:
         '200':
-          description: Dados do resultado do match
+          description: Dados do resultado do jogo (Match)
           content:
             application/json:
               schema:
@@ -661,7 +661,7 @@ components:
         timeduration:
           type: number
           description: Duração do jogo em segundos
-          example: 162105.514785
+          example: 5.514785
         groups:
           type: array
           description: Grupos do jogo
@@ -677,10 +677,10 @@ components:
                 description: Jogadores do grupo
                 items:
                   type: string
-                  example:
-                    - Erik
-                    - Guilherme
-                    - Henrique
+                example:
+                  - Erik
+                  - Guilherme
+                  - Henrique
         podium:
           type: array
           description: Posições no pódio
@@ -695,6 +695,42 @@ components:
                 type: integer
                 description: Posição no pódio
                 example: 24
+        turns:
+          type: array
+          description: Rodadas do jogo
+          items:
+            type: object
+            properties:
+              question:
+                type: integer
+                description: Número da questão
+                example: 2
+              group:
+                type: integer
+                description: Número do grupo
+                example: 1
+              response:
+                type: integer
+                description: Número da resposta
+                example: 2
+              time:
+                type: integer
+                description: Tempo decorrido
+                example: 129
+              powers:
+                type: array
+                description: Lista de poderes
+                items:
+                  type: object
+                  properties:
+                    name:
+                      type: string
+                      description: Nome do poder
+                      example: "Estender Tempo"
+              walked:
+                type: integer
+                description: Distância percorrida
+                example: 5
     GamesResponse:
       type: array
       items:
