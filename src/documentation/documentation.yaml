@@ -117,6 +117,13 @@ paths:
         - Matches
       description: Inicia um match
       operationId: getMatchResult
+      parameters:
+        - name: id
+          in: query
+          description: Id do game para realizar o match
+          schema:
+            type: number
+            example: 1
       responses:
         '200':
           description: Dados do resultado do match
