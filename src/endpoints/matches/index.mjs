@@ -8,56 +8,81 @@ export const handler = async (event) => {
 
     switch (event.requestContext.http.method) {
         case "GET": {
-            if (
-                !(event.queryStringParameters && event.queryStringParameters.id)
-            ) {
+
+            if (!(event.queryStringParameters && event.queryStringParameters.id)) {
                 return {
                     statusCode: 400,
                     body: JSON.stringify({
                         errorCode: 1,
-                        errorMessage: "Falta o argumento id do game",
+                        errorMessage: "Falta o argumento id do Match",
                     }),
                 };
             }
 
             let id = event.queryStringParameters.id;
 
-            results = await conn.query({
-                name: "matchesget",
-                text: `SELECT
-                           matches.id, matches.game, matches.spaces, matches.groups, matches.random, matches.trivia,
-                           json_build_object(
-                                   'user', games.user,
-                                   'visibility', games.visibility,
-                                   'language', games.language,
-                                   'category', games.category,
-                                   'name', games.name,
-                                   'questions', games.questions
-                               ) AS game
-                       FROM matches
+            switch (event.routeKey){
+                case "GET /matches":{
+                    results = await conn.query({
+                        name: "matchesget",
+                        text: `SELECT
+                                   matches.id, matches.game, matches.spaces, matches.groups, matches.random, matches.trivia,
+                                   json_build_object(
+                                       'user', games.user,
+                                       'visibility', games.visibility,
+                                       'language', games.language,
+                                       'category', games.category,
+                                       'name', games.name,
+                                       'questions', games.questions
+                                   ) AS game
+                               FROM matches
+                                        INNER JOIN games ON games.id = matches.game
+                               WHERE
+                                   matches.id = $1 AND games.user = $2;`,
+                        values: [id, user],
+                    });
+                    break;
+                }
+                case "GET /matches/result":{
+                    results = await conn.query({
+                        name: "matchesgetresult",
+                        text: ` SELECT
+                                    matches.id AS match,
+                                    games.id AS game,
+                                    games.name as name,
+                                    matches."createdAt",
+                                    EXTRACT(
+                                        epoch FROM (matches."closedAt" - matches."createdAt")
+                                    ) as timeDuration,
+                                    matches.groups,
+                                    matches.podium,
+                                    matches.turns
+                                FROM matches
                                 INNER JOIN games ON games.id = matches.game
-                       WHERE
-                           matches.id = $1 AND games.user = $2;`,
-                values: [id, user],
-            });
+                                WHERE matches.id = $1 AND games.user = $2 AND matches."closedAt" IS NOT NULL;`,
+                        values: [id, user],
+                    });
+
+                    break;
+                }
+            }
 
             if (results.rows.length != 1) {
                 return {
                     statusCode: 400,
                     body: JSON.stringify({
-                        errorMessage: "Matche não encontrado",
+                        errorMessage: "Match não encontrado",
                     }),
                 };
             }
 
             return {
                 statusCode: 200,
-                body: JSON.stringify(results.rows),
+                body: JSON.stringify(results.rows[0]),
             };
         }
         case "POST": {
             const body = JSON.parse(event.body);
-
             switch (event.routeKey){
                 case "POST /matches/start":{
 
@@ -170,7 +195,6 @@ export const handler = async (event) => {
 
                 }
                 case "POST /matches":{
-
                     if(!(body.match && body.podium && body.turns)){
                         return {
                             statusCode: 400,
@@ -182,9 +206,10 @@ export const handler = async (event) => {
                         };
                     }
 
+
                     let podium = [];
                     for (let groups of body.podium){
-                        if (!(groups.group && groups.position)){
+                        if (!(`${groups.group}` && `${groups.position}`)){
                             return {
                                 statusCode: 400,
                                 body: JSON.stringify({
@@ -204,7 +229,9 @@ export const handler = async (event) => {
 
                     let turns = []
                     for (let turn of body.turns){
-                        if (!(turn.group && turn.response && turn.time)){
+                        if (
+                            !( `${turn.group}` && `${turn.response}` && `${turn.time}`)
+                        ){
                             return {
                                 statusCode: 400,
                                 body: JSON.stringify({

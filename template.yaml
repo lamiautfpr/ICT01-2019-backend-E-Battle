@@ -239,6 +239,14 @@ Resources:
             Method: get
             Auth:
               Authorizer: Authorizer
+        EbattleApiGetResult:
+          Type: HttpApi
+          Properties:
+            ApiId: !Ref EbattleApi
+            Path: /matches/result
+            Method: get
+            Auth:
+              Authorizer: Authorizer
         EbattleApiPut:
           Type: HttpApi
           Properties:
