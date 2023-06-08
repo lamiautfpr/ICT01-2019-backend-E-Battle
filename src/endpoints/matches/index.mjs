@@ -108,6 +108,17 @@ export const handler = async (event) => {
                         };
                     }
 
+                    if (body.groups.length > 5) {
+                        return {
+                            statusCode: 400,
+                            body: JSON.stringify({
+                                errorCode: 1,
+                                errorMessage:
+                                    "Não é possivel realizar a requisição com mais de 5 grupos",
+                            }),
+                        };
+                    }
+
                     results = await conn.query({
                         name: "validatecreatematch",
                         text: "SELECT games.id, games.user FROM games WHERE games.id = $1 and games.user = $2",
