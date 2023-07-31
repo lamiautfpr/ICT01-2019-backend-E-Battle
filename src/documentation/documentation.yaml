@@ -111,28 +111,6 @@ paths:
                 $ref: '#/components/schemas/EditUserResponse'
       security:
         - authToken: [ ]
-  /matches/result:
-    get:
-      tags:
-        - Matches
-      description: Inicia um match
-      operationId: getMatchResult
-      parameters:
-        - name: id
-          in: query
-          description: Id do game para realizar o match
-          schema:
-            type: number
-            example: 1
-      responses:
-        '200':
-          description: Dados do resultado do jogo (Match)
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/MatchesResultResponse'
-      security:
-        - authToken: [ ]
   /matches:
     get:
       tags:
@@ -159,7 +137,7 @@ paths:
       tags:
         - Matches
       description: Salva as informações ao final do jogo
-      operationId: putMatch
+      operationId: saveMatch
       requestBody:
         description: Dados do jogo a ser criado
         content:
@@ -194,6 +172,28 @@ paths:
                 $ref: '#/components/schemas/MatchesResponse'
       security:
         - authToken: [ ]
+  /matches/result:
+    get:
+      tags:
+        - Matches
+      description: Inicia um match
+      operationId: getMatchResult
+      parameters:
+        - name: id
+          in: query
+          description: Id do game para realizar o match
+          schema:
+            type: number
+            example: 1
+      responses:
+        '200':
+          description: Dados do resultado do jogo (Match)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MatchesResultResponse'
+      security:
+        - authToken: [ ]
   /games:
     get:
       tags:
@@ -211,6 +211,28 @@ paths:
       responses:
         '200':
           description: Lista de jogos
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: '#/components/schemas/GamesResponse'
+      security:
+        - authToken: [ ]
+    put:
+      tags:
+        - Games
+      description: Edita um game do usuario
+      operationId: editGame
+      parameters:
+        - name: id
+          in: query
+          description: Id do game a ser editado
+          schema:
+            type: number
+            example: 1
+      responses:
+        '200':
+          description: GameEditado
           content:
             application/json:
               schema:
@@ -255,6 +277,47 @@ paths:
       responses:
         '200':
           description: Game excluido
+      security:
+        - authToken: [ ]
+  /games/duplicate/:
+    post:
+      tags:
+        - Games
+      description: Duplica um game caso seja publico ou do proprio usuario
+      operationId: duplicateGames
+      parameters:
+        - name: id
+          in: query
+          description: Id do game a ser duplicado
+          schema:
+            type: number
+            example: 1
+      responses:
+        '200':
+          description: Game que foi duplicado
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: '#/components/schemas/GamesResponse'
+      security:
+        - authToken: [ ]
+  /games/visibility:
+    post:
+      tags:
+        - Games
+      description: Insere uma visibilidade para o game
+      operationId: setVisibilityGame
+      requestBody:
+        description: Nova visibilidade do game
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/gameVisibility'
+        required: true
+      responses:
+        '200':
+          description: Visibilidade alterada com sucesso
       security:
         - authToken: [ ]
 components:
@@ -398,9 +461,11 @@ components:
               - players
         trivia:
           type: boolean
+          description: Modifica o jogo para que todos os personagens respondam a pergunta ao mesmo tempo
           example: false
         random:
           type: boolean
+          description: Perguntas aparecem na mesma ordem que foram enviadas, ou embaralhadas
           example: false
       required:
         - spaces
@@ -492,6 +557,14 @@ components:
           type: string
           description: Nome do jogo
           example: Jogo 1
+        visibility:
+          type: integer
+          description: 0 - Privado / 1 - Publico
+          example: 0
+        description:
+          type: string
+          description: descrição do jogo
+          example: Contem questões sobre python
         questions:
           type: array
           description: Questões presentes no jogo
@@ -533,7 +606,13 @@ components:
         - category
         - name
         - questions
-
+    gameVisibility:
+      type: object
+      properties:
+        visibility:
+          type: integer
+          description: Visibilidade do game ( 0 - privado / 1 - Publico )
+          example: 1
     RegisterResponse:
       type: object
       properties:
@@ -748,10 +827,22 @@ components:
             type: integer
             description: Id da categoria
             example: 1
+          author:
+            type: int
+            description: Id do usuario que criou o jogo
+            example: Jogo 1
           name:
             type: string
             description: Nome do jogo
             example: Jogo 1
+          visibility:
+            type: integer
+            description: 0 - Privado / 1 - Publico
+            example: 0
+          description:
+            type: string
+            description: descrição do jogo
+            example: Contem questões sobre python
           questions:
             type: array
             description: Questões presentes no jogo
@@ -787,6 +878,10 @@ components:
                 - answers
                 - answer
                 - time
+          updatedAt:
+            type: string
+            description: ultimo update do game
+            example: 2023-06-05 20:27:31.134199
         required:
           - id
           - language

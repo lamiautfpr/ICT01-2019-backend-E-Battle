@@ -209,12 +209,36 @@ Resources:
             Method: get
             Auth:
               Authorizer: Authorizer
-        EbattleApiPost:
+        EbattleApiCreate:
           Type: HttpApi
           Properties:
             ApiId: !Ref EbattleApi
             Path: /games
             Method: post
+            Auth:
+              Authorizer: Authorizer
+        EbattleApiVisibility:
+          Type: HttpApi
+          Properties:
+            ApiId: !Ref EbattleApi
+            Path: /games/visibility
+            Method: post
+            Auth:
+              Authorizer: Authorizer
+        EbattleApiDuplicate:
+          Type: HttpApi
+          Properties:
+            ApiId: !Ref EbattleApi
+            Path: /games/duplicate
+            Method: post
+            Auth:
+              Authorizer: Authorizer
+        EbattleApiUpdate:
+          Type: HttpApi
+          Properties:
+            ApiId: !Ref EbattleApi
+            Path: /games
+            Method: put
             Auth:
               Authorizer: Authorizer
         EbattleApiDelete:
