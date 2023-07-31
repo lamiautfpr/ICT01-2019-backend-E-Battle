@@ -129,6 +129,7 @@ export const handler = async (event) => {
                     for (let question of body.questions) {
                         questions.push({
                             "text":question.text,
+                            "tip":question.tip,
                             "answer":question.answer,
                             "time":question.time ,
                             "answers":question.answers,
