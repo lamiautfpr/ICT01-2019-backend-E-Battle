@@ -575,6 +575,10 @@ components:
                 type: string
                 description: Questão do game
                 example: Quanto é 1 + 1
+              tip:
+                type: string
+                description: Dica para a questao
+                example: Depois do um...
               answers:
                 type: string
                 description: Respostas do jogo
@@ -853,6 +857,10 @@ components:
                   type: string
                   description: Questão do game
                   example: Quanto é 1 + 1
+                tip:
+                  type: string
+                  description: Dica da questão
+                  example: Depois do um...
                 answers:
                   type: string
                   description: Respostas do jogo
