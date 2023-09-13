@@ -29,8 +29,7 @@ export const handler = async (event) => {
             for (let body of results.rows) {
                 for(let question of body.questions){
                     if(question.img){
-                        //question.img = 'https://static.api.ebattle.lamia-edu.com/'+question.img; TODO Temporario, remover depois dos testes da unity
-
+                        question.img = 'https://static.api.ebattle.lamia-edu.com/'+question.img;
                     }
                 }
             }
@@ -79,7 +78,7 @@ export const handler = async (event) => {
                         if (
                             !(
                                 question.text &&
-                                question.answer &&
+                                `${question.answer}` &&
                                 question.answers &&
                                 question.time &&
                                 question.answers.length > 1
@@ -106,7 +105,6 @@ export const handler = async (event) => {
 
                     let keys = await Promise.all(body['questions'].map(async question => {
                         if(question.img && question.img){
-                            return question.img.length > 200 ?  "https://static.api.ebattle.lamia-edu.com/games/questions/2023/06/05/7-175449-1.png" : question.img // TODO Temporario, remover depois dos testes da unity
                             let key = `games/questions/${date}/${user}-${time}-${body['questions'].indexOf(question)}.png`;
                             const buf = Buffer.from(question.img.replace(/^data:image\/\w+;base64,/, ""),'base64');
 
@@ -332,7 +330,7 @@ export const handler = async (event) => {
                 if (
                     !(
                         question.text &&
-                        question.answer &&
+                        `${question.answer}` &&
                         question.answers &&
                         question.time &&
                         question.answers.length > 1
@@ -359,7 +357,6 @@ export const handler = async (event) => {
 
             let keys = await Promise.all(body['questions'].map(async question => {
                 if(question.img && question.img){
-                    return question.img.length > 200 ?  "https://static.api.ebattle.lamia-edu.com/games/questions/2023/06/05/7-175449-1.png" : question.img // TODO Temporario, remover depois dos testes da unity
                     let key = `games/questions/${date}/${user}-${time}-${body['questions'].indexOf(question)}.png`;
                     const buf = Buffer.from(question.img.replace(/^data:image\/\w+;base64,/, ""),'base64');
 

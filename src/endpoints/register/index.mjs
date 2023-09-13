@@ -104,8 +104,7 @@ export const handler = async (event) => {
                     });
                 } catch (e) {
                     if (
-                        e.message ==
-                        'duplicate key value violates unique constraint "users_pk"'
+                        e.message == 'duplicate key value violates unique constraint "users_pk"'
                     ) {
                         return {
                             statusCode: 400,
