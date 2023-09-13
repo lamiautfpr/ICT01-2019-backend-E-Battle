@@ -29,8 +29,7 @@ export const handler = async (event) => {
             for (let body of results.rows) {
                 for(let question of body.questions){
                     if(question.img){
-                        //question.img = 'https://static.api.ebattle.lamia-edu.com/'+question.img; TODO Temporario, remover depois dos testes da unity
-
+                        question.img = 'https://static.api.ebattle.lamia-edu.com/'+question.img;
                     }
                 }
             }
@@ -79,7 +78,7 @@ export const handler = async (event) => {
                         if (
                             !(
                                 question.text &&
-                                question.answer &&
+                                `${question.answer}` &&
                                 question.answers &&
                                 question.time &&
                                 question.answers.length > 1
@@ -332,7 +331,7 @@ export const handler = async (event) => {
                 if (
                     !(
                         question.text &&
-                        question.answer &&
+                        `${question.answer}` &&
                         question.answers &&
                         question.time &&
                         question.answers.length > 1
