@@ -9,36 +9,127 @@ export const handler = async (event) => {
 
     switch (event.requestContext.http.method) {
         case "GET": {
-
-            if (
-                !(event.queryStringParameters && event.queryStringParameters.id)
-            ) {
-                results = await conn.query({
-                    name: "gamesget",
-                    text: 'SELECT id, language, category, name, author, visibility, description, questions, "updatedAt" FROM games WHERE "user" = $1',
-                    values: [user],
-                });
-            } else {
-                results = await conn.query({
-                    name: "gamesgetone",
-                    text: 'SELECT id, language, category, name, author, visibility, description, questions, "updatedAt" FROM games WHERE "id" = $1 and "user" = $2',
-                    values: [event.queryStringParameters.id, user],
-                });
-            }
-
-            for (let body of results.rows) {
-                for(let question of body.questions){
-                    if(question.img){
-                        question.img = 'https://static.api.ebattle.lamia-edu.com/'+question.img;
+            switch(event.routeKey){
+                case "GET /games": {
+                    if (
+                        !(event.queryStringParameters && event.queryStringParameters.id)
+                    ) {
+                        results = await conn.query({
+                            name: "gamesget",
+                            text: `SELECT  
+                                        json_build_object(
+                                            'id', games.id,
+                                            'language', json_build_object('id', languages.id, 'name', languages.name), 
+                                            'category', json_build_object('id', categories.id, 'name', categories.name),
+                                            'name', games.name, 
+                                            'author', json_build_object('id', author.id, 'name', author.name),
+                                            'visibility', games.visibility,
+                                            'description', games.description,
+                                            'questions', games.questions,
+                                            'updatedAt', games."updatedAt"
+                                        ) AS game
+                                    FROM games 
+                                        INNER JOIN users AS author ON author.id = games.author 
+                                        INNER JOIN languages ON languages.id = games.language
+                                        INNER JOIN categories ON categories.id = games.category
+                                    WHERE games."user" = $1;`,
+                            values: [user],
+                        });
+                    } else {
+                        results = await conn.query({
+                            name: "gamesgetone",
+                            text: `SELECT  
+                                        json_build_object(
+                                            'id', games.id,
+                                            'language', json_build_object('id', languages.id, 'name', languages.name), 
+                                            'category', json_build_object('id', categories.id, 'name', categories.name),
+                                            'name', games.name, 
+                                            'author', json_build_object('id', author.id, 'name', author.name),
+                                            'visibility', games.visibility,
+                                            'description', games.description,
+                                            'questions', games.questions,
+                                            'updatedAt', games."updatedAt"
+                                        ) AS game
+                                    FROM games 
+                                        INNER JOIN users AS author ON author.id = games.author 
+                                        INNER JOIN languages ON languages.id = games.language
+                                        INNER JOIN categories ON categories.id = games.category
+                                    WHERE games."id" = $1 and (games."user" = $2 OR visibility=1)`,
+                            values: [event.queryStringParameters.id, user],
+                        });
                     }
+
+                    for (let body of results.rows) {
+                        for (let question of body.game.questions) {
+                            if (question.img) {
+                                question.img = 'https://static.api.ebattle.lamia-edu.com/' + question.img;
+                            }
+                        }
+                    }
+
+                    return {
+                        statusCode: 200,
+                        body: JSON.stringify(results.rows.map((game) => game.game)),
+                    };
+
+                    break;
+                }
+                case "GET /games/community":{
+
+                    let queryParts = {'limit': '', 'name': '', 'category':'', 'language':''};
+
+                    if (event.queryStringParameters !== undefined){
+                        for (let filter of Object.keys(event.queryStringParameters)) {
+                            if (Object.keys(queryParts).includes(filter) && event.queryStringParameters[filter] !== undefined){
+
+                                if(filter === 'name' && event.queryStringParameters[filter].length > 60){ continue; }
+
+                                queryParts[filter] = event.queryStringParameters[filter]
+                            }
+                        }
+                    }
+
+                    results = await conn.query({
+                        text: `SELECT 
+                                json_build_object(
+                                    'id', games.id,
+                                    'language', json_build_object('id', languages.id, 'name', languages.name), 
+                                    'category', json_build_object('id', categories.id, 'name', categories.name),
+                                    'name', games.name, 
+                                    'author', json_build_object('id', author.id, 'name', author.name),
+                                    'visibility', games.visibility,
+                                    'description', games.description,
+                                    'questions', games.questions,
+                                    'updatedAt', games."updatedAt"
+                                ) AS game
+                            FROM games 
+                                INNER JOIN users AS author ON author.id = games.author 
+                                INNER JOIN languages ON languages.id = games.language
+                                INNER JOIN categories ON categories.id = games.category
+                            WHERE games.visibility=1 AND TRUE OR
+                                ( $1::text IS NOT NULL AND games.name ILIKE '%' || $1 || '%' ) OR 
+                                ( $2::integer IS NOT NULL AND games.category = $2 ) OR 
+                                ( $3::integer IS NOT NULL AND games.language = $3 )
+                            LIMIT $4`,
+                        values: [(queryParts['name'] === '') ? null : queryParts['name'] , parseInt(queryParts['category']) || null, parseInt(queryParts['language']) || null, parseInt(queryParts['limit']) || 10]
+                    });
+
+                    for (let body of results.rows) {
+                        for (let question of body.game.questions) {
+                            if (question.img) {
+                                question.img = 'https://static.api.ebattle.lamia-edu.com/' + question.img;
+                            }
+                        }
+                    }
+
+                    return {
+                        statusCode: 200,
+                        body: JSON.stringify(results.rows.map((game) => game.game)),
+                    };
+
+                    break;
                 }
             }
-
-            return {
-                statusCode: 200,
-                body: JSON.stringify(results.rows),
-            };
-
             break;
         }
         case "POST": {
@@ -174,14 +265,34 @@ export const handler = async (event) => {
                             };
                         }
                     }
+
                     results = await conn.query({
-                        text: 'SELECT id, language, category, name, author, visibility, description, questions, "updatedAt" FROM games WHERE "id" = $1',
+                        text: `SELECT  
+                                json_build_object(
+                                    'id', games.id,
+                                    'language', json_build_object('id', languages.id, 'name', languages.name), 
+                                    'category', json_build_object('id', categories.id, 'name', categories.name),
+                                    'name', games.name, 
+                                    'author', json_build_object('id', author.id, 'name', author.name),
+                                    'visibility', games.visibility,
+                                    'description', games.description,
+                                    'questions', games.questions,
+                                    'updatedAt', games."updatedAt"
+                                ) AS game
+                            FROM games 
+                                INNER JOIN users AS author ON author.id = games.author 
+                                INNER JOIN languages ON languages.id = games.language
+                                INNER JOIN categories ON categories.id = games.category
+                            WHERE games."id" = $1`,
                         values: [results.rows[0].id],
                     });
 
+
+                    //return results
+
                     return {
                         statusCode: 200,
-                        body: JSON.stringify(results.rows[0]),
+                        body: JSON.stringify(results.rows[0].game),
                     };
                 }
                 case "POST /games/visibility":{
@@ -237,6 +348,7 @@ export const handler = async (event) => {
                             }),
                         };
                     }
+                    break;
                 }
                 case "POST /games/duplicate":{
                     if (!(event.queryStringParameters && event.queryStringParameters.id)) {
@@ -272,17 +384,37 @@ export const handler = async (event) => {
                         };
                     }
 
+
                     results = await conn.query({
-                        text: 'SELECT id, language, category, name, author, visibility, description, questions, "updatedAt" FROM games WHERE "id" = $1',
+                        text: ` SELECT 
+                                json_build_object(
+                                    'id', games.id,
+                                    'language', json_build_object('id', languages.id, 'name', languages.name), 
+                                    'category', json_build_object('id', categories.id, 'name', categories.name),
+                                    'name', games.name, 
+                                    'author', json_build_object('id', author.id, 'name', author.name),
+                                    'visibility', games.visibility,
+                                    'description', games.description,
+                                    'questions', games.questions,
+                                    'updatedAt', games."updatedAt"
+                                ) as game
+                            FROM games 
+                                INNER JOIN users author ON author.id = games.author 
+                                INNER JOIN languages ON languages.id = games.language
+                                INNER JOIN categories ON categories.id = games.category
+                            WHERE games."id" = $1`,
                         values: [results.rows[0].id],
                     });
 
                     return {
                         statusCode: 200,
-                        body: JSON.stringify(results.rows[0]),
+                        body: JSON.stringify(results.rows[0].game),
                     };
+
+                    break;
                 }
             }
+            break;
         }
         case "PUT": {
 
@@ -385,25 +517,21 @@ export const handler = async (event) => {
                     "img": keys[body.questions.indexOf(question)],
                 });
             }
-            //return body, user, event.queryStringParameters.id
-            try{
-                results = await conn.query({
-                    name: "gamesupdate",
-                    text:`UPDATE games SET language = $1, category = $2, name = $3, visibility = $4, description = $5, questions = $6, "updatedAt" = CURRENT_TIMESTAMP WHERE id = $7 AND "user" = $8 RETURNING id`,
-                    values: [
-                        body.language,
-                        body.category,
-                        body.name,
-                        body.visibility ?? null,
-                        body.description ?? null,
-                        JSON.stringify(questions),
-                        event.queryStringParameters.id,
-                        user,
-                    ],
-                });
-            }catch(e){
-                return e.message
-            }
+
+            results = await conn.query({
+                name: "gamesupdate",
+                text:`UPDATE games SET language = $1, category = $2, name = $3, visibility = $4, description = $5, questions = $6, "updatedAt" = CURRENT_TIMESTAMP WHERE id = $7 AND "user" = $8 RETURNING id`,
+                values: [
+                    body.language,
+                    body.category,
+                    body.name,
+                    body.visibility ?? null,
+                    body.description ?? null,
+                    JSON.stringify(questions),
+                    event.queryStringParameters.id,
+                    user,
+                ],
+            });
 
             results = await conn.query({
                 text: 'SELECT id, language, category, name, author, visibility, description, questions, "updatedAt" FROM games WHERE id = $1',
@@ -412,8 +540,9 @@ export const handler = async (event) => {
 
             return {
                 statusCode: 200,
-                body: JSON.stringify(results.rows[0]),
+                body: JSON.stringify(results.rows[0].game),
             };
+            break;
         }
         case "DELETE": {
             if (
@@ -447,6 +576,7 @@ export const handler = async (event) => {
                     }),
                 };
             }
+            break;
         }
     }
 };
