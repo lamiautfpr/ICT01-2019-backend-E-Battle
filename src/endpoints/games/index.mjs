@@ -32,7 +32,8 @@ export const handler = async (event) => {
                                         INNER JOIN users AS author ON author.id = games.author 
                                         INNER JOIN languages ON languages.id = games.language
                                         INNER JOIN categories ON categories.id = games.category
-                                    WHERE games."user" = $1;`,
+                                    WHERE games."user" = $1
+                                    ORDER BY games."createdAt" DESC;`,
                             values: [user],
                         });
                     } else {
@@ -110,6 +111,7 @@ export const handler = async (event) => {
                                 ( $1::text IS NOT NULL AND games.name ILIKE '%' || $1 || '%' ) OR 
                                 ( $2::integer IS NOT NULL AND games.category = $2 ) OR 
                                 ( $3::integer IS NOT NULL AND games.language = $3 )
+                            ORDER BY games."createdAt" DESC
                             LIMIT $4`,
                         values: [(queryParts['name'] === '') ? null : queryParts['name'] , parseInt(queryParts['category']) || null, parseInt(queryParts['language']) || null, parseInt(queryParts['limit']) || 10]
                     });
