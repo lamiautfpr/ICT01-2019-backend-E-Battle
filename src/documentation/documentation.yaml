@@ -684,6 +684,10 @@ components:
           type: string
           description: Email do usuário
           example: 'teste@gmail.com'
+        work_type:
+          type: string
+          description: Tipo de trabalho
+          example: 'Estudante'
         token:
           type: string
           description: Token de autenticação
