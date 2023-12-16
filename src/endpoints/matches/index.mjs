@@ -125,7 +125,7 @@ export const handler = async (event) => {
                             body: JSON.stringify({
                                 errorCode: 1,
                                 errorMessage:
-                                    "Não é possivel realizar a requisição com apenas um grupo",
+                                    "Não é possivel realizar a requisição com menos de dois grupos",
                             }),
                         };
                     }
@@ -143,7 +143,7 @@ export const handler = async (event) => {
 
                     results = await conn.query({
                         name: "validatecreatematch",
-                        text: "SELECT games.id, games.user FROM games WHERE games.id = $1 and games.user = $2",
+                        text: "SELECT games.id, games.user FROM games WHERE games.status = 1 and games.id = $1 and games.user = $2 ",
                         values: [
                             body.game,
                             user,
@@ -242,7 +242,6 @@ export const handler = async (event) => {
                             }),
                         };
                     }
-
 
                     let podium = [];
                     for (let groups of body.podium){

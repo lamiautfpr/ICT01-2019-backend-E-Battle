@@ -223,6 +223,12 @@ paths:
         - Games
       description: Edita um game do usuario
       operationId: editGame
+      requestBody:
+        description: Dados do jogo a ser editado
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GamesCreate'
       parameters:
         - name: id
           in: query

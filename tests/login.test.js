@@ -20,10 +20,14 @@ describe('Login', function () {
         if(body == null){
             return;
         }
+
         expect(body.name).toBeDefined();
         expect(body.name).toBe("CI/CD");
         expect(body.email).toBeDefined();
         expect(body.email).toBe("cicd@test.com");
+        expect(body.work_type).toBeDefined();
+        expect(body.work_type).toBe("Estudante");
+
         expect(body.token).toBeDefined();
     });
 

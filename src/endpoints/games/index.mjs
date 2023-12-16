@@ -32,7 +32,7 @@ export const handler = async (event) => {
                                         INNER JOIN users AS author ON author.id = games.author 
                                         INNER JOIN languages ON languages.id = games.language
                                         INNER JOIN categories ON categories.id = games.category
-                                    WHERE games."user" = $1
+                                    WHERE games.status = 1 AND games."user" = $1
                                     ORDER BY games."createdAt" DESC;`,
                             values: [user],
                         });
@@ -55,9 +55,19 @@ export const handler = async (event) => {
                                         INNER JOIN users AS author ON author.id = games.author 
                                         INNER JOIN languages ON languages.id = games.language
                                         INNER JOIN categories ON categories.id = games.category
-                                    WHERE games."id" = $1 and (games."user" = $2 OR visibility=1)`,
+                                    WHERE games.status = 1 AND games."id" = $1 AND (games."user" = $2 OR visibility=1)`,
                             values: [event.queryStringParameters.id, user],
                         });
+                    }
+
+                    if (results.rows.length == 0){
+                        return {
+                            statusCode: 400,
+                            body: JSON.stringify({
+                                errorCode: 2,
+                                errorMessage: "Nenhum jogo não encontrado",
+                            }),
+                        };
                     }
 
                     for (let body of results.rows) {
@@ -107,7 +117,7 @@ export const handler = async (event) => {
                                 INNER JOIN users AS author ON author.id = games.author 
                                 INNER JOIN languages ON languages.id = games.language
                                 INNER JOIN categories ON categories.id = games.category
-                            WHERE games.visibility=1 AND TRUE OR
+                            WHERE games.status = 1 AND games.visibility=1 AND TRUE OR
                                 ( $1::text IS NOT NULL AND games.name ILIKE '%' || $1 || '%' ) OR 
                                 ( $2::integer IS NOT NULL AND games.category = $2 ) OR 
                                 ( $3::integer IS NOT NULL AND games.language = $3 )
@@ -269,28 +279,25 @@ export const handler = async (event) => {
                     }
 
                     results = await conn.query({
-                        text: `SELECT  
-                                json_build_object(
-                                    'id', games.id,
-                                    'language', json_build_object('id', languages.id, 'name', languages.name), 
-                                    'category', json_build_object('id', categories.id, 'name', categories.name),
-                                    'name', games.name, 
-                                    'author', json_build_object('id', author.id, 'name', author.name),
-                                    'visibility', games.visibility,
-                                    'description', games.description,
-                                    'questions', games.questions,
-                                    'updatedAt', games."updatedAt"
-                                ) AS game
-                            FROM games 
-                                INNER JOIN users AS author ON author.id = games.author 
-                                INNER JOIN languages ON languages.id = games.language
-                                INNER JOIN categories ON categories.id = games.category
-                            WHERE games."id" = $1`,
+                        text: `SELECT
+                                   json_build_object(
+                                           'id', games.id,
+                                           'language', json_build_object('id', languages.id, 'name', languages.name),
+                                           'category', json_build_object('id', categories.id, 'name', categories.name),
+                                           'name', games.name,
+                                           'author', json_build_object('id', author.id, 'name', author.name),
+                                           'visibility', games.visibility,
+                                           'description', games.description,
+                                           'questions', games.questions,
+                                           'updatedAt', games."updatedAt"
+                                   ) AS game
+                               FROM games
+                                        INNER JOIN users AS author ON author.id = games.author
+                                        INNER JOIN languages ON languages.id = games.language
+                                        INNER JOIN categories ON categories.id = games.category
+                               WHERE games.status = 1 AND games."id" = $1`,
                         values: [results.rows[0].id],
                     });
-
-
-                    //return results
 
                     return {
                         statusCode: 200,
@@ -333,7 +340,7 @@ export const handler = async (event) => {
 
                     results = await conn.query({
                         name: "gamesvisibility",
-                        text: 'UPDATE games SET visibility = $3 WHERE "id" = $1 and "user" = $2',
+                        text: 'UPDATE games SET visibility = $3 WHERE status = 1 AND "id" = $1 AND "user" = $2',
                         values: [event.queryStringParameters.id, user, body.visibility],
                     });
 
@@ -369,7 +376,7 @@ export const handler = async (event) => {
                                     SELECT
                                         $1, "language", "category", "name", 0, "description", "questions", "author", CURRENT_TIMESTAMP
                                     FROM games
-                                    WHERE id = $2 AND ("user" = $1 OR visibility = 1) RETURNING id`,
+                                    WHERE status = 1 AND id = $2 AND ("user" = $1 OR visibility = 1) RETURNING id`,
                             values: [user, event.queryStringParameters.id],
                         });
                     }catch(e){
@@ -388,23 +395,23 @@ export const handler = async (event) => {
 
 
                     results = await conn.query({
-                        text: ` SELECT 
-                                json_build_object(
-                                    'id', games.id,
-                                    'language', json_build_object('id', languages.id, 'name', languages.name), 
-                                    'category', json_build_object('id', categories.id, 'name', categories.name),
-                                    'name', games.name, 
-                                    'author', json_build_object('id', author.id, 'name', author.name),
-                                    'visibility', games.visibility,
-                                    'description', games.description,
-                                    'questions', games.questions,
-                                    'updatedAt', games."updatedAt"
-                                ) as game
-                            FROM games 
-                                INNER JOIN users author ON author.id = games.author 
-                                INNER JOIN languages ON languages.id = games.language
-                                INNER JOIN categories ON categories.id = games.category
-                            WHERE games."id" = $1`,
+                        text: ` SELECT
+                                    json_build_object(
+                                            'id', games.id,
+                                            'language', json_build_object('id', languages.id, 'name', languages.name),
+                                            'category', json_build_object('id', categories.id, 'name', categories.name),
+                                            'name', games.name,
+                                            'author', json_build_object('id', author.id, 'name', author.name),
+                                            'visibility', games.visibility,
+                                            'description', games.description,
+                                            'questions', games.questions,
+                                            'updatedAt', games."updatedAt"
+                                    ) as game
+                                FROM games
+                                         INNER JOIN users author ON author.id = games.author
+                                         INNER JOIN languages ON languages.id = games.language
+                                         INNER JOIN categories ON categories.id = games.category
+                                WHERE games.status = 1 AND games."id" = $1`,
                         values: [results.rows[0].id],
                     });
 
@@ -522,7 +529,7 @@ export const handler = async (event) => {
 
             results = await conn.query({
                 name: "gamesupdate",
-                text:`UPDATE games SET language = $1, category = $2, name = $3, visibility = $4, description = $5, questions = $6, "updatedAt" = CURRENT_TIMESTAMP WHERE id = $7 AND "user" = $8 RETURNING id`,
+                text:`UPDATE games SET language = $1, category = $2, name = $3, visibility = $4, description = $5, questions = $6, "updatedAt" = CURRENT_TIMESTAMP WHERE status = 1 AND id = $7 AND "user" = $8 RETURNING id`,
                 values: [
                     body.language,
                     body.category,
@@ -535,8 +542,35 @@ export const handler = async (event) => {
                 ],
             });
 
+            if (results.rows.length == 0){
+                return {
+                    statusCode: 400,
+                    body: JSON.stringify({
+                        errorCode: 2,
+                        errorMessage: "Nenhum jogo não encontrado",
+                    }),
+                };
+            }
+
             results = await conn.query({
-                text: 'SELECT id, language, category, name, author, visibility, description, questions, "updatedAt" FROM games WHERE id = $1',
+                text: `SELECT  
+                            json_build_object(
+                                'id', games.id,
+                                'language', json_build_object('id', languages.id, 'name', languages.name), 
+                                'category', json_build_object('id', categories.id, 'name', categories.name),
+                                'name', games.name, 
+                                'author', json_build_object('id', author.id, 'name', author.name),
+                                'visibility', games.visibility,
+                                'description', games.description,
+                                'questions', games.questions,
+                                'updatedAt', games."updatedAt"
+                            ) AS game
+                        FROM games 
+                            INNER JOIN users AS author ON author.id = games.author 
+                            INNER JOIN languages ON languages.id = games.language
+                            INNER JOIN categories ON categories.id = games.category
+                        WHERE games.status = 1 AND games.id = $1
+                        ORDER BY games."createdAt" DESC;`,
                 values: [results.rows[0].id],
             });
 
@@ -547,38 +581,42 @@ export const handler = async (event) => {
             break;
         }
         case "DELETE": {
-            if (
-                !(event.queryStringParameters && event.queryStringParameters.id)
-            ) {
-                return {
-                    statusCode: 400,
-                    body: JSON.stringify({
-                        errorCode: 1,
-                        errorMessage: "Falta o argumento id do game",
-                    }),
-                };
-            }
+            try{
+                if (
+                    !(event.queryStringParameters && event.queryStringParameters.id)
+                ) {
+                    return {
+                        statusCode: 400,
+                        body: JSON.stringify({
+                            errorCode: 1,
+                            errorMessage: "Falta o argumento id do game",
+                        }),
+                    };
+                }
 
-            results = await conn.query({
-                name: "gamesdelete",
-                text: 'DELETE FROM games WHERE "id" = $1 and "user" = $2 RETURNING id',
-                values: [event.queryStringParameters.id, user],
-            });
+                results = await conn.query({
+                    name: "gamesdelete",
+                    text: `UPDATE games SET status = 0 WHERE status = 1 AND id = $1 AND "user" = $2 RETURNING id`,
+                    values: [event.queryStringParameters.id, user],
+                });
 
-            if (results.rowCount == 1) {
-                return {
-                    statusCode: 200,
-                };
-            } else {
-                return {
-                    statusCode: 400,
-                    body: JSON.stringify({
-                        errorMessage:
-                            "Não foi encontrado nenhum game com esse id",
-                    }),
-                };
+                if (results.rowCount == 1) {
+                    return {
+                        statusCode: 200,
+                    };
+                } else {
+                    return {
+                        statusCode: 400,
+                        body: JSON.stringify({
+                            errorMessage:
+                                "Não foi encontrado nenhum game com esse id",
+                        }),
+                    };
+                }
+                break;
+            }catch (e){
+                return e.message
             }
-            break;
         }
     }
 };
