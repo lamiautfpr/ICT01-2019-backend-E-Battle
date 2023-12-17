@@ -223,6 +223,12 @@ paths:
         - Games
       description: Edita um game do usuario
       operationId: editGame
+      requestBody:
+        description: Dados do jogo a ser editado
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GamesCreate'
       parameters:
         - name: id
           in: query
@@ -279,7 +285,48 @@ paths:
           description: Game excluido
       security:
         - authToken: [ ]
-  /games/duplicate/:
+  /games/community:
+    get:
+      tags:
+        - Games
+      description: Retorna os jogos da comunidade
+      operationId: getCommunityGames
+      parameters:
+        - name: name
+          in: query
+          description: Nome do game a ser buscado
+          schema:
+            type: string
+            example: Teste 20
+        - name: category
+          in: query
+          description: Categoria dos games a serem pesquisados
+          schema:
+            type: number
+            example: 1
+        - name: language
+          in: query
+          description: Lingua dos games a serem pesquisados
+          schema:
+            type: number
+            example: 1
+        - name: limit
+          in: query
+          description: Limite de games que a pesquisa vai retornar (por padrão é 5)
+          schema:
+            type: number
+            example: 4
+      responses:
+        '200':
+          description: Lista de jogos da comunidade
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: '#/components/schemas/GamesResponse'
+      security:
+        - authToken: [ ]
+  /games/duplicate:
     post:
       tags:
         - Games
@@ -643,6 +690,10 @@ components:
           type: string
           description: Email do usuário
           example: 'teste@gmail.com'
+        work_type:
+          type: string
+          description: Tipo de trabalho
+          example: 'Estudante'
         token:
           type: string
           description: Token de autenticação
@@ -824,17 +875,38 @@ components:
             description: Id do jogo
             example: 1
           language:
-            type: integer
-            description: Id do idioma
-            example: 1
+            type: object
+            properties:
+              id:
+                type: integer
+                description: Id do idioma
+                example: 1
+              name:
+                type: string
+                description: Nome do idioma
+                example: Portugues
           category:
-            type: integer
-            description: Id da categoria
-            example: 1
+            type: object
+            properties:
+              id:
+                type: integer
+                description: Id da categoria
+                example: 1
+              name:
+                type: string
+                description: Nome da categoria
+                example: Portugues
           author:
-            type: int
-            description: Id do usuario que criou o jogo
-            example: Jogo 1
+            type: object
+            properties:
+              id:
+                type: integer
+                description: Id do autor
+                example: 1
+              name:
+                type: string
+                description: Nome do autor
+                example: Jõao
           name:
             type: string
             description: Nome do jogo

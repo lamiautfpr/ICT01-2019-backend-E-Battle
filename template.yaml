@@ -217,6 +217,14 @@ Resources:
             Method: post
             Auth:
               Authorizer: Authorizer
+        EbattleApiCommunity:
+          Type: HttpApi
+          Properties:
+            ApiId: !Ref EbattleApi
+            Path: /games/community
+            Method: get
+            Auth:
+              Authorizer: Authorizer
         EbattleApiVisibility:
           Type: HttpApi
           Properties:

@@ -8,7 +8,7 @@ export const handler = async (event) => {
         const tk = event["headers"]["authorization"];
         const results = await conn.query({
             name: "checklogin",
-            text: "SELECT id, email, name FROM users WHERE token = $1 and status = 1",
+            text: "SELECT id, email, name, work_type FROM users WHERE token = $1 and status = 1",
             values: [tk],
         });
         if (results.rows.length == 1) {
@@ -18,6 +18,7 @@ export const handler = async (event) => {
                 body: JSON.stringify({
                     name: user["name"],
                     email: user["email"],
+                    work_type: user["work_type"],
                     token: tk,
                 }),
             };
@@ -46,7 +47,7 @@ export const handler = async (event) => {
         }
         const results = await conn.query({
             name: "login",
-            text: "SELECT id, email, password, name FROM users WHERE email = $1 and status = 1",
+            text: "SELECT id, email, password, name, work_type FROM users WHERE email = $1 and status = 1",
             values: [body["email"]],
         });
         if (results.rows.length == 1) {
@@ -63,6 +64,7 @@ export const handler = async (event) => {
                     body: JSON.stringify({
                         name: user["name"],
                         email: user["email"],
+                        work_type: user["work_type"],
                         token: token,
                     }),
                 };

@@ -30,17 +30,39 @@ export const handler = async (event) => {
                                    json_build_object(
                                        'user', games.user,
                                        'visibility', games.visibility,
-                                       'language', games.language,
-                                       'category', games.category,
+                                       'language', json_build_object('id', languages.id, 'name', languages.name),
+                                       'category', json_build_object('id', categories.id, 'name', categories.name),
                                        'name', games.name,
+                                       'author', json_build_object('id', author.id, 'name', author.name),
                                        'questions', games.questions
                                    ) AS game
                                FROM matches
-                                        INNER JOIN games ON games.id = matches.game
+                                    INNER JOIN games ON games.id = matches.game
+                                    INNER JOIN users author ON author.id = games.author 
+                                    INNER JOIN languages on languages.id = games.language
+                                    INNER JOIN categories on categories.id = games.category
                                WHERE
                                    matches.id = $1 AND games.user = $2;`,
                         values: [id, user],
                     });
+
+                    if (results.rows.length != 1) {
+                        return {
+                            statusCode: 400,
+                            body: JSON.stringify({
+                                errorMessage: "Match não encontrado",
+                            }),
+                        };
+                    }
+
+                    // Arrumando os links de imagem
+                    for (let question of results.rows[0].game['questions']){
+                        if (question.img) {
+                            question.img = 'https://static.api.ebattle.lamia-edu.com/' + question.img;
+                        }
+                    }
+
+
                     break;
                 }
                 case "GET /matches/result":{
@@ -103,7 +125,7 @@ export const handler = async (event) => {
                             body: JSON.stringify({
                                 errorCode: 1,
                                 errorMessage:
-                                    "Não é possivel realizar a requisição com apenas um grupo",
+                                    "Não é possivel realizar a requisição com menos de dois grupos",
                             }),
                         };
                     }
@@ -121,7 +143,7 @@ export const handler = async (event) => {
 
                     results = await conn.query({
                         name: "validatecreatematch",
-                        text: "SELECT games.id, games.user FROM games WHERE games.id = $1 and games.user = $2",
+                        text: "SELECT games.id, games.user FROM games WHERE games.status = 1 and games.id = $1 and games.user = $2 ",
                         values: [
                             body.game,
                             user,
@@ -183,19 +205,23 @@ export const handler = async (event) => {
                     results = await conn.query({
                         name: "matchesreturn",
                         text: `SELECT
-                                    matches.id, matches.game, matches.spaces, matches.groups, matches.random, matches.trivia,
-                                    json_build_object(
-                                        'user', games.user,
-                                        'visibility', games.visibility,
-                                        'language', games.language,
-                                        'category', games.category,
-                                        'name', games.name,
-                                        'questions', games.questions
-                                    ) AS game
-                                FROM matches
-                                INNER JOIN games ON games.id = matches.game
-                                WHERE
-                                    matches.id = $1 AND games.user = $2;`,
+                                   matches.id, matches.game, matches.spaces, matches.groups, matches.random, matches.trivia,
+                                   json_build_object(
+                                       'user', games.user,
+                                       'visibility', games.visibility,
+                                       'language', json_build_object('id', languages.id, 'name', languages.name),
+                                       'category', json_build_object('id', categories.id, 'name', categories.name),
+                                       'name', games.name,
+                                       'author', json_build_object('id', author.id, 'name', author.name),
+                                       'questions', games.questions
+                                   ) AS game
+                               FROM matches
+                                    INNER JOIN games ON games.id = matches.game
+                                    INNER JOIN users author ON author.id = games.author 
+                                    INNER JOIN languages on languages.id = games.language
+                                    INNER JOIN categories on categories.id = games.category
+                               WHERE
+                                   matches.id = $1 AND games.user = $2;`,
                         values: [results.rows[0].id, user],
                     });
 
@@ -216,7 +242,6 @@ export const handler = async (event) => {
                             }),
                         };
                     }
-
 
                     let podium = [];
                     for (let groups of body.podium){
