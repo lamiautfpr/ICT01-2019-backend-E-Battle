@@ -174,6 +174,30 @@ export const handler = async (event) => {
                             };
                         }
 
+                        if (group.name.length > 20){
+                            return {
+                                statusCode: 400,
+                                body: JSON.stringify({
+                                    errorCode: 3,
+                                    errorMessage:
+                                        "Nome do grupo excede o limite de caracterer",
+                                }),
+                            };
+                        }
+
+                        for (let player of group.players){
+                            if (player.length > 20){
+                                return {
+                                    statusCode: 400,
+                                    body: JSON.stringify({
+                                        errorCode: 3,
+                                        errorMessage:
+                                            "Nome do player excede o limite de caracterer",
+                                    }),
+                                };
+                            }
+                        }
+
                         groups.push({
                             "name": group.name,
                             "players": group.players
