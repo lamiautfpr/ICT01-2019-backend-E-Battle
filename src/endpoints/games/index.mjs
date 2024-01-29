@@ -16,46 +16,46 @@ export const handler = async (event) => {
                     ) {
                         results = await conn.query({
                             name: "gamesget",
-                            text: `SELECT  
-                                        json_build_object(
-                                            'id', games.id,
-                                            'language', json_build_object('id', languages.id, 'name', languages.name), 
-                                            'category', json_build_object('id', categories.id, 'name', categories.name),
-                                            'name', games.name, 
-                                            'author', json_build_object('id', author.id, 'name', author.name),
-                                            'visibility', games.visibility,
-                                            'description', games.description,
-                                            'questions', games.questions,
-                                            'updatedAt', games."updatedAt"
-                                        ) AS game
-                                    FROM games 
-                                        INNER JOIN users AS author ON author.id = games.author 
-                                        INNER JOIN languages ON languages.id = games.language
-                                        INNER JOIN categories ON categories.id = games.category
-                                    WHERE games.status = 1 AND games."user" = $1
-                                    ORDER BY games."createdAt" DESC;`,
+                            text: `SELECT
+                                       json_build_object(
+                                               'id', games.id,
+                                               'language', json_build_object('id', languages.id, 'name', languages.name),
+                                               'category', json_build_object('id', categories.id, 'name', categories.name),
+                                               'name', games.name,
+                                               'author', json_build_object('id', author.id, 'name', author.name),
+                                               'visibility', games.visibility,
+                                               'description', games.description,
+                                               'questions', games.questions,
+                                               'updatedAt', games."updatedAt"
+                                       ) AS game
+                                   FROM games
+                                            INNER JOIN users AS author ON author.id = games.author
+                                            INNER JOIN languages ON languages.id = games.language
+                                            INNER JOIN categories ON categories.id = games.category
+                                   WHERE games.status = 1 AND games."user" = $1
+                                   ORDER BY games."createdAt" DESC;`,
                             values: [user],
                         });
                     } else {
                         results = await conn.query({
                             name: "gamesgetone",
-                            text: `SELECT  
-                                        json_build_object(
-                                            'id', games.id,
-                                            'language', json_build_object('id', languages.id, 'name', languages.name), 
-                                            'category', json_build_object('id', categories.id, 'name', categories.name),
-                                            'name', games.name, 
-                                            'author', json_build_object('id', author.id, 'name', author.name),
-                                            'visibility', games.visibility,
-                                            'description', games.description,
-                                            'questions', games.questions,
-                                            'updatedAt', games."updatedAt"
-                                        ) AS game
-                                    FROM games 
-                                        INNER JOIN users AS author ON author.id = games.author 
-                                        INNER JOIN languages ON languages.id = games.language
-                                        INNER JOIN categories ON categories.id = games.category
-                                    WHERE games.status = 1 AND games."id" = $1 AND (games."user" = $2 OR visibility=1)`,
+                            text: `SELECT
+                                       json_build_object(
+                                               'id', games.id,
+                                               'language', json_build_object('id', languages.id, 'name', languages.name),
+                                               'category', json_build_object('id', categories.id, 'name', categories.name),
+                                               'name', games.name,
+                                               'author', json_build_object('id', author.id, 'name', author.name),
+                                               'visibility', games.visibility,
+                                               'description', games.description,
+                                               'questions', games.questions,
+                                               'updatedAt', games."updatedAt"
+                                       ) AS game
+                                   FROM games
+                                            INNER JOIN users AS author ON author.id = games.author
+                                            INNER JOIN languages ON languages.id = games.language
+                                            INNER JOIN categories ON categories.id = games.category
+                                   WHERE games.status = 1 AND games."id" = $1 AND (games."user" = $2 OR visibility=1)`,
                             values: [event.queryStringParameters.id, user],
                         });
                     }
@@ -101,28 +101,28 @@ export const handler = async (event) => {
                     }
 
                     results = await conn.query({
-                        text: `SELECT 
-                                json_build_object(
-                                    'id', games.id,
-                                    'language', json_build_object('id', languages.id, 'name', languages.name), 
-                                    'category', json_build_object('id', categories.id, 'name', categories.name),
-                                    'name', games.name, 
-                                    'author', json_build_object('id', author.id, 'name', author.name),
-                                    'visibility', games.visibility,
-                                    'description', games.description,
-                                    'questions', games.questions,
-                                    'updatedAt', games."updatedAt"
-                                ) AS game
-                            FROM games 
-                                INNER JOIN users AS author ON author.id = games.author 
-                                INNER JOIN languages ON languages.id = games.language
-                                INNER JOIN categories ON categories.id = games.category
-                            WHERE games.status = 1 AND games.visibility=1 AND TRUE OR
-                                ( $1::text IS NOT NULL AND games.name ILIKE '%' || $1 || '%' ) OR 
-                                ( $2::integer IS NOT NULL AND games.category = $2 ) OR 
-                                ( $3::integer IS NOT NULL AND games.language = $3 )
-                            ORDER BY games."createdAt" DESC
-                            LIMIT $4`,
+                        text: `SELECT
+                                   json_build_object(
+                                           'id', games.id,
+                                           'language', json_build_object('id', languages.id, 'name', languages.name),
+                                           'category', json_build_object('id', categories.id, 'name', categories.name),
+                                           'name', games.name,
+                                           'author', json_build_object('id', author.id, 'name', author.name),
+                                           'visibility', games.visibility,
+                                           'description', games.description,
+                                           'questions', games.questions,
+                                           'updatedAt', games."updatedAt"
+                                   ) AS game
+                               FROM games
+                                        INNER JOIN users AS author ON author.id = games.author
+                                        INNER JOIN languages ON languages.id = games.language
+                                        INNER JOIN categories ON categories.id = games.category
+                               WHERE games.status = 1 AND games.visibility=1 AND TRUE OR
+                                   ( $1::text IS NOT NULL AND games.name ILIKE '%' || $1 || '%' ) OR
+                                   ( $2::integer IS NOT NULL AND games.category = $2 ) OR
+                                   ( $3::integer IS NOT NULL AND games.language = $3 )
+                               ORDER BY games."createdAt" DESC
+                                   LIMIT $4`,
                         values: [(queryParts['name'] === '') ? null : queryParts['name'] , parseInt(queryParts['category']) || null, parseInt(queryParts['language']) || null, parseInt(queryParts['limit']) || 10]
                     });
 
@@ -196,6 +196,32 @@ export const handler = async (event) => {
                                 }),
                             };
                         }
+
+
+                        if ( question.text.length > 1310 || question.answer.length > 122 ) {
+                            return {
+                                statusCode: 400,
+                                body: JSON.stringify({
+                                    errorCode: 1,
+                                    errorMessage:
+                                        "Numero de caracteres excedido",
+                                }),
+                            };
+                        }
+
+                        for (let answer of question.answers){
+                            if ( answer.length > 122 ) {
+                                return {
+                                    statusCode: 400,
+                                    body: JSON.stringify({
+                                        errorCode: 1,
+                                        errorMessage:
+                                            "Numero de caracteres das alternativas excedido",
+                                    }),
+                                };
+                            }
+                        }
+
                     }
 
                     let questions = [];
@@ -553,24 +579,24 @@ export const handler = async (event) => {
             }
 
             results = await conn.query({
-                text: `SELECT  
-                            json_build_object(
-                                'id', games.id,
-                                'language', json_build_object('id', languages.id, 'name', languages.name), 
-                                'category', json_build_object('id', categories.id, 'name', categories.name),
-                                'name', games.name, 
-                                'author', json_build_object('id', author.id, 'name', author.name),
-                                'visibility', games.visibility,
-                                'description', games.description,
-                                'questions', games.questions,
-                                'updatedAt', games."updatedAt"
-                            ) AS game
-                        FROM games 
-                            INNER JOIN users AS author ON author.id = games.author 
-                            INNER JOIN languages ON languages.id = games.language
-                            INNER JOIN categories ON categories.id = games.category
-                        WHERE games.status = 1 AND games.id = $1
-                        ORDER BY games."createdAt" DESC;`,
+                text: `SELECT
+                           json_build_object(
+                                   'id', games.id,
+                                   'language', json_build_object('id', languages.id, 'name', languages.name),
+                                   'category', json_build_object('id', categories.id, 'name', categories.name),
+                                   'name', games.name,
+                                   'author', json_build_object('id', author.id, 'name', author.name),
+                                   'visibility', games.visibility,
+                                   'description', games.description,
+                                   'questions', games.questions,
+                                   'updatedAt', games."updatedAt"
+                           ) AS game
+                       FROM games
+                                INNER JOIN users AS author ON author.id = games.author
+                                INNER JOIN languages ON languages.id = games.language
+                                INNER JOIN categories ON categories.id = games.category
+                       WHERE games.status = 1 AND games.id = $1
+                       ORDER BY games."createdAt" DESC;`,
                 values: [results.rows[0].id],
             });
 
