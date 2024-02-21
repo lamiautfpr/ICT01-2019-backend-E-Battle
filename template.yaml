@@ -333,6 +333,14 @@ Resources:
             ApiId: !Ref EbattleApi
             Path: /register
             Method: post
+        EbattleApiEmails:
+          Type: HttpApi
+          Properties:
+            ApiId: !Ref EbattleApi
+            Path: /register/mail
+            Method: post
+            Auth:
+              Authorizer: Authorizer
   Users:
     Type: AWS::Serverless::Function
     Properties:

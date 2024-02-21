@@ -26,6 +26,26 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/RegisterResponse'
+  /register/mail:
+    post:
+      tags:
+        - Authentication
+      description: Registra um email a lista de emails autorizados
+      operationId: registerEmail
+      requestBody:
+        description: Email a registrar
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RegisterEmail'
+        required: true
+      responses:
+        '200':
+          description: Email registrado com sucesso
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RegisterEmailResponse'
   /login:
     post:
       tags:
@@ -409,6 +429,13 @@ components:
         - name
         - email
         - password
+    RegisterEmail:
+      type: object
+      properties:
+        email:
+          type: string
+          description: Email para registro
+          example: 'teste@gmail.com'
     Login:
       type: object
       properties:
@@ -679,6 +706,29 @@ components:
           type: string
           description: Email do usuário
           example: 'teste@gmail.com'
+    RegisterEmailResponse:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: id do email
+          example: 1
+        email:
+          type: string
+          description: Email cadastrado
+          example: 'teste@gmail.com'
+        situation:
+          type: object
+          properties:
+            id:
+              type: integer
+              description: id da situação do email
+              example: 1
+            description:
+              type: string
+              description: Descrição da situação do email que foi registrado
+              example: 'Email enviado'
+
     LoginResponse:
       type: object
       properties:
