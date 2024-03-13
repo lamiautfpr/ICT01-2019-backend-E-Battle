@@ -22,6 +22,12 @@ Parameters:
   DBHost:
     Type: String
     Default: lamiadb1.ceoy3jbkraru.us-east-1.rds.amazonaws.com
+  SupportEmail:
+    Type: String
+    Default: support_ebattle@lamia-edu.com
+  RedirectLink:
+    Type: String
+    Default: https://ebattle.lamia-edu.com
 
 Globals:
   Function:
@@ -333,11 +339,33 @@ Resources:
             ApiId: !Ref EbattleApi
             Path: /register
             Method: post
-        EbattleApiEmails:
+  Emails:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: src/endpoints/mails/
+      Role: !GetAtt LambdaRole.Arn
+      Events:
+        EbattleApiMailRegister:
           Type: HttpApi
           Properties:
             ApiId: !Ref EbattleApi
-            Path: /register/mail
+            Path: /mails/registermail
+            Method: post
+            Auth:
+              Authorizer: Authorizer
+        EbattleApiMailVerify:
+          Type: HttpApi
+          Properties:
+            ApiId: !Ref EbattleApi
+            Path: /mails/verify
+            Method: post
+            Auth:
+              Authorizer: Authorizer
+        EbattleApiMailInvite:
+          Type: HttpApi
+          Properties:
+            ApiId: !Ref EbattleApi
+            Path: /mails/invite
             Method: post
             Auth:
               Authorizer: Authorizer
