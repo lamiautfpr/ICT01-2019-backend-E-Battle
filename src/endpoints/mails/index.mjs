@@ -211,7 +211,7 @@ export const handler = async (event) => {
                     }
 
                     // Começando o envio do email
-                    const corpoEmail = await bodyEmail('invite_email',body['email'])
+                    const corpoEmail = await bodyEmail('invite_email',body['emails'])
 
                     try {
                         const sendEmailCommand = new SendEmailCommand({
