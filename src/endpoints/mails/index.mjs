@@ -1,9 +1,46 @@
+import fs from 'fs/promises';
 import { getConn } from "/opt/nodejs/database.mjs";
+import { S3Client, GetObjectCommand } from "@aws-sdk/client-s3";
 import { SESClient, SendEmailCommand} from "@aws-sdk/client-ses";
 
 function validaEmail(email) {
     var re = /\S+@\S+\.\S+/;
     return re.test(email);
+}
+
+// Função auxiliar para converter um stream em uma string
+async function streamToString(stream) {
+    const chunks = [];
+    return new Promise((resolve, reject) => {
+        stream.on('data', chunk => chunks.push(chunk));
+        stream.on('error', reject);
+        stream.on('end', () => resolve(Buffer.concat(chunks).toString('utf-8')));
+    });
+}
+
+async function bodyEmail(target, email){
+
+    // Crie uma instância do cliente S3
+    const s3Client = new S3Client({ region: 'us-east-1' });
+
+    try {
+        // Crie um comando para obter o objeto (arquivo) do S3
+        const getObjectCommand = new GetObjectCommand({Bucket: 'ebattle-api-static-dev',Key: `backend_assets/${target}/index.html`});
+
+        // Execute o comando para obter o objeto do S3
+        const { Body } = await s3Client.send(getObjectCommand);
+
+        // Leia o conteúdo do objeto (arquivo) do S3
+        let htmlContent = await streamToString(Body); // Implemente a função 'streamToString' para converter o stream em uma string
+
+        // Substituir o link no conteúdo HTML
+        htmlContent = htmlContent.replace('href="https://ebattle.lamia-edu.com/?email="',
+            `href="${process.env.REDIRECT_LINK}?email=${email}"`);
+
+        return htmlContent;
+    } catch (error) {
+        return error.message
+    }
 }
 
 export const handler = async (event) => {
@@ -21,7 +58,6 @@ export const handler = async (event) => {
 
             switch (event.routeKey){
                 case "POST /mails/registermail":{
-
                     let body;
 
                     try {
@@ -96,26 +132,20 @@ export const handler = async (event) => {
                     }
 
                     // Começando o envio do email
-                    const corpoEmail = `
-                        <h1>Seja muito Bem-Vindo!</h1>
-                        <p>Aprender nunca foi tão fácil!</p>
-                        <p>O objetivo principal do projeto E-Battle é o de estimular o aprendizado em sala de aula através da competitividade saudável entre os jogadores.</p>
-                        <a href='${redirectLink}'><button>Começar</button></a>
-                        <p>Atenciosamente,<br>Support Ebattle</p>
-                    `;
+                    const corpoEmail = await bodyEmail('invite_email',body['email'])
 
                     try {
                         const sendEmailCommand = new SendEmailCommand({
-                            Source: fromMail,
+                            Source: `Support E-Battle <${fromMail}>`,
                             ReplyToAddresses: [fromMail],
                             Destination: { ToAddresses: [body["email"]] },
                             Message: {
-                                Subject: { Data: 'Confirme Seu Endereço de E-mail' },
-                                Body: { Charset: "UTF-8", Html: { Data: corpoEmail } },
+                                Subject: { Data: 'Bem vindo ao Ebattle' },
+                                Body: {Html: { Data: corpoEmail } },
                             },
                         });
-
                         await sesClient.send(sendEmailCommand);
+
                     }catch (e){
                         return {
                             statusCode: 500,
@@ -180,31 +210,26 @@ export const handler = async (event) => {
                         };
                     }
 
-                    const corpoEmail = `
-                        <h1>Seja muito Bem-Vindo!</h1>
-                        <p>Aprender nunca foi tão fácil!</p>
-                        <p>O objetivo principal do projeto E-Battle é o de estimular o aprendizado em sala de aula através da competitividade saudável entre os jogadores.</p>
-                        <a href='${redirectLink}'><button>Começar</button></a>
-                        <p>Atenciosamente,<br>Support Ebattle</p>
-                    `;
+                    // Começando o envio do email
+                    const corpoEmail = await bodyEmail('invite_email',body['email'])
 
                     try {
                         const sendEmailCommand = new SendEmailCommand({
-                            Source: fromMail,
+                            Source: `Support E-Battle <${fromMail}>`,
                             ReplyToAddresses: [fromMail],
                             Destination: { ToAddresses: toMails },
                             Message: {
-                                Subject: { Data: 'Confirme Seu Endereço de E-mail' },
-                                Body: { Charset: "UTF-8", Html: { Data: corpoEmail } },
+                                Subject: { Data: 'Bem vindo ao Ebattle' },
+                                Body: {Html: { Data: corpoEmail } },
                             },
                         });
-
                         await sesClient.send(sendEmailCommand);
 
                         return {
                             statusCode: 200,
                             body: JSON.stringify({ "SentEmails": toMails }),
                         };
+
                     }catch (e){
                         return {
                             statusCode: 500,

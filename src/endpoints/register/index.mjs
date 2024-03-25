@@ -44,7 +44,7 @@ export const handler = async (event) => {
                             };
                         }
 
-                        if(body["email"] != "" && !validaEmail(body["email"])){
+                        if(body["email"] == "" || !validaEmail(body["email"])){
                             return {
                                 statusCode: 400,
                                 body: JSON.stringify({
@@ -56,7 +56,7 @@ export const handler = async (event) => {
                             };
                         }
 
-                        if (body["password"] != "" && body["password"].length < 8){
+                        if (body["password"] == "" || body["password"].length < 8){
                             return {
                                 statusCode: 400,
                                 body: JSON.stringify({
@@ -169,86 +169,6 @@ export const handler = async (event) => {
                             }),
                         };
                     }
-                }
-
-                case "POST /register/mail":{
-                    let body;
-
-                    try {
-                        body = JSON.parse(event.body);
-                    }catch (error){
-                        return {
-                            statusCode: 400,
-                            body: JSON.stringify({
-                                statusCode: 400,
-                                status: "Bad Request",
-                                errorCode: 1,
-                                error: "Invalid email",
-                            }),
-                        };
-                    }
-
-                    if (!validaEmail(body["email"])){
-                        return {
-                            statusCode: 400,
-                            body: JSON.stringify({
-                                statusCode: 400,
-                                status: "Bad Request",
-                                errorCode: 1,
-                                error: "Invalid email",
-                            }),
-                        };
-                    }
-
-                    try {
-                        results = await conn.query({
-                            name: "registerEmail",
-                            text: 'INSERT INTO email_controller ("email", "situation", "createdAt", "updatedAt") VALUES ($1, $2, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP) RETURNING id',
-                            values: [
-                                body.email,
-                                1 // {0:"Em espera de envio",1:"Email enviado", 2:"Enviado e usuario cadastrado"}
-                            ],
-                        });
-                    } catch (e) {
-                        if (
-                            e.message == 'duplicate key value violates unique constraint "email_controller_pk"'
-                        ) {
-                            return {
-                                statusCode: 400,
-                                body: JSON.stringify({
-                                    statusCode: 400,
-                                    status: "Bad Request",
-                                    errorCode: 2,
-                                    error: "Email already registered",
-                                })
-                            };
-                        }
-                    }
-
-
-                    results = await conn.query({
-                        text: `SELECT
-                                   json_build_object(
-                                           'id', mail.id,
-                                           'email', mail.email,
-                                           'situation', mail.situation
-                                   ) AS email
-                               FROM email_controller AS mail
-                               WHERE mail."id" = $1`,
-                        values: [results.rows[0].id],
-                    });
-
-                    let situations = {0:"Em espera de envio",1:"Email enviado", 2:"Enviado e usuario cadastrado"}
-
-                    results.rows[0].email.situation = {
-                        "id": results.rows[0].email.situation,
-                        "description": situations[results.rows[0].email.situation]
-                    };
-
-                    return {
-                        statusCode: 200,
-                        body: JSON.stringify(results.rows[0].email),
-                    };
                 }
             }
         }
