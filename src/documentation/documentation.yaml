@@ -26,6 +26,88 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/RegisterResponse'
+  /mails/register:
+    post:
+      tags:
+        - Emails
+      description: Registra e ja envia o email de convite
+      operationId: emailRegister
+      requestBody:
+        description: Email a registrar
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RegisterEmail'
+        required: true
+      responses:
+        '200':
+          description: Email registrado com sucesso
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RegisterEmailResponse'
+      security:
+        - authToken: [ ]
+  /mails/invite:
+    post:
+      tags:
+        - Emails
+      description: Envia o convite para emails ja registrados a lista
+      operationId: emailRegister
+      requestBody:
+        description: Email a registrar
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RegisterEmail'
+        required: true
+      responses:
+        '200':
+          description: Email registrado com sucesso
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RegisterEmailResponse'
+  /mails/verify:
+    post:
+      tags:
+        - Emails
+      description: Envia email de verificação para um email especifico
+      operationId: emailRegister
+      requestBody:
+        description: Email a registrar
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RegisterEmail'
+        required: true
+      responses:
+        '200':
+          description: Email registrado com sucesso
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RegisterEmailResponse'
+  /mails/recovery:
+    post:
+      tags:
+        - Emails
+      description: Envia o email de recuperação de senha
+      operationId: emailRecovery
+      requestBody:
+        description: Email que vai trocar a senha
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RegisterEmail'
+        required: true
+      responses:
+        '200':
+          description: Email enviado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RegisterEmailResponse'
   /login:
     post:
       tags:
@@ -111,6 +193,20 @@ paths:
                 $ref: '#/components/schemas/EditUserResponse'
       security:
         - authToken: [ ]
+    post:
+      tags:
+        - Users
+      description: Altera a senha de um usuario
+      operationId: userUpdatePassword
+      requestBody:
+        description: Informações que serão alteradas
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EditPasswordUser'
+      responses:
+        '200':
+          description: Informações do usuário editado com sucesso.
   /matches:
     get:
       tags:
@@ -409,6 +505,15 @@ components:
         - name
         - email
         - password
+    RegisterEmail:
+      type: object
+      properties:
+        email:
+          type: string
+          description: Email para registro
+          example: 'teste@gmail.com'
+      required:
+        - email
     Login:
       type: object
       properties:
@@ -423,6 +528,17 @@ components:
       required:
         - email
         - password
+    EditPasswordUser:
+      type: object
+      properties:
+        email:
+          type: string
+          description: Email do usuario
+          example: info@gmail.com
+        password:
+          type: any
+          description: Nova senha do usuario
+          example: "12345678"
     EditUser:
       type: object
       properties:
@@ -679,6 +795,29 @@ components:
           type: string
           description: Email do usuário
           example: 'teste@gmail.com'
+    RegisterEmailResponse:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: id do email
+          example: 1
+        email:
+          type: string
+          description: Email cadastrado
+          example: 'teste@gmail.com'
+        situation:
+          type: object
+          properties:
+            id:
+              type: integer
+              description: id da situação do email
+              example: 1
+            description:
+              type: string
+              description: Descrição da situação do email que foi registrado
+              example: 'Email enviado'
+
     LoginResponse:
       type: object
       properties:
