@@ -16,7 +16,6 @@ export const handler = async (event) => {
             switch(event.routeKey){
                 case "POST /register":{
                     if(event.body != null){
-
                         const body = JSON.parse(event.body);
 
                         let missing = [];

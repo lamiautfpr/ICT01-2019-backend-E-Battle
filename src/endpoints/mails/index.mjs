@@ -52,37 +52,44 @@ export const handler = async (event) => {
             return
         }
         case "POST": {
+            let body;
             const sesClient = new SESClient({ region: 'us-east-1' });
             const fromMail = process.env.SUPPORT_EMAIL;
             const redirectLink = process.env.REDIRECT_LINK;
 
+            let situations = {
+                0:"Em espera de envio",
+                1:"Email enviado",
+                2:"Enviado e usuario cadastrado",
+                3:"Email de recuperação de senha enviado"
+            }
+
+            try {
+                body = JSON.parse(event.body);
+            }catch (error){
+                return {
+                    statusCode: 400,
+                    body: JSON.stringify({
+                        statusCode: 400,
+                        status: "Bad Request",
+                        errorCode: 1,
+                        error: "Invalid email",
+                    }),
+                };
+            }
+
+            if ((!body.email) && (!body.mails)){
+                return {
+                    statusCode: 400,
+                    body: JSON.stringify({
+                        errorCode: 1,
+                        errorMessage: "Faltam argumentos, revise a documentação",
+                    }),
+                };
+            }
+
             switch (event.routeKey){
                 case "POST /mails/registermail":{
-                    let body;
-
-                    try {
-                        body = JSON.parse(event.body);
-                    }catch (error){
-                        return {
-                            statusCode: 400,
-                            body: JSON.stringify({
-                                statusCode: 400,
-                                status: "Bad Request",
-                                errorCode: 1,
-                                error: "Invalid email",
-                            }),
-                        };
-                    }
-
-                    if (!body.email){
-                        return {
-                            statusCode: 400,
-                            body: JSON.stringify({
-                                errorCode: 1,
-                                errorMessage: "Faltam argumentos, revise a documentação",
-                            }),
-                        };
-                    }
 
                     if (!validaEmail(body["email"])){
                         return {
@@ -136,11 +143,11 @@ export const handler = async (event) => {
 
                     try {
                         const sendEmailCommand = new SendEmailCommand({
-                            Source: `Support E-Battle <${fromMail}>`,
+                            Source: `Suporte E-Battle <${fromMail}>`,
                             ReplyToAddresses: [fromMail],
                             Destination: { ToAddresses: [body["email"]] },
                             Message: {
-                                Subject: { Data: 'Bem vindo ao Ebattle' },
+                                Subject: { Data: 'Bem vindo ao E-Battle' },
                                 Body: {Html: { Data: corpoEmail } },
                             },
                         });
@@ -168,8 +175,6 @@ export const handler = async (event) => {
                                WHERE mail."id" = $1`,
                         values: [results.rows[0].id],
                     });
-
-                    let situations = {0:"Em espera de envio",1:"Email enviado", 2:"Enviado e usuario cadastrado"}
 
                     results.rows[0].email.situation = {
                         "id": results.rows[0].email.situation,
@@ -215,11 +220,11 @@ export const handler = async (event) => {
 
                     try {
                         const sendEmailCommand = new SendEmailCommand({
-                            Source: `Support E-Battle <${fromMail}>`,
+                            Source: `Suporte E-Battle <${fromMail}>`,
                             ReplyToAddresses: [fromMail],
                             Destination: { ToAddresses: toMails },
                             Message: {
-                                Subject: { Data: 'Bem vindo ao Ebattle' },
+                                Subject: { Data: 'Bem vindo ao E-Battle' },
                                 Body: {Html: { Data: corpoEmail } },
                             },
                         });
@@ -239,6 +244,103 @@ export const handler = async (event) => {
                             }),
                         };
                     }
+                }
+                case "POST /mails/recovery": {
+
+                    if (!validaEmail(body["email"])){
+                        return {
+                            statusCode: 400,
+                            body: JSON.stringify({
+                                statusCode: 400,
+                                status: "Bad Request",
+                                errorCode: 1,
+                                error: "Invalid email",
+                            }),
+                        };
+                    }
+
+                    if(typeof(body["email"]) != "string"){
+                        return {
+                            statusCode: 400,
+                            body: JSON.stringify({
+                                errorCode: 1,
+                                errorMessage: "Argumentos com tipo invalido, revise a documentação",
+                            }),
+                        };
+                    }
+
+                    results = await conn.query({
+                        name: "recoveryEmail",
+                        text: "SELECT id, name, email FROM users WHERE email = $1",
+                        values: [body.email],
+                    });
+
+                    if (results.rows.length == 0){
+                        return {
+                            statusCode: 404,
+                            body: JSON.stringify({
+                                status: "Not Found",
+                                errorCode: 2,
+                                error: "Email não encontrado",
+                            }),
+                        };
+                    }
+
+                    await conn.query({
+                        name: "updateEmailRecoverySituation",
+                        text: 'UPDATE email_controller SET situation = $2 WHERE email = $1',
+                        values: [
+                            results.rows[0].email,
+                            3 // {0:"Em espera de envio",1:"Email enviado", 2:"Enviado e usuario cadastrado", 3:"Recuperação de senha solicitada"}
+                        ],
+                    });
+
+                    // Começando o envio do email
+                    const corpoEmail = await bodyEmail('invite_email',body['email'])
+
+                    try {
+                        const sendEmailCommand = new SendEmailCommand({
+                            Source: `Suporte E-Battle <${fromMail}>`,
+                            ReplyToAddresses: [fromMail],
+                            Destination: { ToAddresses: [body["email"]] },
+                            Message: {
+                                Subject: { Data: 'Recuperação de senha' },
+                                Body: {Html: { Data: corpoEmail } },
+                            },
+                        });
+                        await sesClient.send(sendEmailCommand);
+                    }catch (e){
+                        return {
+                            statusCode: 500,
+                            body: JSON.stringify({
+                                errorCode: 2,
+                                errorMessage: e.message,
+                            }),
+                        };
+                    }
+
+                    // email enviado agr o retorno
+                    results = await conn.query({
+                        text: `SELECT
+                                   json_build_object(
+                                           'id', mail.id,
+                                           'email', mail.email,
+                                           'situation', mail.situation
+                                   ) AS email
+                               FROM email_controller AS mail
+                               WHERE mail.email = $1`,
+                        values: [results.rows[0].email],
+                    });
+
+                    results.rows[0].email.situation = {
+                        "id": results.rows[0].email.situation,
+                        "description": situations[results.rows[0].email.situation]
+                    };
+
+                    return {
+                        statusCode: 200,
+                        body: JSON.stringify(results.rows[0].email),
+                    };
                 }
             }
         }

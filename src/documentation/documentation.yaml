@@ -46,6 +46,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/RegisterEmailResponse'
+      security:
+        - authToken: [ ]
   /mails/invite:
     post:
       tags:
@@ -82,6 +84,26 @@ paths:
       responses:
         '200':
           description: Email registrado com sucesso
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RegisterEmailResponse'
+  /mails/recovery:
+    post:
+      tags:
+        - Emails
+      description: Envia o email de recuperação de senha
+      operationId: emailRecovery
+      requestBody:
+        description: Email que vai trocar a senha
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RegisterEmail'
+        required: true
+      responses:
+        '200':
+          description: Email enviado
           content:
             application/json:
               schema:
@@ -171,6 +193,20 @@ paths:
                 $ref: '#/components/schemas/EditUserResponse'
       security:
         - authToken: [ ]
+    post:
+      tags:
+        - Users
+      description: Altera a senha de um usuario
+      operationId: userUpdatePassword
+      requestBody:
+        description: Informações que serão alteradas
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EditPasswordUser'
+      responses:
+        '200':
+          description: Informações do usuário editado com sucesso.
   /matches:
     get:
       tags:
@@ -492,6 +528,17 @@ components:
       required:
         - email
         - password
+    EditPasswordUser:
+      type: object
+      properties:
+        email:
+          type: string
+          description: Email do usuario
+          example: info@gmail.com
+        password:
+          type: any
+          description: Nova senha do usuario
+          example: "12345678"
     EditUser:
       type: object
       properties:

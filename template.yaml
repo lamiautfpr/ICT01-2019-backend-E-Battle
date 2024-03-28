@@ -369,6 +369,12 @@ Resources:
             Method: post
             Auth:
               Authorizer: Authorizer
+        EbattleApiMailRecovery:
+          Type: HttpApi
+          Properties:
+            ApiId: !Ref EbattleApi
+            Path: /mails/recovery
+            Method: post
   Users:
     Type: AWS::Serverless::Function
     Properties:
@@ -391,6 +397,12 @@ Resources:
             Method: put
             Auth:
               Authorizer: Authorizer
+        EbattleApiPost:
+          Type: HttpApi
+          Properties:
+            ApiId: !Ref EbattleApi
+            Path: /users
+            Method: post
   Categories:
     Type: AWS::Serverless::Function
     Properties:
