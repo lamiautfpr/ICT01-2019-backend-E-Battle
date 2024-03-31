@@ -76,9 +76,9 @@ export const handler = async (event) => {
                         error: "Invalid email",
                     }),
                 };
-            }
+            }body['emails']
 
-            if ((!body.email) && (!body.mails)){
+            if ((!body.email) && (!body.emails)){
                 return {
                     statusCode: 400,
                     body: JSON.stringify({
