@@ -31,7 +31,8 @@ export const handler = async (event) => {
                                         INNER JOIN users author ON author.id = games.author 
                                         INNER JOIN languages on languages.id = games.language
                                         INNER JOIN categories on categories.id = games.category
-                                   WHERE games.user = $1;`,
+                                   WHERE games.user = $1
+                                   ORDER BY matches."createdAt" DESC;`,
                             values: [user],
                         });
                     }else{
@@ -118,7 +119,6 @@ export const handler = async (event) => {
                             values: [id, user],
                         });
                     }
-
                     break;
                 }
             }
@@ -265,19 +265,19 @@ export const handler = async (event) => {
                         text: `SELECT
                                    matches.id, matches.game, matches.spaces, matches.groups, matches.random, matches.trivia,
                                    json_build_object(
-                                           'user', games.user,
-                                           'visibility', games.visibility,
-                                           'language', json_build_object('id', languages.id, 'name', languages.name),
-                                           'category', json_build_object('id', categories.id, 'name', categories.name),
-                                           'name', games.name,
-                                           'author', json_build_object('id', author.id, 'name', author.name),
-                                           'questions', games.questions
+                                       'user', games.user,
+                                       'visibility', games.visibility,
+                                       'language', json_build_object('id', languages.id, 'name', languages.name),
+                                       'category', json_build_object('id', categories.id, 'name', categories.name),
+                                       'name', games.name,
+                                       'author', json_build_object('id', author.id, 'name', author.name),
+                                       'questions', games.questions
                                    ) AS game
                                FROM matches
-                                        INNER JOIN games ON games.id = matches.game
-                                        INNER JOIN users author ON author.id = games.author
-                                        INNER JOIN languages on languages.id = games.language
-                                        INNER JOIN categories on categories.id = games.category
+                                    INNER JOIN games ON games.id = matches.game
+                                    INNER JOIN users author ON author.id = games.author 
+                                    INNER JOIN languages on languages.id = games.language
+                                    INNER JOIN categories on categories.id = games.category
                                WHERE
                                    matches.id = $1 AND games.user = $2;`,
                         values: [results.rows[0].id, user],
@@ -350,9 +350,9 @@ export const handler = async (event) => {
                     results = await conn.query({
                         name: "validateupdatematch",
                         text: `SELECT matches.id
-                               FROM matches
-                                        INNER JOIN games ON games.id = matches.game
-                               WHERE games.user = $1 AND matches.id = $2`,
+                                FROM matches
+                                INNER JOIN games ON games.id = matches.game
+                                WHERE games.user = $1 AND matches.id = $2`,
                         values: [user,body.match],
                     });
 
