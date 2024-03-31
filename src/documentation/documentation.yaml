@@ -505,6 +505,7 @@ components:
         - name
         - email
         - password
+        - institution
     RegisterEmail:
       type: object
       properties:
