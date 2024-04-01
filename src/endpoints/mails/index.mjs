@@ -76,7 +76,7 @@ export const handler = async (event) => {
                         error: "Invalid email",
                     }),
                 };
-            }body['emails']
+            }
 
             if ((!body.email) && (!body.emails)){
                 return {
@@ -217,7 +217,7 @@ export const handler = async (event) => {
 
                     // Começando o envio do email
                     const corpoEmail = await bodyEmail('invite_email',body['emails'])
-
+                    //return body['emails']
                     try {
                         const sendEmailCommand = new SendEmailCommand({
                             Source: `Suporte E-Battle <${fromMail}>`,
