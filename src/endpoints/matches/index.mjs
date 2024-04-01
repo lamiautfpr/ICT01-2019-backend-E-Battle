@@ -9,46 +9,60 @@ export const handler = async (event) => {
     switch (event.requestContext.http.method) {
         case "GET": {
 
-            if (!(event.queryStringParameters && event.queryStringParameters.id)) {
-                return {
-                    statusCode: 400,
-                    body: JSON.stringify({
-                        errorCode: 1,
-                        errorMessage: "Falta o argumento id do Match",
-                    }),
-                };
-            }
-
-            let id = event.queryStringParameters.id;
-
+            let id = ((event.queryStringParameters && event.queryStringParameters.id)) ? event.queryStringParameters.id : undefined;
             switch (event.routeKey){
                 case "GET /matches":{
-                    results = await conn.query({
-                        name: "matchesget",
-                        text: `SELECT
-                                   matches.id, matches.game, matches.spaces, matches.groups, matches.random, matches.trivia,
-                                   json_build_object(
-                                       'user', games.user,
-                                       'visibility', games.visibility,
-                                       'language', json_build_object('id', languages.id, 'name', languages.name),
-                                       'category', json_build_object('id', categories.id, 'name', categories.name),
-                                       'name', games.name,
-                                       'author', json_build_object('id', author.id, 'name', author.name),
-                                       'questions', games.questions
-                                   ) AS game
-                               FROM matches
-                                    INNER JOIN games ON games.id = matches.game
-                                    INNER JOIN users author ON author.id = games.author 
-                                    INNER JOIN languages on languages.id = games.language
-                                    INNER JOIN categories on categories.id = games.category
-                               WHERE
-                                   matches.id = $1 AND games.user = $2;`,
-                        values: [id, user],
-                    });
+                    if (id == undefined){
+                        results = await conn.query({
+                            name: "matchesgetall",
+                            text: `SELECT
+                                       matches.id, matches.game, matches.spaces, matches.groups, matches.random, matches.trivia,
+                                       json_build_object(
+                                           'user', games.user,
+                                           'visibility', games.visibility,
+                                           'language', json_build_object('id', languages.id, 'name', languages.name),
+                                           'category', json_build_object('id', categories.id, 'name', categories.name),
+                                           'name', games.name,
+                                           'author', json_build_object('id', author.id, 'name', author.name),
+                                           'questions', games.questions
+                                       ) AS game
+                                   FROM matches
+                                        INNER JOIN games ON games.id = matches.game
+                                        INNER JOIN users author ON author.id = games.author 
+                                        INNER JOIN languages on languages.id = games.language
+                                        INNER JOIN categories on categories.id = games.category
+                                   WHERE games.user = $1
+                                   ORDER BY matches."createdAt" DESC;`,
+                            values: [user],
+                        });
+                    }else{
+                        results = await conn.query({
+                            name: "matchesgetunique",
+                            text: `SELECT
+                                       matches.id, matches.game, matches.spaces, matches.groups, matches.random, matches.trivia,
+                                       json_build_object(
+                                           'user', games.user,
+                                           'visibility', games.visibility,
+                                           'language', json_build_object('id', languages.id, 'name', languages.name),
+                                           'category', json_build_object('id', categories.id, 'name', categories.name),
+                                           'name', games.name,
+                                           'author', json_build_object('id', author.id, 'name', author.name),
+                                           'questions', games.questions
+                                       ) AS game
+                                   FROM matches
+                                        INNER JOIN games ON games.id = matches.game
+                                        INNER JOIN users author ON author.id = games.author 
+                                        INNER JOIN languages on languages.id = games.language
+                                        INNER JOIN categories on categories.id = games.category
+                                   WHERE
+                                      matches.id = $1 AND games.user = $2;`,
+                            values: [id, user],
+                        });
+                    }
 
-                    if (results.rows.length != 1) {
+                    if (results.rows.length < 1) {
                         return {
-                            statusCode: 400,
+                            statusCode: 404,
                             body: JSON.stringify({
                                 errorMessage: "Match não encontrado",
                             }),
@@ -62,45 +76,65 @@ export const handler = async (event) => {
                         }
                     }
 
-
                     break;
                 }
                 case "GET /matches/result":{
-                    results = await conn.query({
-                        name: "matchesgetresult",
-                        text: ` SELECT
-                                    matches.id AS match,
-                                    games.id AS game,
-                                    games.name as name,
-                                    matches."createdAt",
-                                    EXTRACT(
-                                        epoch FROM (matches."closedAt" - matches."createdAt")
-                                    ) as timeDuration,
-                                    matches.groups,
-                                    matches.podium,
-                                    matches.turns
-                                FROM matches
-                                INNER JOIN games ON games.id = matches.game
-                                WHERE matches.id = $1 AND games.user = $2 AND matches."closedAt" IS NOT NULL;`,
-                        values: [id, user],
-                    });
 
+                    if (id == undefined){
+                        results = await conn.query({
+                            name: "matchesgetresult",
+                            text: ` SELECT
+                                        matches.id AS match,
+                                        games.id AS game,
+                                        games.name as name,
+                                        matches."createdAt",
+                                        EXTRACT(
+                                            epoch FROM (matches."closedAt" - matches."createdAt")
+                                        ) as timeDuration,
+                                        matches.groups,
+                                        matches.podium,
+                                        matches.turns
+                                    FROM matches
+                                    INNER JOIN games ON games.id = matches.game
+                                    WHERE games.user = $1 AND matches."closedAt" IS NOT NULL;`,
+                            values: [user],
+                        });
+                    }else{
+                        results = await conn.query({
+                            name: "matchesgetresult",
+                            text: ` SELECT
+                                        matches.id AS match,
+                                        games.id AS game,
+                                        games.name as name,
+                                        matches."createdAt",
+                                        EXTRACT(
+                                            epoch FROM (matches."closedAt" - matches."createdAt")
+                                        ) as timeDuration,
+                                        matches.groups,
+                                        matches.podium,
+                                        matches.turns
+                                    FROM matches
+                                    INNER JOIN games ON games.id = matches.game
+                                    WHERE matches.id = $1 AND games.user = $2 AND matches."closedAt" IS NOT NULL;`,
+                            values: [id, user],
+                        });
+                    }
                     break;
                 }
             }
 
             if (results.rows.length != 1) {
                 return {
-                    statusCode: 400,
+                    statusCode: 404,
                     body: JSON.stringify({
-                        errorMessage: "Match não encontrado",
+                        errorMessage: "Nenhuma partida encontrada",
                     }),
                 };
             }
 
             return {
                 statusCode: 200,
-                body: JSON.stringify(results.rows[0]),
+                body: JSON.stringify(results.rows),
             };
         }
         case "POST": {
