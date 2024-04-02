@@ -68,6 +68,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/RegisterEmailResponse'
+      security:
+        - authToken: [ ]
   /mails/verify:
     post:
       tags:
@@ -88,6 +90,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/RegisterEmailResponse'
+      security:
+        - authToken: [ ]
   /mails/recovery:
     post:
       tags:
@@ -108,6 +112,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/RegisterEmailResponse'
+      security:
+        - authToken: [ ]
   /login:
     post:
       tags:
