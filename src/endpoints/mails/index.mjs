@@ -34,8 +34,9 @@ async function bodyEmail(target, email){
         let htmlContent = await streamToString(Body); // Implemente a função 'streamToString' para converter o stream em uma string
 
         // Substituir o link no conteúdo HTML
-        htmlContent = htmlContent.replace('href="https://ebattle.lamia-edu.com/?email="',
-            `href="${process.env.REDIRECT_LINK}?email=${email}"`);
+        let update_content = (target == 'invite_email') ? 'href="https://ebattle.lamia-edu.com/?email="' : 'href="https://ebattle.lamia-edu.com/resetPassword?email="'
+        let target_content = update_content.replace('email=',`email=${email}`)
+        htmlContent = htmlContent.replace(update_content,target_content);
 
         return htmlContent;
     } catch (error) {
@@ -296,8 +297,7 @@ export const handler = async (event) => {
                     });
 
                     // Começando o envio do email
-                    const corpoEmail = await bodyEmail('invite_email',body['email'])
-
+                    const corpoEmail = await bodyEmail('recovery_email',body['email'])
                     try {
                         const sendEmailCommand = new SendEmailCommand({
                             Source: `Suporte E-Battle <${fromMail}>`,
