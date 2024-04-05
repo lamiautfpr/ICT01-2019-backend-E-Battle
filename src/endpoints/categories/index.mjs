@@ -26,9 +26,9 @@ function transformarObjeto(listaObjetos) {
             resultado[nivel] = resultadoNivel;
 
             // Nível de Ensino
-            let nivelEnsino = conteudo.theaching_level;
+            let nivelEnsino = conteudo.teaching_level;
             if (nivelEnsino) {
-                resultadoNivel.theaching_level = nivelEnsino.name;
+                resultadoNivel.teaching_level = nivelEnsino.name;
             }
 
             // Tema do Jogo
@@ -77,7 +77,7 @@ export const handler = async () => {
         text: ` SELECT
                     json_object_agg(tl.id,
                             json_build_object(
-                                'theaching_level', json_build_object('id', tl.id, 'name', tl.name),
+                                'teaching_level', json_build_object('id', tl.id, 'name', tl.name),
                                 'game_theme', json_build_object('id', gt.id, 'name', gt.name),
                                 'category', json_build_object('id', c.id, 'name', c.name),
                                 'subcategory', json_build_object('id', s.id, 'name', s.name)
