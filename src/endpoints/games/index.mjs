@@ -4,7 +4,6 @@ import { S3Client, PutObjectCommand } from "@aws-sdk/client-s3";
 export const handler = async (event) => {
     const conn = await getConn();
     const user = event.requestContext.authorizer.lambda.user;
-
     let results = null;
 
     switch (event.requestContext.http.method) {
@@ -145,15 +144,24 @@ export const handler = async (event) => {
             break;
         }
         case "POST": {
+
+            let create_game_errors = {
+                '"games_categories_fk"': 'Categoria',
+                '"games_subcategory_fk"': 'Subcategoria',
+                '"games_languages_fk"': 'Linguagem',
+                '"games_teaching_level_fk"': 'Nivel de ensino',
+                '"games_theme_fk"': 'Tema'
+            };
+
             switch(event.routeKey){
                 case "POST /games":{
                     const body = JSON.parse(event.body);
-
                     if (
                         !(
-                            body.language &&
-                            body.category &&
-                            body.name &&
+                            body.language        &&
+                            body.teaching_level  &&
+                            body.theme           &&
+                            body.name            &&
                             body.questions
                         )
                     ) {
@@ -172,6 +180,37 @@ export const handler = async (event) => {
                             body: JSON.stringify({
                                 errorCode: 1,
                                 errorMessage: "É necessario ter ao menos uma pergunta",
+                            }),
+                        };
+                    }
+
+
+                    // Convertendo strings vazias para null
+                    if (typeof body.category == "string"){
+                        body.category = body.category.trim() || null;
+                    }
+
+                    if (typeof body.subcategory == "string"){
+                        body.subcategory = body.subcategory.trim() || null;
+                    }
+
+                    if (body.category == null && body.subcategory != null){
+                        return {
+                            statusCode: 400,
+                            body: JSON.stringify({
+                                errorCode: 1,
+                                errorMessage: "Argumentos invalidos, revise a documentação",
+                            }),
+                        }
+                    }
+
+                    if ((body.category !== null && (typeof body.category !== 'number' || !Number.isInteger(body.category))) ||
+                        (body.subcategory !== null && (typeof body.subcategory !== 'number' || !Number.isInteger(body.subcategory)))) {
+                        return {
+                            statusCode: 404,
+                            body: JSON.stringify({
+                                errorCode: 1,
+                                errorMessage: "Algum dos elementos [Categoria, Subcategoria] estão inválidos, revise a documentação",
                             }),
                         };
                     }
@@ -267,60 +306,61 @@ export const handler = async (event) => {
                     try {
                         results = await conn.query({
                             name: "gamescreate",
-                            text: 'INSERT INTO games ("user", "language", "category", "name", "visibility", "description", "questions", "author", "updatedAt") VALUES ($1, $2, $3, $4, $5, $6, $7, $1, CURRENT_TIMESTAMP) RETURNING id',
+                            text: `INSERT INTO games ( "user", "language", "teaching_level","theme","category","subcategory",
+                                                       "name", "visibility", "description", "questions", "author", "updatedAt") 
+                                                        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $1, CURRENT_TIMESTAMP) RETURNING id`,
                             values: [
                                 user,
                                 body.language,
-                                body.category,
+                                body.teaching_level,
+                                body.theme,
+                                body.category ?? null,
+                                body.subcategory ?? null,
                                 body.name,
                                 body.visibility ?? null,
                                 body.description ?? null,
-                                JSON.stringify(questions),
+                                JSON.stringify(questions)
                             ],
                         });
+
                     } catch (e) {
-                        if (
-                            e.message == 'insert or update on table "games" violates foreign key constraint "games_categories_fk"'
-                        ) {
+
+                        if (create_game_errors.hasOwnProperty(e.message.split('constraint ')[1])){
                             return {
                                 statusCode: 400,
                                 body: JSON.stringify({
                                     errorCode: 1,
-                                    errorMessage: "Categoria inexistente",
+                                    errorMessage: `${create_game_errors[e.message.split('constraint ')[1]]} inexistente`,
                                 }),
                             };
                         }
 
-                        if (
-                            e.message == 'insert or update on table "games" violates foreign key constraint "games_languages_fk"'
-                        ) {
-                            return {
-                                statusCode: 400,
-                                body: JSON.stringify({
-                                    errorCode: 1,
-                                    errorMessage: "Linguagem inexistente",
-                                }),
-                            };
-                        }
+                        return e.message
                     }
 
                     results = await conn.query({
                         text: `SELECT
                                    json_build_object(
-                                           'id', games.id,
-                                           'language', json_build_object('id', languages.id, 'name', languages.name),
-                                           'category', json_build_object('id', categories.id, 'name', categories.name),
-                                           'name', games.name,
-                                           'author', json_build_object('id', author.id, 'name', author.name, 'author_institution', author.institution),
-                                           'visibility', games.visibility,
-                                           'description', games.description,
-                                           'questions', games.questions,
-                                           'updatedAt', games."updatedAt"
+                                       'id', games.id,
+                                       'language', json_build_object('id', languages.id, 'name', languages.name),
+                                       'teaching_level', json_build_object('id', teaching_levels.id, 'name', teaching_levels.name),
+                                       'theme', json_build_object('id', game_themes.id, 'name', game_themes.name),
+                                       'category', json_build_object('id', categories.id, 'name', categories.name),
+                                       'subcategory', json_build_object('id', subcategories.id, 'name', subcategories.name),
+                                       'name', games.name,
+                                       'author', json_build_object('id', author.id, 'name', author.name, 'author_institution', author.institution),
+                                       'visibility', games.visibility,
+                                       'description', games.description,
+                                       'questions', games.questions,
+                                       'updatedAt', games."updatedAt"
                                    ) AS game
                                FROM games
-                                        INNER JOIN users AS author ON author.id = games.author
-                                        INNER JOIN languages ON languages.id = games.language
-                                        INNER JOIN categories ON categories.id = games.category
+                                    INNER JOIN users AS author ON author.id = games.author
+                                    INNER JOIN languages ON languages.id = games.language
+                                    INNER JOIN teaching_levels ON teaching_levels.id = games.teaching_level
+                                    INNER JOIN game_themes ON game_themes.id = games.theme
+                                    LEFT JOIN categories ON categories.id = games.category
+                                    LEFT JOIN subcategories ON subcategories.id = games.subcategory
                                WHERE games.status = 1 AND games."id" = $1`,
                         values: [results.rows[0].id],
                     });
