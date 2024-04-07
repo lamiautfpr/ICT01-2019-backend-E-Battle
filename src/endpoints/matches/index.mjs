@@ -18,26 +18,26 @@ export const handler = async (event) => {
                             text: `SELECT
                                        matches.id, matches.game, matches.spaces, matches.groups, matches.random, matches.trivia,
                                        json_build_object(
-                                           'user', games.user,
-                                           'visibility', games.visibility,
-                                           'language', json_build_object('id', languages.id, 'name', languages.name),
-                                           'teaching_level', json_build_object('id', teaching_levels.id, 'name', teaching_levels.name),
-                                           'theme', json_build_object('id', game_themes.id, 'name', game_themes.name),
-                                           'category', json_build_object('id', categories.id, 'name', categories.name),
-                                           'subcategory', json_build_object('id', subcategories.id, 'name', subcategories.name),
-                                           'description', games.description,
-                                           'visibility', games.visibility,
-                                           'name', games.name,
-                                           'author', json_build_object('id', author.id, 'name', author.name)
+                                               'user', games.user,
+                                               'visibility', games.visibility,
+                                               'language', json_build_object('id', languages.id, 'name', languages.name),
+                                               'teaching_level', json_build_object('id', teaching_levels.id, 'name', teaching_levels.name),
+                                               'theme', json_build_object('id', game_themes.id, 'name', game_themes.name),
+                                               'category', json_build_object('id', categories.id, 'name', categories.name),
+                                               'subcategory', json_build_object('id', subcategories.id, 'name', subcategories.name),
+                                               'description', games.description,
+                                               'visibility', games.visibility,
+                                               'name', games.name,
+                                               'author', json_build_object('id', author.id, 'name', author.name)
                                        ) AS game
                                    FROM matches
-                                        INNER JOIN games ON games.id = matches.game
-                                        INNER JOIN users author ON author.id = games.author 
-                                        INNER JOIN languages on languages.id = games.language
-                                        INNER JOIN teaching_levels ON teaching_levels.id = games.teaching_level
-                                        INNER JOIN game_themes ON game_themes.id = games.theme
-                                        LEFT JOIN categories ON categories.id = games.category
-                                        LEFT JOIN subcategories ON subcategories.id = games.subcategory
+                                            INNER JOIN games ON games.id = matches.game
+                                            INNER JOIN users author ON author.id = games.author
+                                            INNER JOIN languages on languages.id = games.language
+                                            INNER JOIN teaching_levels ON teaching_levels.id = games.teaching_level
+                                            INNER JOIN game_themes ON game_themes.id = games.theme
+                                            LEFT JOIN categories ON categories.id = games.category
+                                            LEFT JOIN subcategories ON subcategories.id = games.subcategory
                                    WHERE games.user = $1
                                    ORDER BY matches."createdAt" DESC;`,
                             values: [user],
@@ -48,28 +48,28 @@ export const handler = async (event) => {
                             text: `SELECT
                                        matches.id, matches.game, matches.spaces, matches.groups, matches.random, matches.trivia,
                                        json_build_object(
-                                           'user', games.user,
-                                           'visibility', games.visibility,
-                                           'language', json_build_object('id', languages.id, 'name', languages.name),
-                                           'teaching_level', json_build_object('id', teaching_levels.id, 'name', teaching_levels.name),
-                                           'theme', json_build_object('id', game_themes.id, 'name', game_themes.name),
-                                           'category', json_build_object('id', categories.id, 'name', categories.name),
-                                           'subcategory', json_build_object('id', subcategories.id, 'name', subcategories.name),
-                                           'description', games.description,
-                                           'visibility', games.visibility,
-                                           'name', games.name,
-                                           'author', json_build_object('id', author.id, 'name', author.name)
+                                               'user', games.user,
+                                               'visibility', games.visibility,
+                                               'language', json_build_object('id', languages.id, 'name', languages.name),
+                                               'teaching_level', json_build_object('id', teaching_levels.id, 'name', teaching_levels.name),
+                                               'theme', json_build_object('id', game_themes.id, 'name', game_themes.name),
+                                               'category', json_build_object('id', categories.id, 'name', categories.name),
+                                               'subcategory', json_build_object('id', subcategories.id, 'name', subcategories.name),
+                                               'description', games.description,
+                                               'visibility', games.visibility,
+                                               'name', games.name,
+                                               'author', json_build_object('id', author.id, 'name', author.name)
                                        ) AS game
                                    FROM matches
-                                        INNER JOIN games ON games.id = matches.game
-                                        INNER JOIN users author ON author.id = games.author 
-                                        INNER JOIN languages on languages.id = games.language
-                                        INNER JOIN teaching_levels ON teaching_levels.id = games.teaching_level
-                                        INNER JOIN game_themes ON game_themes.id = games.theme
-                                        LEFT JOIN categories ON categories.id = games.category
-                                        LEFT JOIN subcategories ON subcategories.id = games.subcategory
+                                            INNER JOIN games ON games.id = matches.game
+                                            INNER JOIN users author ON author.id = games.author
+                                            INNER JOIN languages on languages.id = games.language
+                                            INNER JOIN teaching_levels ON teaching_levels.id = games.teaching_level
+                                            INNER JOIN game_themes ON game_themes.id = games.theme
+                                            LEFT JOIN categories ON categories.id = games.category
+                                            LEFT JOIN subcategories ON subcategories.id = games.subcategory
                                    WHERE
-                                      matches.id = $1 AND games.user = $2;`,
+                                       matches.id = $1 AND games.user = $2;`,
                             values: [id, user],
                         });
                     }
@@ -109,7 +109,7 @@ export const handler = async (event) => {
                                         matches.podium,
                                         matches.turns
                                     FROM matches
-                                    INNER JOIN games ON games.id = matches.game
+                                        INNER JOIN games ON games.id = matches.game
                                     WHERE games.user = $1 AND matches."closedAt" IS NOT NULL;`,
                             values: [user],
                         });
@@ -128,7 +128,7 @@ export const handler = async (event) => {
                                         matches.podium,
                                         matches.turns
                                     FROM matches
-                                    INNER JOIN games ON games.id = matches.game
+                                        INNER JOIN games ON games.id = matches.game
                                     WHERE matches.id = $1 AND games.user = $2 AND matches."closedAt" IS NOT NULL;`,
                             values: [id, user],
                         });
@@ -279,26 +279,26 @@ export const handler = async (event) => {
                         text: `SELECT
                                    matches.id, matches.game, matches.spaces, matches.groups, matches.random, matches.trivia,
                                    json_build_object(
-                                       'user', games.user,
-                                       'visibility', games.visibility,
-                                       'language', json_build_object('id', languages.id, 'name', languages.name),
-                                       'teaching_level', json_build_object('id', teaching_levels.id, 'name', teaching_levels.name),
-                                       'theme', json_build_object('id', game_themes.id, 'name', game_themes.name),
-                                       'category', json_build_object('id', categories.id, 'name', categories.name),
-                                       'subcategory', json_build_object('id', subcategories.id, 'name', subcategories.name),
-                                       'description', games.description,
-                                       'visibility', games.visibility,
-                                       'name', games.name,
-                                       'author', json_build_object('id', author.id, 'name', author.name)
+                                           'user', games.user,
+                                           'visibility', games.visibility,
+                                           'language', json_build_object('id', languages.id, 'name', languages.name),
+                                           'teaching_level', json_build_object('id', teaching_levels.id, 'name', teaching_levels.name),
+                                           'theme', json_build_object('id', game_themes.id, 'name', game_themes.name),
+                                           'category', json_build_object('id', categories.id, 'name', categories.name),
+                                           'subcategory', json_build_object('id', subcategories.id, 'name', subcategories.name),
+                                           'description', games.description,
+                                           'visibility', games.visibility,
+                                           'name', games.name,
+                                           'author', json_build_object('id', author.id, 'name', author.name)
                                    ) AS match
                                FROM matches
-                                    INNER JOIN games ON games.id = matches.game
-                                    INNER JOIN users author ON author.id = games.author 
-                                    INNER JOIN languages on languages.id = games.language
-                                    INNER JOIN teaching_levels ON teaching_levels.id = games.teaching_level
-                                    INNER JOIN game_themes ON game_themes.id = games.theme
-                                    LEFT JOIN categories ON categories.id = games.category
-                                    LEFT JOIN subcategories ON subcategories.id = games.subcategory
+                                   INNER JOIN games ON games.id = matches.game
+                                   INNER JOIN users author ON author.id = games.author
+                                   INNER JOIN languages on languages.id = games.language
+                                   INNER JOIN teaching_levels ON teaching_levels.id = games.teaching_level
+                                   INNER JOIN game_themes ON game_themes.id = games.theme
+                                   LEFT JOIN categories ON categories.id = games.category
+                                   LEFT JOIN subcategories ON subcategories.id = games.subcategory
                                WHERE matches.id = $1 AND games.user = $2;`,
                         values: [results.rows[0].id, user],
                     });
@@ -370,9 +370,9 @@ export const handler = async (event) => {
                     results = await conn.query({
                         name: "validateupdatematch",
                         text: `SELECT matches.id
-                                FROM matches
-                                INNER JOIN games ON games.id = matches.game
-                                WHERE games.user = $1 AND matches.id = $2`,
+                               FROM matches
+                                        INNER JOIN games ON games.id = matches.game
+                               WHERE games.user = $1 AND matches.id = $2`,
                         values: [user,body.match],
                     });
 
