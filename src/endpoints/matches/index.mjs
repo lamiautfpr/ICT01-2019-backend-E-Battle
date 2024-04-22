@@ -18,6 +18,7 @@ export const handler = async (event) => {
                             text: `SELECT
                                        matches.id, matches.game, matches.spaces, matches.groups, matches.random, matches.trivia,
                                        json_build_object(
+                                               'id', games.id,
                                                'user', games.user,
                                                'visibility', games.visibility,
                                                'language', json_build_object('id', languages.id, 'name', languages.name),
@@ -28,7 +29,7 @@ export const handler = async (event) => {
                                                'description', games.description,
                                                'visibility', games.visibility,
                                                'name', games.name,
-                                               'author', json_build_object('id', author.id, 'name', author.name)
+                                               'author', json_build_object('id', author.id, 'name', author.name,'institution',author.institution)
                                        ) AS game
                                    FROM matches
                                             INNER JOIN games ON games.id = matches.game
@@ -48,6 +49,7 @@ export const handler = async (event) => {
                             text: `SELECT
                                        matches.id, matches.game, matches.spaces, matches.groups, matches.random, matches.trivia,
                                        json_build_object(
+                                               'id', games.id,
                                                'user', games.user,
                                                'visibility', games.visibility,
                                                'language', json_build_object('id', languages.id, 'name', languages.name),
@@ -58,7 +60,7 @@ export const handler = async (event) => {
                                                'description', games.description,
                                                'visibility', games.visibility,
                                                'name', games.name,
-                                               'author', json_build_object('id', author.id, 'name', author.name)
+                                               'author', json_build_object('id', author.id, 'name', author.name,'institution',author.institution)
                                        ) AS game
                                    FROM matches
                                             INNER JOIN games ON games.id = matches.game
@@ -289,7 +291,7 @@ export const handler = async (event) => {
                                            'description', games.description,
                                            'visibility', games.visibility,
                                            'name', games.name,
-                                           'author', json_build_object('id', author.id, 'name', author.name)
+                                           'author', json_build_object('id', author.id, 'name', author.name,'institution',author.institution)
                                    ) AS match
                                FROM matches
                                    INNER JOIN games ON games.id = matches.game
