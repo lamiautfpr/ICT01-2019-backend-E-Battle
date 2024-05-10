@@ -10,6 +10,8 @@ export const handler = async (event) => {
         case "GET": {
 
             let id = ((event.queryStringParameters && event.queryStringParameters.id)) ? event.queryStringParameters.id : undefined;
+            let questions = ((event.queryStringParameters && event.queryStringParameters.questions == 1)) ? event.queryStringParameters.questions : undefined;
+
             switch (event.routeKey){
                 case "GET /matches":{
                     if (id == undefined){
@@ -26,6 +28,7 @@ export const handler = async (event) => {
                                                'theme', json_build_object('id', game_themes.id, 'name', game_themes.name),
                                                'category', json_build_object('id', categories.id, 'name', categories.name),
                                                'subcategory', json_build_object('id', subcategories.id, 'name', subcategories.name),
+                                               'num_questions',jsonb_array_length(games.questions::jsonb),
                                                'description', games.description,
                                                'visibility', games.visibility,
                                                'name', games.name,
@@ -57,9 +60,11 @@ export const handler = async (event) => {
                                                'theme', json_build_object('id', game_themes.id, 'name', game_themes.name),
                                                'category', json_build_object('id', categories.id, 'name', categories.name),
                                                'subcategory', json_build_object('id', subcategories.id, 'name', subcategories.name),
+                                               'num_questions',jsonb_array_length(games.questions::jsonb),
                                                'description', games.description,
                                                'visibility', games.visibility,
                                                'name', games.name,
+                                                ${(questions == 1) ? "'questions', games.questions," : ''}
                                                'author', json_build_object('id', author.id, 'name', author.name,'institution',author.institution)
                                        ) AS game
                                    FROM matches
@@ -288,6 +293,7 @@ export const handler = async (event) => {
                                            'theme', json_build_object('id', game_themes.id, 'name', game_themes.name),
                                            'category', json_build_object('id', categories.id, 'name', categories.name),
                                            'subcategory', json_build_object('id', subcategories.id, 'name', subcategories.name),
+                                           'num_questions',jsonb_array_length(games.questions::jsonb),
                                            'description', games.description,
                                            'visibility', games.visibility,
                                            'name', games.name,

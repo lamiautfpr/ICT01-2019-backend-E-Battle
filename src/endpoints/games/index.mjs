@@ -24,7 +24,7 @@ export const handler = async (event) => {
                                            'category', json_build_object('id', categories.id, 'name', categories.name),
                                            'subcategory', json_build_object('id', subcategories.id, 'name', subcategories.name),
                                            'name', games.name,
-                                           'author', json_build_object('id', author.id, 'name', author.name, 'author_institution', author.institution),
+                                           'author', json_build_object('id', author.id, 'name', author.name, 'institution', author.institution),
                                            'visibility', games.visibility,
                                            'description', games.description,
                                            'questions', games.questions,
@@ -53,7 +53,7 @@ export const handler = async (event) => {
                                            'category', json_build_object('id', categories.id, 'name', categories.name),
                                            'subcategory', json_build_object('id', subcategories.id, 'name', subcategories.name),
                                            'name', games.name,
-                                           'author', json_build_object('id', author.id, 'name', author.name, 'author_institution', author.institution),
+                                           'author', json_build_object('id', author.id, 'name', author.name, 'institution', author.institution),
                                            'visibility', games.visibility,
                                            'description', games.description,
                                            'questions', games.questions,
@@ -66,7 +66,7 @@ export const handler = async (event) => {
                                         INNER JOIN game_themes ON game_themes.id = games.theme
                                         LEFT JOIN categories ON categories.id = games.category
                                         LEFT JOIN subcategories ON subcategories.id = games.subcategory
-                                   WHERE games.status = 1 AND games."id" = $1 AND (games."user" = $2 OR visibility=1)`,
+                                   WHERE games.status = 1 AND games."id" = $1 AND games."user" = $2`,
                             values: [event.queryStringParameters.id, user],
                         });
                     }
@@ -121,7 +121,7 @@ export const handler = async (event) => {
                                         'category', json_build_object('id', categories.id, 'name', categories.name),
                                         'subcategory', json_build_object('id', subcategories.id, 'name', subcategories.name),
                                         'name', games.name,
-                                        'author', json_build_object('id', author.id, 'name', author.name, 'author_institution', author.institution),
+                                        'author', json_build_object('id', author.id, 'name', author.name, 'institution', author.institution),
                                         'visibility', games.visibility,
                                         'description', games.description,
                                         'questions', games.questions,
@@ -364,7 +364,7 @@ export const handler = async (event) => {
                                        'category', json_build_object('id', categories.id, 'name', categories.name),
                                        'subcategory', json_build_object('id', subcategories.id, 'name', subcategories.name),
                                        'name', games.name,
-                                       'author', json_build_object('id', author.id, 'name', author.name, 'author_institution', author.institution),
+                                       'author', json_build_object('id', author.id, 'name', author.name, 'institution', author.institution),
                                        'visibility', games.visibility,
                                        'description', games.description,
                                        'questions', games.questions,
@@ -485,7 +485,7 @@ export const handler = async (event) => {
                                        'category', json_build_object('id', categories.id, 'name', categories.name),
                                        'subcategory', json_build_object('id', subcategories.id, 'name', subcategories.name),
                                        'name', games.name,
-                                       'author', json_build_object('id', author.id, 'name', author.name, 'author_institution', author.institution),
+                                       'author', json_build_object('id', author.id, 'name', author.name, 'institution', author.institution),
                                        'visibility', games.visibility,
                                        'description', games.description,
                                        'questions', games.questions,
@@ -646,7 +646,7 @@ export const handler = async (event) => {
                                    'language', json_build_object('id', languages.id, 'name', languages.name),
                                    'category', json_build_object('id', categories.id, 'name', categories.name),
                                    'name', games.name,
-                                   'author', json_build_object('id', author.id, 'name', author.name, 'author_institution', author.institution),
+                                   'author', json_build_object('id', author.id, 'name', author.name, 'institution', author.institution),
                                    'visibility', games.visibility,
                                    'description', games.description,
                                    'questions', games.questions,
