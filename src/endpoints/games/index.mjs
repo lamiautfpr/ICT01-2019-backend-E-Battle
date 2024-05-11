@@ -232,17 +232,9 @@ export const handler = async (event) => {
                     }
 
                     for (let question of body.questions) {
-
-                        if (
-                            !(
-                                question.text &&
-                                `${question.answer}` &&
-                                question.answers &&
-                                question.time &&
-                                question.answers.length > 1
-                            )
-                        ) {
+                        if (!(Array.isArray(question.answers))){
                             return {
+
                                 statusCode: 400,
                                 body: JSON.stringify({
                                     errorCode: 1,
@@ -252,6 +244,26 @@ export const handler = async (event) => {
                             };
                         }
 
+                        if (question.answers.length != 0 && !(question.answers.length > 1)){
+                            return {
+                                statusCode: 400,
+                                body: JSON.stringify({
+                                    errorCode: 1,
+                                    errorMessage:
+                                        "Alguma pergunta não segue o padrão dos jogos",
+                                }),
+                            };
+                        }
+                        if (!(question.text && `${question.answer}` && question.time)) {
+                            return {
+                                statusCode: 400,
+                                body: JSON.stringify({
+                                    errorCode: 1,
+                                    errorMessage:
+                                        "Alguma pergunta não segue o padrão dos jogos",
+                                }),
+                            };
+                        }
 
                         if ( question.text.length > 1310 || question.answer.length > 122 ) {
                             return {
