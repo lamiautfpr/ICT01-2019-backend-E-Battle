@@ -10,6 +10,8 @@ export const handler = async (event) => {
         case "GET": {
 
             let id = ((event.queryStringParameters && event.queryStringParameters.id)) ? event.queryStringParameters.id : undefined;
+            let questions = ((event.queryStringParameters && event.queryStringParameters.questions == 1)) ? event.queryStringParameters.questions : undefined;
+
             switch (event.routeKey){
                 case "GET /matches":{
                     if (id == undefined){
@@ -18,19 +20,28 @@ export const handler = async (event) => {
                             text: `SELECT
                                        matches.id, matches.game, matches.spaces, matches.groups, matches.random, matches.trivia,
                                        json_build_object(
-                                           'user', games.user,
-                                           'visibility', games.visibility,
-                                           'language', json_build_object('id', languages.id, 'name', languages.name),
-                                           'category', json_build_object('id', categories.id, 'name', categories.name),
-                                           'name', games.name,
-                                           'author', json_build_object('id', author.id, 'name', author.name),
-                                           'questions', games.questions
+                                               'id', games.id,
+                                               'user', games.user,
+                                               'visibility', games.visibility,
+                                               'language', json_build_object('id', languages.id, 'name', languages.name),
+                                               'teaching_level', json_build_object('id', teaching_levels.id, 'name', teaching_levels.name),
+                                               'theme', json_build_object('id', game_themes.id, 'name', game_themes.name),
+                                               'category', json_build_object('id', categories.id, 'name', categories.name),
+                                               'subcategory', json_build_object('id', subcategories.id, 'name', subcategories.name),
+                                               'num_questions',jsonb_array_length(games.questions::jsonb),
+                                               'description', games.description,
+                                               'visibility', games.visibility,
+                                               'name', games.name,
+                                               'author', json_build_object('id', author.id, 'name', author.name,'institution',author.institution)
                                        ) AS game
                                    FROM matches
-                                        INNER JOIN games ON games.id = matches.game
-                                        INNER JOIN users author ON author.id = games.author 
-                                        INNER JOIN languages on languages.id = games.language
-                                        INNER JOIN categories on categories.id = games.category
+                                            INNER JOIN games ON games.id = matches.game
+                                            INNER JOIN users author ON author.id = games.author
+                                            INNER JOIN languages on languages.id = games.language
+                                            INNER JOIN teaching_levels ON teaching_levels.id = games.teaching_level
+                                            INNER JOIN game_themes ON game_themes.id = games.theme
+                                            LEFT JOIN categories ON categories.id = games.category
+                                            LEFT JOIN subcategories ON subcategories.id = games.subcategory
                                    WHERE games.user = $1
                                    ORDER BY matches."createdAt" DESC;`,
                             values: [user],
@@ -41,21 +52,31 @@ export const handler = async (event) => {
                             text: `SELECT
                                        matches.id, matches.game, matches.spaces, matches.groups, matches.random, matches.trivia,
                                        json_build_object(
-                                           'user', games.user,
-                                           'visibility', games.visibility,
-                                           'language', json_build_object('id', languages.id, 'name', languages.name),
-                                           'category', json_build_object('id', categories.id, 'name', categories.name),
-                                           'name', games.name,
-                                           'author', json_build_object('id', author.id, 'name', author.name),
-                                           'questions', games.questions
+                                               'id', games.id,
+                                               'user', games.user,
+                                               'visibility', games.visibility,
+                                               'language', json_build_object('id', languages.id, 'name', languages.name),
+                                               'teaching_level', json_build_object('id', teaching_levels.id, 'name', teaching_levels.name),
+                                               'theme', json_build_object('id', game_themes.id, 'name', game_themes.name),
+                                               'category', json_build_object('id', categories.id, 'name', categories.name),
+                                               'subcategory', json_build_object('id', subcategories.id, 'name', subcategories.name),
+                                               'num_questions',jsonb_array_length(games.questions::jsonb),
+                                               'description', games.description,
+                                               'visibility', games.visibility,
+                                               'name', games.name,
+                                                ${(questions == 1) ? "'questions', games.questions," : ''}
+                                               'author', json_build_object('id', author.id, 'name', author.name,'institution',author.institution)
                                        ) AS game
                                    FROM matches
-                                        INNER JOIN games ON games.id = matches.game
-                                        INNER JOIN users author ON author.id = games.author 
-                                        INNER JOIN languages on languages.id = games.language
-                                        INNER JOIN categories on categories.id = games.category
+                                            INNER JOIN games ON games.id = matches.game
+                                            INNER JOIN users author ON author.id = games.author
+                                            INNER JOIN languages on languages.id = games.language
+                                            INNER JOIN teaching_levels ON teaching_levels.id = games.teaching_level
+                                            INNER JOIN game_themes ON game_themes.id = games.theme
+                                            LEFT JOIN categories ON categories.id = games.category
+                                            LEFT JOIN subcategories ON subcategories.id = games.subcategory
                                    WHERE
-                                      matches.id = $1 AND games.user = $2;`,
+                                       matches.id = $1 AND games.user = $2;`,
                             values: [id, user],
                         });
                     }
@@ -64,17 +85,17 @@ export const handler = async (event) => {
                         return {
                             statusCode: 404,
                             body: JSON.stringify({
-                                errorMessage: "Match não encontrado",
+                                errorMessage: "Nenhum match encontrado",
                             }),
                         };
                     }
 
                     // Arrumando os links de imagem
-                    for (let question of results.rows[0].game['questions']){
-                        if (question.img) {
-                            question.img = 'https://static.api.ebattle.lamia-edu.com/' + question.img;
-                        }
-                    }
+                    // for (let question of results.rows[0].match['questions']){
+                    //     if (question.img) {
+                    //         question.img = 'https://static.api.ebattle.lamia-edu.com/' + question.img;
+                    //     }
+                    // }
 
                     break;
                 }
@@ -95,7 +116,7 @@ export const handler = async (event) => {
                                         matches.podium,
                                         matches.turns
                                     FROM matches
-                                    INNER JOIN games ON games.id = matches.game
+                                        INNER JOIN games ON games.id = matches.game
                                     WHERE games.user = $1 AND matches."closedAt" IS NOT NULL;`,
                             values: [user],
                         });
@@ -114,7 +135,7 @@ export const handler = async (event) => {
                                         matches.podium,
                                         matches.turns
                                     FROM matches
-                                    INNER JOIN games ON games.id = matches.game
+                                        INNER JOIN games ON games.id = matches.game
                                     WHERE matches.id = $1 AND games.user = $2 AND matches."closedAt" IS NOT NULL;`,
                             values: [id, user],
                         });
@@ -123,7 +144,7 @@ export const handler = async (event) => {
                 }
             }
 
-            if (results.rows.length != 1) {
+            if (results.rows.length < 1) {
                 return {
                     statusCode: 404,
                     body: JSON.stringify({
@@ -265,21 +286,28 @@ export const handler = async (event) => {
                         text: `SELECT
                                    matches.id, matches.game, matches.spaces, matches.groups, matches.random, matches.trivia,
                                    json_build_object(
-                                       'user', games.user,
-                                       'visibility', games.visibility,
-                                       'language', json_build_object('id', languages.id, 'name', languages.name),
-                                       'category', json_build_object('id', categories.id, 'name', categories.name),
-                                       'name', games.name,
-                                       'author', json_build_object('id', author.id, 'name', author.name),
-                                       'questions', games.questions
-                                   ) AS game
+                                           'user', games.user,
+                                           'visibility', games.visibility,
+                                           'language', json_build_object('id', languages.id, 'name', languages.name),
+                                           'teaching_level', json_build_object('id', teaching_levels.id, 'name', teaching_levels.name),
+                                           'theme', json_build_object('id', game_themes.id, 'name', game_themes.name),
+                                           'category', json_build_object('id', categories.id, 'name', categories.name),
+                                           'subcategory', json_build_object('id', subcategories.id, 'name', subcategories.name),
+                                           'num_questions',jsonb_array_length(games.questions::jsonb),
+                                           'description', games.description,
+                                           'visibility', games.visibility,
+                                           'name', games.name,
+                                           'author', json_build_object('id', author.id, 'name', author.name,'institution',author.institution)
+                                   ) AS match
                                FROM matches
-                                    INNER JOIN games ON games.id = matches.game
-                                    INNER JOIN users author ON author.id = games.author 
-                                    INNER JOIN languages on languages.id = games.language
-                                    INNER JOIN categories on categories.id = games.category
-                               WHERE
-                                   matches.id = $1 AND games.user = $2;`,
+                                   INNER JOIN games ON games.id = matches.game
+                                   INNER JOIN users author ON author.id = games.author
+                                   INNER JOIN languages on languages.id = games.language
+                                   INNER JOIN teaching_levels ON teaching_levels.id = games.teaching_level
+                                   INNER JOIN game_themes ON game_themes.id = games.theme
+                                   LEFT JOIN categories ON categories.id = games.category
+                                   LEFT JOIN subcategories ON subcategories.id = games.subcategory
+                               WHERE matches.id = $1 AND games.user = $2;`,
                         values: [results.rows[0].id, user],
                     });
 
@@ -350,9 +378,9 @@ export const handler = async (event) => {
                     results = await conn.query({
                         name: "validateupdatematch",
                         text: `SELECT matches.id
-                                FROM matches
-                                INNER JOIN games ON games.id = matches.game
-                                WHERE games.user = $1 AND matches.id = $2`,
+                               FROM matches
+                                        INNER JOIN games ON games.id = matches.game
+                               WHERE games.user = $1 AND matches.id = $2`,
                         values: [user,body.match],
                     });
 

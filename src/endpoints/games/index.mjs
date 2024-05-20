@@ -4,7 +4,6 @@ import { S3Client, PutObjectCommand } from "@aws-sdk/client-s3";
 export const handler = async (event) => {
     const conn = await getConn();
     const user = event.requestContext.authorizer.lambda.user;
-
     let results = null;
 
     switch (event.requestContext.http.method) {
@@ -18,20 +17,26 @@ export const handler = async (event) => {
                             name: "gamesget",
                             text: `SELECT
                                        json_build_object(
-                                               'id', games.id,
-                                               'language', json_build_object('id', languages.id, 'name', languages.name),
-                                               'category', json_build_object('id', categories.id, 'name', categories.name),
-                                               'name', games.name,
-                                               'author', json_build_object('id', author.id, 'name', author.name, 'author_institution', author.institution),
-                                               'visibility', games.visibility,
-                                               'description', games.description,
-                                               'questions', games.questions,
-                                               'updatedAt', games."updatedAt"
+                                           'id', games.id,
+                                           'language', json_build_object('id', languages.id, 'name', languages.name),
+                                           'teaching_level', json_build_object('id', teaching_levels.id, 'name', teaching_levels.name),
+                                           'theme', json_build_object('id', game_themes.id, 'name', game_themes.name),
+                                           'category', json_build_object('id', categories.id, 'name', categories.name),
+                                           'subcategory', json_build_object('id', subcategories.id, 'name', subcategories.name),
+                                           'name', games.name,
+                                           'author', json_build_object('id', author.id, 'name', author.name, 'institution', author.institution),
+                                           'visibility', games.visibility,
+                                           'description', games.description,
+                                           'questions', games.questions,
+                                           'updatedAt', games."updatedAt"
                                        ) AS game
                                    FROM games
-                                            INNER JOIN users AS author ON author.id = games.author
-                                            INNER JOIN languages ON languages.id = games.language
-                                            INNER JOIN categories ON categories.id = games.category
+                                        INNER JOIN users AS author ON author.id = games.author
+                                        INNER JOIN languages ON languages.id = games.language
+                                        INNER JOIN teaching_levels ON teaching_levels.id = games.teaching_level
+                                        INNER JOIN game_themes ON game_themes.id = games.theme
+                                        LEFT JOIN categories ON categories.id = games.category
+                                        LEFT JOIN subcategories ON subcategories.id = games.subcategory
                                    WHERE games.status = 1 AND games."user" = $1
                                    ORDER BY games."createdAt" DESC;`,
                             values: [user],
@@ -41,21 +46,27 @@ export const handler = async (event) => {
                             name: "gamesgetone",
                             text: `SELECT
                                        json_build_object(
-                                               'id', games.id,
-                                               'language', json_build_object('id', languages.id, 'name', languages.name),
-                                               'category', json_build_object('id', categories.id, 'name', categories.name),
-                                               'name', games.name,
-                                               'author', json_build_object('id', author.id, 'name', author.name, 'author_institution', author.institution),
-                                               'visibility', games.visibility,
-                                               'description', games.description,
-                                               'questions', games.questions,
-                                               'updatedAt', games."updatedAt"
+                                            'id', games.id,
+                                           'language', json_build_object('id', languages.id, 'name', languages.name),
+                                           'teaching_level', json_build_object('id', teaching_levels.id, 'name', teaching_levels.name),
+                                           'theme', json_build_object('id', game_themes.id, 'name', game_themes.name),
+                                           'category', json_build_object('id', categories.id, 'name', categories.name),
+                                           'subcategory', json_build_object('id', subcategories.id, 'name', subcategories.name),
+                                           'name', games.name,
+                                           'author', json_build_object('id', author.id, 'name', author.name, 'institution', author.institution),
+                                           'visibility', games.visibility,
+                                           'description', games.description,
+                                           'questions', games.questions,
+                                           'updatedAt', games."updatedAt"
                                        ) AS game
                                    FROM games
-                                            INNER JOIN users AS author ON author.id = games.author
-                                            INNER JOIN languages ON languages.id = games.language
-                                            INNER JOIN categories ON categories.id = games.category
-                                   WHERE games.status = 1 AND games."id" = $1 AND (games."user" = $2 OR visibility=1)`,
+                                        INNER JOIN users AS author ON author.id = games.author
+                                        INNER JOIN languages ON languages.id = games.language
+                                        INNER JOIN teaching_levels ON teaching_levels.id = games.teaching_level
+                                        INNER JOIN game_themes ON game_themes.id = games.theme
+                                        LEFT JOIN categories ON categories.id = games.category
+                                        LEFT JOIN subcategories ON subcategories.id = games.subcategory
+                                   WHERE games.status = 1 AND games."id" = $1 AND games."user" = $2`,
                             values: [event.queryStringParameters.id, user],
                         });
                     }
@@ -103,20 +114,26 @@ export const handler = async (event) => {
                     results = await conn.query({
                         text: `SELECT
                                    json_build_object(
-                                           'id', games.id,
-                                           'language', json_build_object('id', languages.id, 'name', languages.name),
-                                           'category', json_build_object('id', categories.id, 'name', categories.name),
-                                           'name', games.name,
-                                           'author', json_build_object('id', author.id, 'name', author.name, 'author_institution', author.institution),
-                                           'visibility', games.visibility,
-                                           'description', games.description,
-                                           'questions', games.questions,
-                                           'updatedAt', games."updatedAt"
+                                        'id', games.id,
+                                        'language', json_build_object('id', languages.id, 'name', languages.name),
+                                        'teaching_level', json_build_object('id', teaching_levels.id, 'name', teaching_levels.name),
+                                        'theme', json_build_object('id', game_themes.id, 'name', game_themes.name),
+                                        'category', json_build_object('id', categories.id, 'name', categories.name),
+                                        'subcategory', json_build_object('id', subcategories.id, 'name', subcategories.name),
+                                        'name', games.name,
+                                        'author', json_build_object('id', author.id, 'name', author.name, 'institution', author.institution),
+                                        'visibility', games.visibility,
+                                        'description', games.description,
+                                        'questions', games.questions,
+                                        'updatedAt', games."updatedAt"
                                    ) AS game
                                FROM games
-                                        INNER JOIN users AS author ON author.id = games.author
-                                        INNER JOIN languages ON languages.id = games.language
-                                        INNER JOIN categories ON categories.id = games.category
+                                    INNER JOIN users AS author ON author.id = games.author
+                                    INNER JOIN languages ON languages.id = games.language
+                                    INNER JOIN teaching_levels ON teaching_levels.id = games.teaching_level
+                                    INNER JOIN game_themes ON game_themes.id = games.theme
+                                    LEFT JOIN categories ON categories.id = games.category
+                                    LEFT JOIN subcategories ON subcategories.id = games.subcategory
                                WHERE games.author = 276 AND games.status = 1 AND games.visibility=1 AND (
                                    ( $1::text IS NOT NULL AND games.name ILIKE '%' || $1 || '%' ) OR
                                    ( $2::integer IS NOT NULL AND games.category = $2 ) OR
@@ -138,22 +155,30 @@ export const handler = async (event) => {
                         statusCode: 200,
                         body: JSON.stringify(results.rows.map((game) => game.game)),
                     };
-
-                    break;
                 }
             }
             break;
         }
         case "POST": {
+
+            let create_game_errors = {
+                '"games_categories_fk"': 'Categoria',
+                '"games_subcategory_fk"': 'Subcategoria',
+                '"games_languages_fk"': 'Linguagem',
+                '"games_teaching_level_fk"': 'Nivel de ensino',
+                '"games_theme_fk"': 'Tema'
+            };
+
             switch(event.routeKey){
                 case "POST /games":{
                     const body = JSON.parse(event.body);
-
+                    const category = body.category
                     if (
                         !(
-                            body.language &&
-                            body.category &&
-                            body.name &&
+                            body.language        &&
+                            category.teaching_level  &&
+                            category.theme           &&
+                            body.name            &&
                             body.questions
                         )
                     ) {
@@ -176,18 +201,41 @@ export const handler = async (event) => {
                         };
                     }
 
+                    // Convertendo strings vazias para null
+                    if (typeof category.category == "string"){
+                        category.category = category.category.trim() || null;
+                    }
+
+                    if (typeof category.subcategory == "string"){
+                        category.subcategory = category.subcategory.trim() || null;
+                    }
+
+                    if (category.category == null && category.subcategory != null){
+                        return {
+                            statusCode: 400,
+                            body: JSON.stringify({
+                                errorCode: 1,
+                                errorMessage: "Argumentos invalidos, revise a documentação",
+                            }),
+                        }
+                    }
+
+                    if ((category.category !== null && (typeof category.category !== 'number' || !Number.isInteger(category.category))) ||
+                        (category.subcategory !== null && (typeof category.subcategory !== 'number' || !Number.isInteger(category.subcategory)))) {
+                        return {
+                            statusCode: 404,
+                            body: JSON.stringify({
+                                errorCode: 1,
+                                errorMessage: "Algum dos elementos [Categoria, Subcategoria] estão inválidos, revise a documentação",
+                            }),
+                        };
+                    }
+
                     for (let question of body.questions) {
 
-                        if (
-                            !(
-                                question.text &&
-                                `${question.answer}` &&
-                                question.answers &&
-                                question.time &&
-                                question.answers.length > 1
-                            )
-                        ) {
+                        if (!(Array.isArray(question.answers))){
                             return {
+
                                 statusCode: 400,
                                 body: JSON.stringify({
                                     errorCode: 1,
@@ -197,6 +245,26 @@ export const handler = async (event) => {
                             };
                         }
 
+                        if (question.answers.length != 0 && !(question.answers.length > 1)){
+                            return {
+                                statusCode: 400,
+                                body: JSON.stringify({
+                                    errorCode: 1,
+                                    errorMessage:
+                                        "Alguma pergunta não segue o padrão dos jogos",
+                                }),
+                            };
+                        }
+                        if (!(question.text && `${question.answer}` && question.time)) {
+                            return {
+                                statusCode: 400,
+                                body: JSON.stringify({
+                                    errorCode: 1,
+                                    errorMessage:
+                                        "Alguma pergunta não segue o padrão dos jogos",
+                                }),
+                            };
+                        }
 
                         if ( question.text.length > 1310 || question.answer.length > 122 ) {
                             return {
@@ -267,60 +335,62 @@ export const handler = async (event) => {
                     try {
                         results = await conn.query({
                             name: "gamescreate",
-                            text: 'INSERT INTO games ("user", "language", "category", "name", "visibility", "description", "questions", "author", "updatedAt") VALUES ($1, $2, $3, $4, $5, $6, $7, $1, CURRENT_TIMESTAMP) RETURNING id',
+                            text: `INSERT INTO games ( "user", "language", "teaching_level","theme","category","subcategory",
+                                                       "name", "visibility", "description", "questions", "author", "updatedAt") 
+                                                        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $1, CURRENT_TIMESTAMP) RETURNING id`,
                             values: [
                                 user,
                                 body.language,
-                                body.category,
+                                category.teaching_level,
+                                category.theme,
+                                category.category ?? null,
+                                category.subcategory ?? null,
                                 body.name,
                                 body.visibility ?? null,
                                 body.description ?? null,
-                                JSON.stringify(questions),
+                                JSON.stringify(questions)
                             ],
                         });
+
                     } catch (e) {
-                        if (
-                            e.message == 'insert or update on table "games" violates foreign key constraint "games_categories_fk"'
-                        ) {
+
+                        if (create_game_errors.hasOwnProperty(e.message.split('constraint ')[1])){
                             return {
                                 statusCode: 400,
                                 body: JSON.stringify({
                                     errorCode: 1,
-                                    errorMessage: "Categoria inexistente",
+                                    errorMessage: `${create_game_errors[e.message.split('constraint ')[1]]} inexistente`,
                                 }),
                             };
                         }
 
-                        if (
-                            e.message == 'insert or update on table "games" violates foreign key constraint "games_languages_fk"'
-                        ) {
-                            return {
-                                statusCode: 400,
-                                body: JSON.stringify({
-                                    errorCode: 1,
-                                    errorMessage: "Linguagem inexistente",
-                                }),
-                            };
-                        }
+                        return e.message
                     }
 
                     results = await conn.query({
                         text: `SELECT
                                    json_build_object(
-                                           'id', games.id,
-                                           'language', json_build_object('id', languages.id, 'name', languages.name),
-                                           'category', json_build_object('id', categories.id, 'name', categories.name),
-                                           'name', games.name,
-                                           'author', json_build_object('id', author.id, 'name', author.name, 'author_institution', author.institution),
-                                           'visibility', games.visibility,
-                                           'description', games.description,
-                                           'questions', games.questions,
-                                           'updatedAt', games."updatedAt"
+                                       'id', games.id,
+                                       'language', json_build_object('id', languages.id, 'name', languages.name),
+                                       'category', json_build_object(
+                                            'teaching_level', json_build_object('id', teaching_levels.id, 'name', teaching_levels.name),
+                                            'theme', json_build_object('id', game_themes.id, 'name', game_themes.name),
+                                            'category', json_build_object('id', categories.id, 'name', categories.name),
+                                            'subcategory', json_build_object('id', subcategories.id, 'name', subcategories.name)),
+                                       'name', games.name,
+                                       'author', json_build_object('id', author.id, 'name', author.name, 'institution', author.institution),
+                                       'visibility', games.visibility,
+                                       'description', games.description,
+                                       'questions', games.questions,
+                                       'updatedAt', games."updatedAt"
                                    ) AS game
                                FROM games
-                                        INNER JOIN users AS author ON author.id = games.author
-                                        INNER JOIN languages ON languages.id = games.language
-                                        INNER JOIN categories ON categories.id = games.category
+                                    INNER JOIN users AS author ON author.id = games.author
+                                    INNER JOIN languages ON languages.id = games.language
+                                    INNER JOIN teaching_levels ON teaching_levels.id = games.teaching_level
+                                    INNER JOIN game_themes ON game_themes.id = games.theme
+                                    LEFT JOIN categories ON categories.id = games.category
+                                    LEFT JOIN subcategories ON subcategories.id = games.subcategory
                                WHERE games.status = 1 AND games."id" = $1`,
                         values: [results.rows[0].id],
                     });
@@ -398,9 +468,9 @@ export const handler = async (event) => {
 
                     try{
                         results = await conn.query({
-                            text:  `INSERT INTO games ("user", "language", "category", "name", "visibility", "description", "questions", "author", "updatedAt")
+                            text:  `INSERT INTO games ("user", "language", "teaching_level","theme","category","subcategory", "name", "visibility", "description", "questions", "author", "updatedAt")
                                     SELECT
-                                        $1, "language", "category", "name", 0, "description", "questions", "author", CURRENT_TIMESTAMP
+                                        $1, "language", "teaching_level","theme","category","subcategory", "name", 0, "description", "questions", "author", CURRENT_TIMESTAMP
                                     FROM games
                                     WHERE status = 1 AND id = $2 AND ("user" = $1 OR visibility = 1) RETURNING id`,
                             values: [user, event.queryStringParameters.id],
@@ -419,25 +489,30 @@ export const handler = async (event) => {
                         };
                     }
 
-
                     results = await conn.query({
-                        text: ` SELECT
-                                    json_build_object(
-                                            'id', games.id,
-                                            'language', json_build_object('id', languages.id, 'name', languages.name),
-                                            'category', json_build_object('id', categories.id, 'name', categories.name),
-                                            'name', games.name,
-                                            'author', json_build_object('id', author.id, 'name', author.name, 'author_institution', author.institution),
-                                            'visibility', games.visibility,
-                                            'description', games.description,
-                                            'questions', games.questions,
-                                            'updatedAt', games."updatedAt"
-                                    ) as game
-                                FROM games
-                                         INNER JOIN users author ON author.id = games.author
-                                         INNER JOIN languages ON languages.id = games.language
-                                         INNER JOIN categories ON categories.id = games.category
-                                WHERE games.status = 1 AND games."id" = $1`,
+                        text: `SELECT
+                                   json_build_object(
+                                       'id', games.id,
+                                       'language', json_build_object('id', languages.id, 'name', languages.name),
+                                       'teaching_level', json_build_object('id', teaching_levels.id, 'name', teaching_levels.name),
+                                       'theme', json_build_object('id', game_themes.id, 'name', game_themes.name),
+                                       'category', json_build_object('id', categories.id, 'name', categories.name),
+                                       'subcategory', json_build_object('id', subcategories.id, 'name', subcategories.name),
+                                       'name', games.name,
+                                       'author', json_build_object('id', author.id, 'name', author.name, 'institution', author.institution),
+                                       'visibility', games.visibility,
+                                       'description', games.description,
+                                       'questions', games.questions,
+                                       'updatedAt', games."updatedAt"
+                                   ) AS game
+                               FROM games
+                                    INNER JOIN users AS author ON author.id = games.author
+                                    INNER JOIN languages ON languages.id = games.language
+                                    INNER JOIN teaching_levels ON teaching_levels.id = games.teaching_level
+                                    INNER JOIN game_themes ON game_themes.id = games.theme
+                                    LEFT JOIN categories ON categories.id = games.category
+                                    LEFT JOIN subcategories ON subcategories.id = games.subcategory
+                               WHERE games.status = 1 AND games."id" = $1`,
                         values: [results.rows[0].id],
                     });
 
@@ -452,159 +527,233 @@ export const handler = async (event) => {
             break;
         }
         case "PUT": {
-
-            if (!(event.queryStringParameters && event.queryStringParameters.id)) {
-                return {
-                    statusCode: 400,
-                    body: JSON.stringify({
-                        errorCode: 1,
-                        errorMessage: "Falta o argumento id do game",
-                    }),
-                };
-            }
-
-            const body = JSON.parse(event.body);
-
-            if (
-                !(
-                    body.language &&
-                    body.category &&
-                    body.name &&
-                    body.questions
-                )
-            ) {
-                return {
-                    statusCode: 400,
-                    body: JSON.stringify({
-                        errorCode: 1,
-                        errorMessage: "Faltam argumentos, revise a documentação",
-                    }),
-                };
-            }
-
-            if (body.questions.length == 0) {
-                return {
-                    statusCode: 400,
-                    body: JSON.stringify({
-                        errorCode: 1,
-                        errorMessage: "É necessario ter ao menos uma pergunta",
-                    }),
-                };
-            }
-
-            for (let question of body.questions) {
-
+            try{
+                const body = JSON.parse(event.body);
+                const category = body.category
                 if (
                     !(
-                        question.text &&
-                        `${question.answer}` &&
-                        question.answers &&
-                        question.time &&
-                        question.answers.length > 1
+                        body.language        &&
+                        category.teaching_level  &&
+                        category.theme           &&
+                        body.name            &&
+                        body.questions
                     )
                 ) {
                     return {
                         statusCode: 400,
                         body: JSON.stringify({
                             errorCode: 1,
-                            errorMessage:
-                                "Alguma pergunta não segue o padrão dos jogos",
+                            errorMessage: "Faltam argumentos, revise a documentação",
                         }),
                     };
                 }
-            }
 
-            let questions = [];
-            const s3 = new S3Client();
+                if (body.questions.length == 0) {
+                    return {
+                        statusCode: 400,
+                        body: JSON.stringify({
+                            errorCode: 1,
+                            errorMessage: "É necessario ter ao menos uma pergunta",
+                        }),
+                    };
+                }
 
-            let dataAtual = new Date();
 
-            let date = `${dataAtual.getFullYear()}/${(dataAtual.getMonth()+1).toString().padStart(2,'0')}/${dataAtual.getDate().toString().padStart(2,'0')}`
-            let time = `${dataAtual.getHours().toString().padStart(2,'0')}${dataAtual.getMinutes().toString().padStart(2,'0')}${dataAtual.getSeconds().toString().padStart(2,'0')}`
+                // Convertendo strings vazias para null
+                if (typeof category.category == "string"){
+                    category.category = category.category.trim() || null;
+                }
 
-            let keys = await Promise.all(body['questions'].map(async question => {
-                if(question.img && question.img){
-                    let key = `games/questions/${date}/${user}-${time}-${body['questions'].indexOf(question)}.png`;
-                    const buf = Buffer.from(question.img.replace(/^data:image\/\w+;base64,/, ""),'base64');
+                if (typeof category.subcategory == "string"){
+                    category.subcategory = category.subcategory.trim() || null;
+                }
 
-                    await s3.send(new PutObjectCommand({
-                        Bucket: 'ebattle-api-static-'+process.env.ENVIRONMENT,
-                        Key: key,
-                        Body: buf,
-                        ContentType: 'image/png',
-                    }));
+                if (category.category == null && category.subcategory != null){
+                    return {
+                        statusCode: 400,
+                        body: JSON.stringify({
+                            errorCode: 1,
+                            errorMessage: "Argumentos invalidos, revise a documentação",
+                        }),
+                    }
+                }
 
-                    if(buf.length > (20*1024*1024)){
-                        return 'Tamanho excede o permitido'
+                if ((category.category !== null && (typeof category.category !== 'number' || !Number.isInteger(category.category))) ||
+                    (category.subcategory !== null && (typeof category.subcategory !== 'number' || !Number.isInteger(category.subcategory)))) {
+                    return {
+                        statusCode: 404,
+                        body: JSON.stringify({
+                            errorCode: 1,
+                            errorMessage: "Algum dos elementos [Categoria, Subcategoria] estão inválidos, revise a documentação",
+                        }),
+                    };
+                }
+
+                for (let question of body.questions) {
+
+                    if (!(Array.isArray(question.answers))){
+                        return {
+
+                            statusCode: 400,
+                            body: JSON.stringify({
+                                errorCode: 1,
+                                errorMessage:
+                                    "Alguma pergunta não segue o padrão dos jogos",
+                            }),
+                        };
                     }
 
-                    return key;
+                    if (question.answers.length != 0 && !(question.answers.length > 1)){
+                        return {
+                            statusCode: 400,
+                            body: JSON.stringify({
+                                errorCode: 1,
+                                errorMessage:
+                                    "Alguma pergunta não segue o padrão dos jogos",
+                            }),
+                        };
+                    }
+                    if (!(question.text && `${question.answer}` && question.time)) {
+                        return {
+                            statusCode: 400,
+                            body: JSON.stringify({
+                                errorCode: 1,
+                                errorMessage:
+                                    "Alguma pergunta não segue o padrão dos jogos",
+                            }),
+                        };
+                    }
+
+                    if ( question.text.length > 1310 || question.answer.length > 122 ) {
+                        return {
+                            statusCode: 400,
+                            body: JSON.stringify({
+                                errorCode: 1,
+                                errorMessage:
+                                    "Numero de caracteres excedido",
+                            }),
+                        };
+                    }
+
+                    for (let answer of question.answers){
+                        if ( answer.length > 122 ) {
+                            return {
+                                statusCode: 400,
+                                body: JSON.stringify({
+                                    errorCode: 1,
+                                    errorMessage:
+                                        "Numero de caracteres das alternativas excedido",
+                                }),
+                            };
+                        }
+                    }
+
                 }
-                return undefined;
-            }));
 
-            for (let question of body.questions) {
-                questions.push({
-                    "text":question.text,
-                    "answer":question.answer,
-                    "time":question.time ,
-                    "answers":question.answers,
-                    "img": keys[body.questions.indexOf(question)],
+                let questions = [];
+                const s3 = new S3Client();
+
+                let dataAtual = new Date();
+
+                let date = `${dataAtual.getFullYear()}/${(dataAtual.getMonth()+1).toString().padStart(2,'0')}/${dataAtual.getDate().toString().padStart(2,'0')}`
+                let time = `${dataAtual.getHours().toString().padStart(2,'0')}${dataAtual.getMinutes().toString().padStart(2,'0')}${dataAtual.getSeconds().toString().padStart(2,'0')}`
+
+                let keys = await Promise.all(body['questions'].map(async question => {
+                    if(question.img && question.img){
+                        let key = `games/questions/${date}/${user}-${time}-${body['questions'].indexOf(question)}.png`;
+                        const buf = Buffer.from(question.img.replace(/^data:image\/\w+;base64,/, ""),'base64');
+
+                        await s3.send(new PutObjectCommand({
+                            Bucket: 'ebattle-api-static-'+process.env.ENVIRONMENT,
+                            Key: key,
+                            Body: buf,
+                            ContentType: 'image/png',
+                        }));
+
+                        if(buf.length > (20*1024*1024)){
+                            return 'Tamanho excede o permitido'
+                        }
+
+                        return key;
+                    }
+                    return undefined;
+                }));
+
+                for (let question of body.questions) {
+                    questions.push({
+                        "text":question.text,
+                        "tip":question.tip,
+                        "answer":question.answer,
+                        "time":question.time ,
+                        "answers":question.answers,
+                        "img": keys[body.questions.indexOf(question)],
+                    });
+                }
+
+                results = await conn.query({
+                    name: "gamesupdate",
+                    text:`UPDATE games SET language = $1, teaching_level = $2,  theme = $3,category = $4, subcategory = $5, name = $6, visibility = $7, description = $8, questions = $9, "updatedAt" = CURRENT_TIMESTAMP WHERE status = 1 AND id = $10 AND "user" = $11 RETURNING id`,
+                    values: [
+                        body.language,
+                        category.teaching_level,
+                        category.theme,
+                        category.category ?? null,
+                        category.subcategory ?? null,
+                        body.name,
+                        body.visibility ?? null,
+                        body.description ?? null,
+                        JSON.stringify(questions),
+                        event.queryStringParameters.id,
+                        user,
+                    ],
                 });
-            }
 
-            results = await conn.query({
-                name: "gamesupdate",
-                text:`UPDATE games SET language = $1, category = $2, name = $3, visibility = $4, description = $5, questions = $6, "updatedAt" = CURRENT_TIMESTAMP WHERE status = 1 AND id = $7 AND "user" = $8 RETURNING id`,
-                values: [
-                    body.language,
-                    body.category,
-                    body.name,
-                    body.visibility ?? null,
-                    body.description ?? null,
-                    JSON.stringify(questions),
-                    event.queryStringParameters.id,
-                    user,
-                ],
-            });
+                if (results.rows.length == 0){
+                    return {
+                        statusCode: 400,
+                        body: JSON.stringify({
+                            errorCode: 2,
+                            errorMessage: "Nenhum jogo não encontrado",
+                        }),
+                    };
+                }
 
-            if (results.rows.length == 0){
-                return {
-                    statusCode: 400,
-                    body: JSON.stringify({
-                        errorCode: 2,
-                        errorMessage: "Nenhum jogo não encontrado",
-                    }),
-                };
-            }
-
-            results = await conn.query({
-                text: `SELECT
-                           json_build_object(
+                results = await conn.query({
+                    text: `SELECT
+                               json_build_object(
                                    'id', games.id,
                                    'language', json_build_object('id', languages.id, 'name', languages.name),
-                                   'category', json_build_object('id', categories.id, 'name', categories.name),
+                                   'category', json_build_object(
+                                        'teaching_level', json_build_object('id', teaching_levels.id, 'name', teaching_levels.name),
+                                        'theme', json_build_object('id', game_themes.id, 'name', game_themes.name),
+                                        'category', json_build_object('id', categories.id, 'name', categories.name),
+                                        'subcategory', json_build_object('id', subcategories.id, 'name', subcategories.name)),
                                    'name', games.name,
-                                   'author', json_build_object('id', author.id, 'name', author.name, 'author_institution', author.institution),
+                                   'author', json_build_object('id', author.id, 'name', author.name, 'institution', author.institution),
                                    'visibility', games.visibility,
                                    'description', games.description,
                                    'questions', games.questions,
                                    'updatedAt', games."updatedAt"
-                           ) AS game
-                       FROM games
+                               ) AS game
+                           FROM games
                                 INNER JOIN users AS author ON author.id = games.author
                                 INNER JOIN languages ON languages.id = games.language
-                                INNER JOIN categories ON categories.id = games.category
-                       WHERE games.status = 1 AND games.id = $1
-                       ORDER BY games."createdAt" DESC;`,
-                values: [results.rows[0].id],
-            });
+                                INNER JOIN teaching_levels ON teaching_levels.id = games.teaching_level
+                                INNER JOIN game_themes ON game_themes.id = games.theme
+                                LEFT JOIN categories ON categories.id = games.category
+                                LEFT JOIN subcategories ON subcategories.id = games.subcategory
+                           WHERE games.status = 1 AND games."id" = $1`,
+                    values: [results.rows[0].id],
+                });
 
-            return {
-                statusCode: 200,
-                body: JSON.stringify(results.rows[0].game),
-            };
-            break;
+                return {
+                    statusCode: 200,
+                    body: JSON.stringify(results.rows[0].game),
+                };
+                break;
+            } catch(e){
+                return e.message
+            }
         }
         case "DELETE": {
             try{

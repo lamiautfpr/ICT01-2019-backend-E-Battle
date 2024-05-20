@@ -138,8 +138,27 @@ paths:
     get:
       tags:
         - Creation options
-      description: Retorna as categorias do jogo
+      description: Retorna as categorias do jogo, com base no id enviado, pega da categoria abaixo todos referentes ao id solicitado
       operationId: getCategories
+      parameters:
+        - name: teaching_levels_id
+          in: query
+          description: Id do nivel de ensino, retorna os temas do nivel de ensino selecionado
+          schema:
+            type: integer
+            example: 5
+        - name: games_theme_id
+          in: query
+          description: Id do tema do jogo, retorna as categorias do tema selecionado
+          schema:
+            type: integer
+            example:
+        - name: category_id
+          in: query
+          description: Id da categoria do jogo, retorna as subcategorias da categoria selecionada
+          schema:
+            type: integer
+            example:
       responses:
         '200':
           description: Lista de categorias
@@ -543,7 +562,7 @@ components:
           description: Email do usuario
           example: info@gmail.com
         password:
-          type: any
+          type: string
           description: Nova senha do usuario
           example: "12345678"
     EditUser:
@@ -580,12 +599,12 @@ components:
       properties:
         id:
           type: integer
-          description: Id da categoria
+          description: Id do nivel de ensiono / tema / categoria / subcategoria
           example: 1
         name:
           type: string
-          description: Nome da categoria
-          example: 'Geografia'
+          description: Nome do nivel de ensino / tema / categoria / subcategoria
+          example: 'Artes'
     Language:
       type: object
       properties:
@@ -600,14 +619,17 @@ components:
     Match:
       type: object
       properties:
+        id:
+          type: integer
+          description: Id do match
+          example: 79
+        game:
+          type: integer
+          description: id do game
         spaces:
           type: integer
           description: Numero de casas do tabuleiro
           example: 1
-        game:
-          type: integer
-          description: id do game do match
-          example: 12
         groups:
           type: array
           description: grupos que vão jogar
@@ -719,10 +741,22 @@ components:
           type: integer
           description: Id do idioma
           example: 1
+        teaching_level:
+          type: integer
+          description: Id do nivel de ensino
+          example: 5
+        theme:
+          type: integer
+          description: Id do tema
+          example: 12
         category:
           type: integer
           description: Id da categoria
-          example: 1
+          example: 39
+        subcategory:
+          type: integer
+          description: Id da subcategoria
+          example: 24
         name:
           type: string
           description: Nome do jogo
@@ -777,7 +811,8 @@ components:
       required:
         - id
         - language
-        - category
+        - teaching_level
+        - theme
         - name
         - questions
     gameVisibility:
@@ -787,6 +822,7 @@ components:
           type: integer
           description: Visibilidade do game ( 0 - privado / 1 - Publico )
           example: 1
+
     RegisterResponse:
       type: object
       properties:
@@ -824,7 +860,6 @@ components:
               type: string
               description: Descrição da situação do email que foi registrado
               example: 'Email enviado'
-
     LoginResponse:
       type: object
       properties:
