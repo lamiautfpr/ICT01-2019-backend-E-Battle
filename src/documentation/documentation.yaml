@@ -741,22 +741,25 @@ components:
           type: integer
           description: Id do idioma
           example: 1
-        teaching_level:
-          type: integer
-          description: Id do nivel de ensino
-          example: 5
-        theme:
-          type: integer
-          description: Id do tema
-          example: 12
         category:
-          type: integer
-          description: Id da categoria
-          example: 39
-        subcategory:
-          type: integer
-          description: Id da subcategoria
-          example: 24
+          type: object
+          properties:
+            teaching_level:
+              type: integer
+              description: Id do nivel de ensino
+              example: 5
+            theme:
+              type: integer
+              description: Id do tema
+              example: 12
+            category:
+              type: integer
+              description: Id da categoria
+              example: 39
+            subcategory:
+              type: integer
+              description: Id da subcategoria
+              example: 24
         name:
           type: string
           description: Nome do jogo
@@ -1069,14 +1072,22 @@ components:
           category:
             type: object
             properties:
-              id:
+              teaching_level:
+                type: integer
+                description: Id do nivel de ensino
+                example: 5
+              theme:
+                type: integer
+                description: Id do tema
+                example: 12
+              category:
                 type: integer
                 description: Id da categoria
-                example: 1
-              name:
-                type: string
-                description: Nome da categoria
-                example: Portugues
+                example: 39
+              subcategory:
+                type: integer
+                description: Id da subcategoria
+                example: 24
           author:
             type: object
             properties:
@@ -1088,6 +1099,10 @@ components:
                 type: string
                 description: Nome do autor
                 example: Jõao
+              institution:
+                type: string
+                description: Instituição do autor
+                example: "Universidade Tecnológica Federal do Parana"
           name:
             type: string
             description: Nome do jogo
