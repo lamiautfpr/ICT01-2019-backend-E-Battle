@@ -489,36 +489,9 @@ export const handler = async (event) => {
                         };
                     }
 
-                    results = await conn.query({
-                        text: `SELECT
-                                   json_build_object(
-                                           'id', games.id,
-                                           'language', json_build_object('id', languages.id, 'name', languages.name),
-                                           'teaching_level', json_build_object('id', teaching_levels.id, 'name', teaching_levels.name),
-                                           'theme', json_build_object('id', game_themes.id, 'name', game_themes.name),
-                                           'category', json_build_object('id', categories.id, 'name', categories.name),
-                                           'subcategory', json_build_object('id', subcategories.id, 'name', subcategories.name),
-                                           'name', games.name,
-                                           'author', json_build_object('id', author.id, 'name', author.name, 'institution', author.institution),
-                                           'visibility', games.visibility,
-                                           'description', games.description,
-                                           'questions', games.questions,
-                                           'updatedAt', games."updatedAt"
-                                   ) AS game
-                               FROM games
-                                        INNER JOIN users AS author ON author.id = games.author
-                                        INNER JOIN languages ON languages.id = games.language
-                                        INNER JOIN teaching_levels ON teaching_levels.id = games.teaching_level
-                                        INNER JOIN game_themes ON game_themes.id = games.theme
-                                        LEFT JOIN categories ON categories.id = games.category
-                                        LEFT JOIN subcategories ON subcategories.id = games.subcategory
-                               WHERE games.status = 1 AND games."id" = $1`,
-                        values: [results.rows[0].id],
-                    });
-
                     return {
                         statusCode: 200,
-                        body: JSON.stringify(results.rows[0].game),
+                        body: JSON.stringify(results.rows[0]),
                     };
 
                     break;
