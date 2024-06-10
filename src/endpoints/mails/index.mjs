@@ -187,9 +187,6 @@ export const handler = async (event) => {
                         body: JSON.stringify(results.rows[0].email),
                     };
                 }
-                case "POST /mails/verify": {
-                    return
-                }
                 case "POST /mails/invite": {
                     const body = JSON.parse(event.body);
 
