@@ -134,7 +134,7 @@ export const handler = async (event) => {
                                     INNER JOIN game_themes ON game_themes.id = games.theme
                                     LEFT JOIN categories ON categories.id = games.category
                                     LEFT JOIN subcategories ON subcategories.id = games.subcategory
-                               WHERE games.author = 276 AND games.status = 1 AND games.visibility=1 AND (
+                               WHERE games.author IN (221,276) AND games.status = 1 AND games.visibility=1 AND (
                                    ( $1::text IS NOT NULL AND games.name ILIKE '%' || $1 || '%' ) OR
                                    ( $2::integer IS NOT NULL AND games.category = $2 ) OR
                                    ( $3::integer IS NOT NULL AND games.language = $3 ) OR TRUE)
@@ -255,7 +255,7 @@ export const handler = async (event) => {
                                 }),
                             };
                         }
-                        if (!(question.text && `${question.answer}` && question.time)) {
+                        if (!(question.text && question.time)) {
                             return {
                                 statusCode: 400,
                                 body: JSON.stringify({
