@@ -89,7 +89,7 @@ export const handler = async (event) => {
 
                         results = await conn.query({
                             name: "verifyemail",
-                            text: 'SELECT email FROM email_controller WHERE email = $1',
+                            text: 'SELECT email, convitedby FROM email_controller WHERE email = $1 and situation = 1',
                             values: [
                                 body.email,
                             ],
@@ -107,12 +107,20 @@ export const handler = async (event) => {
                             };
                         }
 
+                        results = await conn.query({
+                            name: "permissionlevel",
+                            text: 'SELECT permission_level FROM users WHERE id = $1',
+                            values: [
+                                results.rows[0].convitedby,
+                            ],
+                        });
+
                         try {
                             const password_hash = bcrypt.hashSync(body["password"], 10);
 
                             results = await conn.query({
                                 name: "register",
-                                text: 'INSERT INTO users ("name", "email", "password", "institution", "city", "work_type", "education_level", "status") VALUES ($1, $2, $3, $4, $5, $6, $7, 1) RETURNING id',
+                                text: 'INSERT INTO users ("name", "email", "password", "institution", "city", "work_type", "education_level", "status", "permission_level") VALUES ($1, $2, $3, $4, $5, $6, $7, 1, $8) RETURNING id',
                                 values: [
                                     body.name,
                                     body.email,
@@ -121,6 +129,7 @@ export const handler = async (event) => {
                                     body.city,
                                     body.workType,
                                     body.educationLevel,
+                                    results.rows[0].permission_level+1,
                                 ],
                             });
                         } catch (e) {
@@ -133,7 +142,17 @@ export const handler = async (event) => {
                                         statusCode: 400,
                                         status: "Bad Request",
                                         errorCode: 2,
-                                        error: "Email already registered",
+                                        error: "Email ja registrado!",
+                                    })
+                                };
+                            } else {
+                                return {
+                                    statusCode: 500,
+                                    body: JSON.stringify({
+                                        statusCode: 500,
+                                        status: "Bad Request",
+                                        errorCode: 6589,
+                                        error: "Um erro inesperado ocorreu, cod 6589!!",
                                     })
                                 };
                             }
