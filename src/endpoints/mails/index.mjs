@@ -57,6 +57,16 @@ export const handler = async (event) => {
             const sesClient = new SESClient({ region: 'us-east-1' });
             const fromMail = process.env.SUPPORT_EMAIL;
             const redirectLink = process.env.REDIRECT_LINK;
+            const user_who_invited = event.requestContext.authorizer.lambda.user
+
+            let convitedby = await conn.query({
+                name: "selectConvitedBy",
+                text: "SELECT permission_level FROM users WHERE id = $1",
+                values: [
+                    user_who_invited
+                ],
+            });
+            let permission_user_who_invited = convitedby.rows[0].permission_level
 
             let situations = {
                 0:"Em espera de envio",
@@ -92,6 +102,18 @@ export const handler = async (event) => {
             switch (event.routeKey){
                 case "POST /mails/registermail":{
 
+                    if ( permission_user_who_invited > 2){
+                        return {
+                            statusCode: 403,
+                            body: JSON.stringify({
+                                statusCode: 403,
+                                status: "Forbidden",
+                                errorCode: 1,
+                                error: "Nivel de permissão insuficiente!",
+                            }),
+                        };
+                    }
+
                     if (!validaEmail(body["email"])){
                         return {
                             statusCode: 400,
@@ -117,10 +139,11 @@ export const handler = async (event) => {
                     try {
                         results = await conn.query({
                             name: "registerEmail",
-                            text: 'INSERT INTO email_controller ("email", "situation", "createdAt", "updatedAt") VALUES ($1, $2, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP) RETURNING id',
+                            text: 'INSERT INTO email_controller ("email", "situation", "createdAt", "updatedAt", "convitedby") VALUES ($1, $2, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, $3) RETURNING id',
                             values: [
                                 body.email,
-                                1 // {0:"Em espera de envio",1:"Email enviado", 2:"Enviado e usuario cadastrado"}
+                                1, // {0:"Em espera de envio",1:"Email enviado", 2:"Enviado e usuario cadastrado"}
+                                user_who_invited
                             ],
                         });
                     } catch (e) {
@@ -189,6 +212,19 @@ export const handler = async (event) => {
                 }
                 case "POST /mails/invite": {
                     const body = JSON.parse(event.body);
+
+                    if ( permission_user_who_invited > 2){
+                        return {
+                            statusCode: 403,
+                            body: JSON.stringify({
+                                statusCode: 403,
+                                status: "Forbidden",
+                                errorCode: 1,
+                                error: "Nivel de permissão insuficiente!",
+                            }),
+                        };
+                    }
+
 
                     if (!body.emails){
                         return {
