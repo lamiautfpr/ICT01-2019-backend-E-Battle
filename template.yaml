@@ -233,12 +233,20 @@ Resources:
             Method: get
             Auth:
               Authorizer: Authorizer
-        EbattleApiVisibility:
+        EbattleApiUpdateVisibility:
           Type: HttpApi
           Properties:
             ApiId: !Ref EbattleApi
             Path: /games/visibility
             Method: post
+            Auth:
+              Authorizer: Authorizer
+        EbattleApiGetVisibility:
+          Type: HttpApi
+          Properties:
+            ApiId: !Ref EbattleApi
+            Path: /games/visibility
+            Method: get
             Auth:
               Authorizer: Authorizer
         EbattleApiDuplicate:

@@ -473,6 +473,28 @@ paths:
           description: Visibilidade alterada com sucesso
       security:
         - authToken: [ ]
+    get:
+      tags:
+        - Games
+      description: Coleta a visibilidade de um jogo especifico
+      operationId: getVisibilityGame
+      parameters:
+        - name: id
+          in: query
+          description: Id do game que vamos buscar a visibilidade
+          schema:
+            type: number
+            example: 1
+      responses:
+        '200':
+            description: Visibilidade do game
+            content:
+              application/json:
+                schema:
+                  oneOf:
+                    - $ref: '#/components/schemas/gameVisibility'
+      security:
+        - authToken: [ ]
 components:
   securitySchemes:
     authToken:
