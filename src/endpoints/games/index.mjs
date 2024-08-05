@@ -156,6 +156,39 @@ export const handler = async (event) => {
                         body: JSON.stringify(results.rows.map((game) => game.game)),
                     };
                 }
+                case "GET /games/visibility":{
+                    if (!(event.queryStringParameters && event.queryStringParameters.id)) {
+                        return {
+                            statusCode: 400,
+                            body: JSON.stringify({
+                                errorCode: 1,
+                                errorMessage: "Falta o argumento id do game",
+                            }),
+                        };
+                    }
+
+                    results = await conn.query({
+                        text: 'SELECT visibility FROM games WHERE id = $1',
+                        values: [event.queryStringParameters.id],
+                    });
+
+                    if (results.rows.length == 0) {
+                        return {
+                            statusCode: 400,
+                            body: JSON.stringify({
+                                errorCode: 2,
+                                errorMessage: "Nenhum jogo não encontrado",
+                            }),
+                        };
+                    }
+
+                    return {
+                        statusCode: 200,
+                        body: JSON.stringify(results.rows[0])
+                    };
+
+                    break;
+                }
             }
             break;
         }
