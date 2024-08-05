@@ -57,16 +57,18 @@ export const handler = async (event) => {
             const sesClient = new SESClient({ region: 'us-east-1' });
             const fromMail = process.env.SUPPORT_EMAIL;
             const redirectLink = process.env.REDIRECT_LINK;
-            const user_who_invited = event.requestContext.authorizer.lambda.user
 
-            let convitedby = await conn.query({
-                name: "selectConvitedBy",
-                text: "SELECT permission_level FROM users WHERE id = $1",
-                values: [
-                    user_who_invited
-                ],
-            });
-            let permission_user_who_invited = convitedby.rows[0].permission_level
+            if (event.requestContext.authorizer != undefined){
+                const user_who_invited = event.requestContext.authorizer.lambda.user
+                let convitedby = await conn.query({
+                    name: "selectConvitedBy",
+                    text: "SELECT permission_level FROM users WHERE id = $1",
+                    values: [
+                        user_who_invited
+                    ],
+                });
+                let permission_user_who_invited = convitedby.rows[0].permission_level
+            }
 
             let situations = {
                 0:"Em espera de envio",
