@@ -58,8 +58,11 @@ export const handler = async (event) => {
             const fromMail = process.env.SUPPORT_EMAIL;
             const redirectLink = process.env.REDIRECT_LINK;
 
+            let user_who_invited;
+            let permission_user_who_invited;
+
             if (event.requestContext.authorizer != undefined){
-                const user_who_invited = event.requestContext.authorizer.lambda.user
+                user_who_invited = event.requestContext.authorizer.lambda.user
                 let convitedby = await conn.query({
                     name: "selectConvitedBy",
                     text: "SELECT permission_level FROM users WHERE id = $1",
@@ -67,7 +70,7 @@ export const handler = async (event) => {
                         user_who_invited
                     ],
                 });
-                let permission_user_who_invited = convitedby.rows[0].permission_level
+                permission_user_who_invited = convitedby.rows[0].permission_level
             }
 
             let situations = {
@@ -227,7 +230,6 @@ export const handler = async (event) => {
                         };
                     }
 
-
                     if (!body.emails){
                         return {
                             statusCode: 400,
@@ -283,7 +285,7 @@ export const handler = async (event) => {
                 }
                 case "POST /mails/recovery": {
 
-                    if (!validaEmail(body["email"])){
+                    if (!validaEmail(body["email"])) {
                         return {
                             statusCode: 400,
                             body: JSON.stringify({
@@ -295,7 +297,7 @@ export const handler = async (event) => {
                         };
                     }
 
-                    if(typeof(body["email"]) != "string"){
+                    if (typeof (body["email"]) != "string") {
                         return {
                             statusCode: 400,
                             body: JSON.stringify({
@@ -311,7 +313,7 @@ export const handler = async (event) => {
                         values: [body.email],
                     });
 
-                    if (results.rows.length == 0){
+                    if (results.rows.length == 0) {
                         return {
                             statusCode: 404,
                             body: JSON.stringify({
@@ -332,7 +334,7 @@ export const handler = async (event) => {
                     });
 
                     // Começando o envio do email
-                    const corpoEmail = await bodyEmail('recovery_email',body['email'])
+                    const corpoEmail = await bodyEmail('recovery_email', body['email'])
                     try {
                         const sendEmailCommand = new SendEmailCommand({
                             Source: `Suporte E-Battle <${fromMail}>`,
@@ -340,11 +342,11 @@ export const handler = async (event) => {
                             Destination: { ToAddresses: [body["email"]] },
                             Message: {
                                 Subject: { Data: 'Recuperação de senha' },
-                                Body: {Html: { Data: corpoEmail } },
+                                Body: { Html: { Data: corpoEmail } },
                             },
                         });
                         await sesClient.send(sendEmailCommand);
-                    }catch (e){
+                    } catch (e) {
                         return {
                             statusCode: 500,
                             body: JSON.stringify({
@@ -356,12 +358,11 @@ export const handler = async (event) => {
 
                     // email enviado agr o retorno
                     results = await conn.query({
-                        text: `SELECT
-                                   json_build_object(
-                                           'id', mail.id,
-                                           'email', mail.email,
-                                           'situation', mail.situation
-                                   ) AS email
+                        text: `SELECT json_build_object(
+                                              'id', mail.id,
+                                              'email', mail.email,
+                                              'situation', mail.situation
+                                      ) AS email
                                FROM email_controller AS mail
                                WHERE mail.email = $1`,
                         values: [results.rows[0].email],
