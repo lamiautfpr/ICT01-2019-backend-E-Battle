@@ -503,7 +503,7 @@ export const handler = async (event) => {
                         results = await conn.query({
                             text:  `INSERT INTO games ("user", "language", "teaching_level","theme","category","subcategory", "name", "visibility", "description", "questions", "author", "updatedAt")
                                     SELECT
-                                        $1, "language", "teaching_level","theme","category","subcategory", "name", 0, "description", "questions", "author", CURRENT_TIMESTAMP
+                                        $1, "language", "teaching_level","theme","category","subcategory", "name" || ' - DUPLICATED', 0, "description", "questions", "author", CURRENT_TIMESTAMP
                                     FROM games
                                     WHERE status = 1 AND id = $2 AND ("user" = $1 OR visibility = 1) RETURNING id`,
                             values: [user, event.queryStringParameters.id],
