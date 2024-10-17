@@ -413,6 +413,34 @@ Resources:
             ApiId: !Ref EbattleApi
             Path: /users
             Method: post
+  Instituitions:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: src/endpoints/instituitions/
+      Role: !GetAtt LambdaRole.Arn
+      Events:
+        EbattleApiGet:
+          Type: HttpApi
+          Properties:
+            ApiId: !Ref EbattleApi
+            Path: /instituitions
+            Method: get
+            Auth:
+              Authorizer: Authorizer
+  Roles:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: src/endpoints/roles/
+      Role: !GetAtt LambdaRole.Arn
+      Events:
+        EbattleApiGet:
+          Type: HttpApi
+          Properties:
+            ApiId: !Ref EbattleApi
+            Path: /roles
+            Method: get
+            Auth:
+              Authorizer: Authorizer
   Categories:
     Type: AWS::Serverless::Function
     Properties:

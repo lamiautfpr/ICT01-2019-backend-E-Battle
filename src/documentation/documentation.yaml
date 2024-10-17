@@ -210,6 +210,36 @@ paths:
       responses:
         '200':
           description: Informações do usuário editado com sucesso.
+  /instituitions:
+    get:
+      tags:
+          - Instituitions
+      description: Mostra as instituições disponiveis
+      operationId: selectInstituitions
+      responses:
+        '200':
+          description: Instituições cadastradas
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SelectInstituitionsResponse'
+      security:
+        - authToken: [ ]
+  /roles:
+      get:
+        tags:
+            - Roles
+        description: Mostra as roles disponiveis
+        operationId: selectRoles
+        responses:
+          '200':
+            description: Roles cadastradas
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/SelectRolesResponse'
+        security:
+          - authToken: [ ]
   /matches:
     get:
       tags:
@@ -1142,6 +1172,36 @@ components:
           type: string
           description: Nivel educacional
           example: "Ensino medio completo"
+    SelectInstituitionsResponse:
+      type: array
+      items:
+        type: object
+        properties:
+          id:
+            type: integer
+            description: id da instituição
+            example: 7
+          name:
+            type: string
+            description: Nome da instituição
+            example: Universidade Tecnologica Federal do Parana
+          acronym:
+            type: string
+            description: Sigla da instituição
+            example: UTFPR
+    SelectRolesResponse:
+      type: array
+      items:
+        type: object
+        properties:
+          id:
+            type: integer
+            description: id da role
+            example: 1
+          name:
+            type: string
+            description: Nome da Role
+            example: Professor
     CategoriesResponse:
       type: array
       items:
