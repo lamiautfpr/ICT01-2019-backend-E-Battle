@@ -210,6 +210,21 @@ paths:
       responses:
         '200':
           description: Informações do usuário editado com sucesso.
+  /users/all:
+    get:
+      tags:
+        - Users
+      description: Mostra as informações de todos os usuartios de um gestor
+      operationId: selectAllUser
+      responses:
+        '200':
+          description: Informações dos usuarios cadastrados
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SelectAllUsersResponse'
+      security:
+        - authToken: [ ]
   /instituitions:
     get:
       tags:
@@ -1110,6 +1125,10 @@ components:
           type: string
           description: Token de autenticação
           example: '9a4450f20304bb601af1d7a62bc450b15479bcd1364a96cabd0da1eb5c4bb667155d236e7677ef320213b78ca9c2bfae02083e5992360801e3fc50b3b55bf07d'
+    SelectAllUsersResponse:
+      type: array
+      items:
+        $ref: '#/components/schemas/SelectUserResponse'
     SelectUserResponse:
       type: object
       properties:
