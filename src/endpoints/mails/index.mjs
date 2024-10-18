@@ -60,17 +60,20 @@ export const handler = async (event) => {
 
             let user_who_invited;
             let permission_user_who_invited;
+            let instituition_user_who_invited;
 
             if (event.requestContext.authorizer != undefined){
                 user_who_invited = event.requestContext.authorizer.lambda.user
                 let convitedby = await conn.query({
                     name: "selectConvitedBy",
-                    text: "SELECT permission_level FROM users WHERE id = $1",
+                    text: "SELECT role_id, instituition_id as instituition FROM users WHERE id = $1",
                     values: [
                         user_who_invited
                     ],
                 });
-                permission_user_who_invited = convitedby.rows[0].permission_level
+
+                permission_user_who_invited = convitedby.rows[0].role_id
+                instituition_user_who_invited = convitedby.rows[0].instituition
             }
 
             let situations = {
@@ -119,6 +122,22 @@ export const handler = async (event) => {
                         };
                     }
 
+                    if (body["instituition"] == undefined){
+                        body["instituition"] = instituition_user_who_invited
+                    }
+                    
+                    if ((instituition_user_who_invited != body["instituition"]) && (permission_user_who_invited > 1)){
+                        return {
+                            statusCode: 403,
+                            body: JSON.stringify({
+                                statusCode: 403,
+                                status: "Forbidden",
+                                errorCode: 1,
+                                error: "Nivel de permissão insuficiente!",
+                            }),
+                        };
+                    }
+
                     if (!validaEmail(body["email"])){
                         return {
                             statusCode: 400,
@@ -144,11 +163,12 @@ export const handler = async (event) => {
                     try {
                         results = await conn.query({
                             name: "registerEmail",
-                            text: 'INSERT INTO email_controller ("email", "situation", "createdAt", "updatedAt", "convitedby") VALUES ($1, $2, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, $3) RETURNING id',
+                            text: 'INSERT INTO email_controller ("email", "situation", "createdAt", "updatedAt", "convitedby", "instituition_id") VALUES ($1, $2, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, $3, $4) RETURNING id',
                             values: [
                                 body.email,
                                 1, // {0:"Em espera de envio",1:"Email enviado", 2:"Enviado e usuario cadastrado"}
-                                user_who_invited
+                                user_who_invited,
+                                body["instituition"]
                             ],
                         });
                     } catch (e) {
