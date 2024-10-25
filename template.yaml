@@ -435,6 +435,14 @@ Resources:
             Method: get
             Auth:
               Authorizer: Authorizer
+        EbattleApiPost:
+          Type: HttpApi
+          Properties:
+            ApiId: !Ref EbattleApi
+            Path: /instituitions
+            Method: post
+            Auth:
+              Authorizer: Authorizer
   Roles:
     Type: AWS::Serverless::Function
     Properties:

@@ -240,6 +240,28 @@ paths:
                 $ref: '#/components/schemas/SelectInstituitionsResponse'
       security:
         - authToken: [ ]
+    post:
+      tags:
+          - Instituitions
+      description: Cadastra uma nova instituição
+      operationId: createInstituitions
+      requestBody:
+        description: Dados da instituição a ser cadastrada
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Instituitions'
+        required: true
+      responses:
+        '200':
+          description: Instituição cadastrada
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SelectInstituitionResponse'
+      security:
+        - authToken: [ ]
+    
   /roles:
       get:
         tags:
@@ -590,6 +612,10 @@ components:
           type: string
           description: Email para registro
           example: 'teste@gmail.com'
+        Instituitions:
+          type: integer
+          description: Id da instituição, apenas o nivel mais alto de permissão pode enviar, caso contrario a instituição é a mesma de quem enviou
+          example: 2
       required:
         - email
     ReSendEmails:
@@ -1059,7 +1085,33 @@ components:
           type: integer
           description: Visibilidade do game ( 0 - privado / 1 - Publico )
           example: 1
-
+    Instituitions:
+      type: object
+      properties:
+        name:
+          type: string
+          description: Nome da instituição
+          example: Universidade Tecnologica Federal do Parana
+        acronym:
+          type: string
+          description: Sigla da instituição
+          example: UTFPR 
+        city:
+          type: string
+          description: Cidade da instituição
+          example: Curitiba
+        state:
+          type: string
+          description: Estado da instituição
+          example: Parana
+        description:
+          type: string
+          description: Descrição da instituição
+          example: "Instituição de ensino"
+        plan_id:
+          type: integer
+          description: Plano da instituição
+          example: 1
     RegisterResponse:
       type: object
       properties:
@@ -1191,23 +1243,26 @@ components:
           type: string
           description: Nivel educacional
           example: "Ensino medio completo"
+    SelectInstituitionResponse:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: Id da instituição
+          example: 1
+        name:
+          type: string
+          description: Nome da instituição
+          example: Universidade Tecnologica Federal do Parana
+        acronym:
+          type: string
+          description: Sigla da instituição
+          example: UTFPR
+      
     SelectInstituitionsResponse:
       type: array
       items:
-        type: object
-        properties:
-          id:
-            type: integer
-            description: id da instituição
-            example: 7
-          name:
-            type: string
-            description: Nome da instituição
-            example: Universidade Tecnologica Federal do Parana
-          acronym:
-            type: string
-            description: Sigla da instituição
-            example: UTFPR
+        $ref: '#/components/schemas/SelectInstituitionResponse'
     SelectRolesResponse:
       type: array
       items:
