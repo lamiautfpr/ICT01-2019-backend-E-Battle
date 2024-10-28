@@ -210,6 +210,73 @@ paths:
       responses:
         '200':
           description: Informações do usuário editado com sucesso.
+  /users/all:
+    get:
+      tags:
+        - Users
+      description: Mostra as informações de todos os usuarios de um gestor
+      operationId: selectAllUser
+      responses:
+        '200':
+          description: Informações dos usuarios cadastrados
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SelectAllUsersResponse'
+      security:
+        - authToken: [ ]
+  /instituitions:
+    get:
+      tags:
+          - Instituitions
+      description: Mostra as instituições disponiveis
+      operationId: selectInstituitions
+      responses:
+        '200':
+          description: Instituições cadastradas
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SelectInstituitionsResponse'
+      security:
+        - authToken: [ ]
+    post:
+      tags:
+          - Instituitions
+      description: Cadastra uma nova instituição
+      operationId: createInstituitions
+      requestBody:
+        description: Dados da instituição a ser cadastrada
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Instituitions'
+        required: true
+      responses:
+        '200':
+          description: Instituição cadastrada
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SelectInstituitionResponse'
+      security:
+        - authToken: [ ]
+    
+  /roles:
+      get:
+        tags:
+            - Roles
+        description: Mostra as roles disponiveis
+        operationId: selectRoles
+        responses:
+          '200':
+            description: Roles cadastradas
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/SelectRolesResponse'
+        security:
+          - authToken: [ ]
   /matches:
     get:
       tags:
@@ -545,6 +612,10 @@ components:
           type: string
           description: Email para registro
           example: 'teste@gmail.com'
+        Instituitions:
+          type: integer
+          description: Id da instituição, apenas o nivel mais alto de permissão pode enviar, caso contrario a instituição é a mesma de quem enviou
+          example: 2
       required:
         - email
     ReSendEmails:
@@ -1014,7 +1085,33 @@ components:
           type: integer
           description: Visibilidade do game ( 0 - privado / 1 - Publico )
           example: 1
-
+    Instituitions:
+      type: object
+      properties:
+        name:
+          type: string
+          description: Nome da instituição
+          example: Universidade Tecnologica Federal do Parana
+        acronym:
+          type: string
+          description: Sigla da instituição
+          example: UTFPR 
+        city:
+          type: string
+          description: Cidade da instituição
+          example: Curitiba
+        state:
+          type: string
+          description: Estado da instituição
+          example: Parana
+        description:
+          type: string
+          description: Descrição da instituição
+          example: "Instituição de ensino"
+        plan_id:
+          type: integer
+          description: Plano da instituição
+          example: 1
     RegisterResponse:
       type: object
       properties:
@@ -1080,6 +1177,10 @@ components:
           type: string
           description: Token de autenticação
           example: '9a4450f20304bb601af1d7a62bc450b15479bcd1364a96cabd0da1eb5c4bb667155d236e7677ef320213b78ca9c2bfae02083e5992360801e3fc50b3b55bf07d'
+    SelectAllUsersResponse:
+      type: array
+      items:
+        $ref: '#/components/schemas/SelectUserResponse'
     SelectUserResponse:
       type: object
       properties:
@@ -1142,6 +1243,39 @@ components:
           type: string
           description: Nivel educacional
           example: "Ensino medio completo"
+    SelectInstituitionResponse:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: Id da instituição
+          example: 1
+        name:
+          type: string
+          description: Nome da instituição
+          example: Universidade Tecnologica Federal do Parana
+        acronym:
+          type: string
+          description: Sigla da instituição
+          example: UTFPR
+      
+    SelectInstituitionsResponse:
+      type: array
+      items:
+        $ref: '#/components/schemas/SelectInstituitionResponse'
+    SelectRolesResponse:
+      type: array
+      items:
+        type: object
+        properties:
+          id:
+            type: integer
+            description: id da role
+            example: 1
+          name:
+            type: string
+            description: Nome da Role
+            example: Professor
     CategoriesResponse:
       type: array
       items:

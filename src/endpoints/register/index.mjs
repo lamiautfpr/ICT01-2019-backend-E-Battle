@@ -89,12 +89,12 @@ export const handler = async (event) => {
 
                         results = await conn.query({
                             name: "verifyemail",
-                            text: 'SELECT email, convitedby FROM email_controller WHERE email = $1 and situation = 1',
+                            text: 'SELECT email, convitedby, instituition_id FROM email_controller WHERE email = $1 and situation = 1',
                             values: [
                                 body.email,
                             ],
                         });
-
+                        
                         if (results.rows.length == 0){
                             return {
                                 statusCode: 400,
@@ -106,10 +106,10 @@ export const handler = async (event) => {
                                 }),
                             };
                         }
-
+                        let user_instituition = results.rows[0].instituition_id;
                         results = await conn.query({
                             name: "permissionlevel",
-                            text: 'SELECT permission_level FROM users WHERE id = $1',
+                            text: 'SELECT role_id FROM users WHERE id = $1',
                             values: [
                                 results.rows[0].convitedby,
                             ],
@@ -120,16 +120,18 @@ export const handler = async (event) => {
 
                             results = await conn.query({
                                 name: "register",
-                                text: 'INSERT INTO users ("name", "email", "password", "institution", "city", "work_type", "education_level", "status", "permission_level") VALUES ($1, $2, $3, $4, $5, $6, $7, 1, $8) RETURNING id',
+                                text: 'INSERT INTO users ("name", "email", "password", "institution","instituition_id", "city", "work_type", "education_level", "status", "permission_level","role_id") VALUES ($1, $2, $3, $4, $5, $6, $7, $8, 1, $9, $10) RETURNING id',
                                 values: [
                                     body.name,
                                     body.email,
                                     password_hash,
                                     body.institution,
+                                    user_instituition,
                                     body.city,
                                     body.workType,
                                     body.educationLevel,
-                                    results.rows[0].permission_level+1,
+                                    results.rows[0].role_id+1,
+                                    results.rows[0].role_id+1,
                                 ],
                             });
                         } catch (e) {
