@@ -26,6 +26,22 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/RegisterResponse'
+  
+  /mails:
+    get:
+      tags:
+        - Emails
+      description: Retorna os emails de uma instituição
+      operationId: getEmails
+      responses:
+        '200':
+          description: Lista de informações dos emails
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SelectEmailsResponse'
+      security:
+        - authToken: [ ]
   /mails/registermail:
     post:
       tags:
@@ -1158,6 +1174,49 @@ components:
             type: string
             description: Emails para qual reenviamos o convite
             example: 'teste@gmail.com'
+    SelectEmailsResponse:
+      type: array
+      items:
+        type: object
+        properties:
+          email:
+            type: string
+            description: Email cadastrado no sistema
+            example: ebattle@gmail.com
+          convitedby:
+            type: string
+            description: id do usuario de quem enviou o convite
+            example: 333
+          createdAt:
+            type: string
+            description: Data de criação do email
+            example: 2024-03-31T03:03:55.841Z
+          updatedAt:
+            type: string
+            description: ultima data de atualização da situação do email
+            example: 2024-03-31T03:03:55.841Z
+          instituition:
+            type: object
+            properties:
+              id:
+                type: integer
+                description: id da instituição
+                example: 1
+              name:
+                type: string
+                description: Nome da instituição
+                example: Universidade Tecnologica Federal do Parana
+          situation:
+            type: object
+            properties:
+              id:
+                type: integer
+                description: id da situação do email
+                example: 1
+              description:
+                type: string
+                description: Descrição da situação do email que foi registrado
+                example: 'Email enviado'
     LoginResponse:
       type: object
       properties:
@@ -1169,10 +1228,17 @@ components:
           type: string
           description: Email do usuário
           example: 'teste@gmail.com'
-        work_type:
-          type: string
-          description: Tipo de trabalho
-          example: 'Estudante'
+        role:
+          type: object
+          properties:
+            id:
+              type: integer
+              description: id da role
+              example: 3
+            name:
+              type: string
+              description: Nome da Role
+              example: Professor
         token:
           type: string
           description: Token de autenticação
@@ -1200,22 +1266,40 @@ components:
           type: string
           description: Email do usuario
           example: joao@teste
-        institution:
-          type: string
-          description: Instituição do usuário
-          example: "Universidade Tecnológica Federal do Swagger"
         city:
           type: string
           description: Cidade do usuario
           example: "Santa helena"
-        workType:
-          type: string
-          description: Tipo de trabalho
-          example: "Estudante"
         educationLevel:
           type: string
           description: Nivel educacional
           example: "Ensino medio completo"
+        role:
+          type: object
+          properties:
+            id:
+              type: integer
+              description: id da role
+              example: 2
+            name:
+              type: string
+              description: Nome da Role
+              example: Gestor(a)
+        instituition:
+          type: object
+          properties:
+            id:
+              type: integer
+              description: id da instituição
+              example: 1
+            name:
+              type: string
+              description: Nome da instituição
+              example: Universidade Tecnologica Federal do Parana
+            acronym:
+              type: string
+              description: Sigla da instituição
+              example: UTFPR
     EditUserResponse:
       type: object
       properties:

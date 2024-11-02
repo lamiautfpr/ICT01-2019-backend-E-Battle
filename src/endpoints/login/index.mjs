@@ -8,7 +8,7 @@ export const handler = async (event) => {
         const tk = event["headers"]["authorization"];
         const results = await conn.query({
             name: "checklogin",
-            text: "SELECT u.id, u.email, u.name, r.name as role, u.work_type FROM users u INNER JOIN roles r ON r.id = u.role_id WHERE u.token = $1 and u.status = 1",
+            text: "SELECT u.id, u.email, u.name, json_build_object('id', r.id, 'name', r.name) as role FROM users u INNER JOIN roles r ON r.id = u.role_id WHERE u.token = $1 and u.status = 1",
             values: [tk],
         });
         if (results.rows.length == 1) {
@@ -19,7 +19,6 @@ export const handler = async (event) => {
                     name: user["name"],
                     email: user["email"],
                     role: user["role"],
-                    work_type: user["work_type"],
                     token: tk,
                 }),
             };
@@ -49,7 +48,7 @@ export const handler = async (event) => {
         try{
         const results = await conn.query({
             name: "login",
-            text: "SELECT u.id, u.email, u.password, u.name, r.name as role, u.work_type FROM users u INNER JOIN roles r ON r.id = u.role_id WHERE u.email = $1 and u.status = 1",
+            text: "SELECT u.id, u.email, u.password, u.name, json_build_object('id', r.id, 'name', r.name) as role FROM users u INNER JOIN roles r ON r.id = u.role_id WHERE u.email = $1 and u.status = 1",
             values: [body["email"]],
         });
         if (results.rows.length == 1) {
@@ -67,7 +66,6 @@ export const handler = async (event) => {
                         name: user["name"],
                         email: user["email"],
                         role: user["role"],
-                        work_type: user["work_type"],
                         token: token,
                     }),
                 };

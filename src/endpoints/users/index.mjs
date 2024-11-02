@@ -19,10 +19,9 @@ export const handler = async (event) => {
                     results = await conn.query({
                         text: `
                             SELECT 
-                                u.id, u.status, u.name, u.email, u."createdAt" 
-                                u.city, work_type, education_level,
-                                u.institution,
-                                json_build_object('id', i.id, 'name', i.name) as instituition,
+                                u.id, u.status, u.name, u.email, u."createdAt",
+                                u.city, u.education_level,
+                                json_build_object('id', i.id, 'name', i.name, 'acronym', i.acronym) as instituition,
                                 json_build_object('id', r.id, 'name', r.name) as role
                             FROM users u
                             INNER JOIN instituitions i ON i.id = u.instituition_id
