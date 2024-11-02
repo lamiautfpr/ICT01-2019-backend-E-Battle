@@ -51,46 +51,7 @@ export const handler = async (event) => {
     let results = null;
     switch (event.requestContext.http.method) {
         case "GET": {
-            let user = event.requestContext.authorizer.lambda.user
-            
-            let infos = await conn.query({
-                text: `SELECT u.instituition_id, r.permission_level  FROM users u INNER JOIN roles r on r.id = u.role_id WHERE u.id = $1`,
-                values: [user],
-            });
-            
-            let instituition = infos.rows[0].instituition_id
-            let permission = infos.rows[0].permission_level
-            
-            // So gestor pode ter essas informaç~çoes da instituição
-            if (permission > 2){
-                return {
-                    statusCode: 403,
-                    body: JSON.stringify({
-                        statusCode: 403,
-                        status: "Forbidden",
-                        errorCode: 1,
-                        error: "Nivel de permissão insuficiente!",
-                    }),
-                };
-            }
-
-            results = await conn.query({
-                text: `
-                    SELECT
-                        e.email,
-                        e."convitedby",
-                        e."createdAt",
-                        e."updatedAt",
-                        json_build_object('id', i.id, 'name', i.name) as instituition,
-                        json_build_object('id', s.id, 'situation', s.description) as situation
-                    FROM email_controller e
-                    INNER JOIN instituitions i ON i.id = e.instituition_id
-                    INNER JOIN situations s on s.id = e.situation
-                    WHERE e.instituition_id = $1`,
-                values: [instituition],
-            });
-            
-            return JSON.stringify(results.rows);
+            break;
         }
         case "POST": {
             let body;

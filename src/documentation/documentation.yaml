@@ -26,22 +26,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/RegisterResponse'
-  
-  /mails:
-    get:
-      tags:
-        - Emails
-      description: Retorna os emails de uma instituição
-      operationId: getEmails
-      responses:
-        '200':
-          description: Lista de informações dos emails
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/SelectEmailsResponse'
-      security:
-        - authToken: [ ]
   /mails/registermail:
     post:
       tags:
@@ -226,21 +210,6 @@ paths:
       responses:
         '200':
           description: Informações do usuário editado com sucesso.
-  /users/all:
-    get:
-      tags:
-        - Users
-      description: Mostra as informações de todos os usuarios de um gestor
-      operationId: selectAllUser
-      responses:
-        '200':
-          description: Informações dos usuarios cadastrados
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/SelectAllUsersResponse'
-      security:
-        - authToken: [ ]
   /instituitions:
     get:
       tags:
@@ -277,7 +246,36 @@ paths:
                 $ref: '#/components/schemas/SelectInstituitionResponse'
       security:
         - authToken: [ ]
-    
+  /instituitions/users:
+    get:
+      tags:
+          - Instituitions
+      description: Mostra os usuarios da instituição do usuario logado
+      operationId: selectUsersInstituition
+      responses:
+        '200':
+          description: Usuarios cadastrados na instituição
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SelectAllInstituitionUsersResponse'
+      security:
+        - authToken: [ ]  
+  /instituitions/mails:
+    get:
+      tags:
+        - Instituitions
+      description: Retorna os emails de uma instituição
+      operationId: getEmails
+      responses:
+        '200':
+          description: Lista de informações dos emails
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SelectEmailsResponse'
+      security:
+        - authToken: [ ]
   /roles:
       get:
         tags:
@@ -1243,10 +1241,6 @@ components:
           type: string
           description: Token de autenticação
           example: '9a4450f20304bb601af1d7a62bc450b15479bcd1364a96cabd0da1eb5c4bb667155d236e7677ef320213b78ca9c2bfae02083e5992360801e3fc50b3b55bf07d'
-    SelectAllUsersResponse:
-      type: array
-      items:
-        $ref: '#/components/schemas/SelectUserResponse'
     SelectUserResponse:
       type: object
       properties:
@@ -1342,7 +1336,10 @@ components:
           type: string
           description: Sigla da instituição
           example: UTFPR
-      
+    SelectAllInstituitionUsersResponse:
+      type: array
+      items:
+        $ref: '#/components/schemas/SelectUserResponse' 
     SelectInstituitionsResponse:
       type: array
       items:

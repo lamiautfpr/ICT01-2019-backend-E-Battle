@@ -14,7 +14,6 @@ export const handler = async (event) => {
         case "GET": {
             switch(event.routeKey){
                 case "GET /users":{
-                    try{
                     const user = event.requestContext.authorizer.lambda.user;
                     results = await conn.query({
                         text: `
@@ -33,54 +32,6 @@ export const handler = async (event) => {
                     return {
                         statusCode: 200,
                         body: JSON.stringify(results.rows[0]),
-                    };
-                    }catch(e){
-                        return e.message
-                    }
-                }
-                case "GET /users/all":{
-                    const user = event.requestContext.authorizer.lambda.user;
-                
-                    results = await conn.query({
-                        text: 'SELECT role_id FROM users WHERE "id" = $1',
-                        values: [user],
-                    });
-                    
-                    //return user
-                    
-                    if (results.rows[0].role_id > 2){
-                        return {
-                            statusCode: 401,
-                            body: JSON.stringify({
-                                errorCode: 1,
-                                errorMessage: "Acesso negado",
-                            }),
-                        };
-                    }
-
-                    let situations = {
-                        0:"Em espera de envio",
-                        1:"Email enviado",
-                        2:"Enviado e usuario cadastrado",
-                        3:"Email de recuperação de senha enviado"
-                    }
-
-                    results = await conn.query({
-                    text: `
-                        SELECT
-                            u.id, u.status, u.name, u.email, u.institution, u.city, u.work_type, u.education_level,
-                            json_build_object('id', r.id, 'role', r.name) as role,
-                            json_build_object('email', e.email, 'situation', e.situation, 'invitedAt', e."createdAt") as email_controller
-                        FROM email_controller e 
-                        RIGHT JOIN users u ON u.email = e.email
-                        INNER JOIN roles r on r.id = u.role_id
-                        WHERE e.convitedby = $1`,
-                    values: [user],
-                });
-
-                    return {
-                        statusCode: 200,
-                        body: JSON.stringify(results.rows),
                     };
                 }
             }
