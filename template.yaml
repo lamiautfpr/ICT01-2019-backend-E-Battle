@@ -355,6 +355,14 @@ Resources:
       CodeUri: src/endpoints/mails/
       Role: !GetAtt LambdaRole.Arn
       Events:
+        EbattleApiMailGetMails:
+          Type: HttpApi
+          Properties:
+            ApiId: !Ref EbattleApi
+            Path: /mails
+            Method: get
+            Auth:
+              Authorizer: Authorizer
         EbattleApiMailRegister:
           Type: HttpApi
           Properties:

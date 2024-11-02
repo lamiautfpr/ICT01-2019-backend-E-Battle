@@ -19,7 +19,7 @@ export const handler = async (event) => {
                     results = await conn.query({
                         text: `
                             SELECT 
-                                u.id, u.status, u.name, u.email, 
+                                u.id, u.status, u.name, u.email, u."createdAt" 
                                 u.city, work_type, education_level,
                                 u.institution,
                                 json_build_object('id', i.id, 'name', i.name) as instituition,
