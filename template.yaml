@@ -399,14 +399,6 @@ Resources:
             Method: get
             Auth:
               Authorizer: Authorizer
-        EbattleApiGetAll:
-          Type: HttpApi
-          Properties:
-            ApiId: !Ref EbattleApi
-            Path: /users/all
-            Method: get
-            Auth:
-              Authorizer: Authorizer
         EbattleApiPut:
           Type: HttpApi
           Properties:
@@ -432,6 +424,22 @@ Resources:
           Properties:
             ApiId: !Ref EbattleApi
             Path: /instituitions
+            Method: get
+            Auth:
+              Authorizer: Authorizer
+        EbattleApiGetAllUsers:
+          Type: HttpApi
+          Properties:
+            ApiId: !Ref EbattleApi
+            Path: /instituitions/users
+            Method: get
+            Auth:
+              Authorizer: Authorizer
+        EbattleApiGetAllMails:
+          Type: HttpApi
+          Properties:
+            ApiId: !Ref EbattleApi
+            Path: /instituitions/mails
             Method: get
             Auth:
               Authorizer: Authorizer

@@ -2,6 +2,7 @@ import fs from 'fs/promises';
 import { getConn } from "/opt/nodejs/database.mjs";
 import { S3Client, GetObjectCommand } from "@aws-sdk/client-s3";
 import { SESClient, SendEmailCommand} from "@aws-sdk/client-ses";
+import { info } from 'console';
 
 function validaEmail(email) {
     var re = /\S+@\S+\.\S+/;
@@ -50,7 +51,7 @@ export const handler = async (event) => {
     let results = null;
     switch (event.requestContext.http.method) {
         case "GET": {
-            return
+            break;
         }
         case "POST": {
             let body;
