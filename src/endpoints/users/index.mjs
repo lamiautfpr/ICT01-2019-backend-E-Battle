@@ -14,9 +14,20 @@ export const handler = async (event) => {
         case "GET": {
             switch(event.routeKey){
                 case "GET /users":{
+                    try{
                     const user = event.requestContext.authorizer.lambda.user;
                     results = await conn.query({
-                        text: 'SELECT id, status, name, email, institution, city, work_type, education_level FROM users WHERE "id" = $1',
+                        text: `
+                            SELECT 
+                                u.id, u.status, u.name, u.email, 
+                                u.city, work_type, education_level,
+                                u.institution,
+                                json_build_object('id', i.id, 'name', i.name) as instituition,
+                                json_build_object('id', r.id, 'name', r.name) as role
+                            FROM users u
+                            INNER JOIN instituitions i ON i.id = u.instituition_id
+                            INNER JOIN roles r on r.id = u.role_id
+                            WHERE u."id" = $1`,
                         values: [user],
                     });
 
@@ -24,6 +35,9 @@ export const handler = async (event) => {
                         statusCode: 200,
                         body: JSON.stringify(results.rows[0]),
                     };
+                    }catch(e){
+                        return e.message
+                    }
                 }
                 case "GET /users/all":{
                     const user = event.requestContext.authorizer.lambda.user;
