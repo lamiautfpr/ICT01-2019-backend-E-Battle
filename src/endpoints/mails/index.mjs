@@ -51,7 +51,59 @@ export const handler = async (event) => {
     let results = null;
     switch (event.requestContext.http.method) {
         case "GET": {
-            break;
+
+            if ((!event.queryStringParameters) || (!event.queryStringParameters.email)){
+                return {
+                    statusCode: 400,
+                    body: JSON.stringify({
+                        statusCode: 400,
+                        status: "Bad Request",
+                        errorCode: 1,
+                        error: "Falta o parametro email",
+                    }),
+                };
+            }
+
+            if (!validaEmail(event.queryStringParameters.email)){
+                return {
+                    statusCode: 400,
+                    body: JSON.stringify({
+                        statusCode: 400,
+                        status: "Bad Request",
+                        errorCode: 1,
+                        error: "Invalid email",
+                    }),
+                };
+            }
+
+            results = await conn.query({
+                name: "selectEmails",
+                text: `SELECT 
+                            e.email, e.situation, json_build_object('id', i.id, 'name', i.name, 'acronym', i.acronym) as instituition
+                       FROM email_controller e
+                       INNER JOIN instituitions i ON e.instituition_id = i.id
+                       WHERE situation = 1 and email = $1`,
+                values: [event.queryStringParameters.email]
+            });
+
+            if (results.rows.length == 0){
+                return {
+                    statusCode: 404,
+                    body: JSON.stringify({
+                        statusCode: 404,
+                        status: "Not Found",
+                        errorCode: 1,
+                        error: "Email não encontrado ou não esta em situação de convite",
+                    }),
+                };
+            }
+
+            return JSON.stringify({
+                statusCode: 200,
+                bodyEmail: results.rows[0],
+
+            })
+
         }
         case "POST": {
             let body;
@@ -403,20 +455,20 @@ export const handler = async (event) => {
         }
         case "DELETE": {
 
-            if ((!event.queryStringParameters) || (!event.queryStringParameters.id)){
+            if ((!event.queryStringParameters) || (!event.queryStringParameters.email)){
                 return {
                     statusCode: 400,
                     body: JSON.stringify({
                         statusCode: 400,
                         status: "Bad Request",
                         errorCode: 1,
-                        error: "Missing or invalid parameters",
+                        error: "Falta o parametro id do email",
                     }),
                 };
             }
 
             let user = event.requestContext.authorizer.lambda.user
-            let email_to_delete = event.queryStringParameters.id
+            let email_to_delete = event.queryStringParameters.email
 
             let user_info = await conn.query({
                 name: "selectUser",
@@ -426,7 +478,7 @@ export const handler = async (event) => {
 
             let email_to_delete_info = await conn.query({
                 name: "selectMail",
-                text: "SELECT instituition_id FROM email_controller WHERE ID = $1 AND situation = 1",
+                text: "SELECT instituition_id FROM email_controller WHERE email = $1 AND situation = 1",
                 values: [email_to_delete],
             });
 
@@ -470,7 +522,7 @@ export const handler = async (event) => {
 
             results = await conn.query({
                 name: "deleteEmail",
-                text: "DELETE FROM email_controller WHERE id = $1 AND situation = 1",
+                text: "DELETE FROM email_controller WHERE email = $1 AND situation = 1",
                 values: [email_to_delete],
             });
 

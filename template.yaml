@@ -355,27 +355,27 @@ Resources:
       CodeUri: src/endpoints/mails/
       Role: !GetAtt LambdaRole.Arn
       Events:
-        EbattleApiMailDelete:
-            Type: HttpApi
-            Properties:
-                ApiId: !Ref EbattleApi
-                Path: /mails
-                Method: delete
-                Auth:
-                    Authorizer: Authorizer
-        EbattleApiMailRegister:
-          Type: HttpApi
-          Properties:
-            ApiId: !Ref EbattleApi
-            Path: /mails/registermail
-            Method: post
-            Auth:
-              Authorizer: Authorizer
         EbattleApiMailVerify:
           Type: HttpApi
           Properties:
             ApiId: !Ref EbattleApi
             Path: /mails/verify
+            Method: get
+            Auth:
+              Authorizer: Authorizer
+        EbattleApiMailDelete:
+          Type: HttpApi
+          Properties:
+              ApiId: !Ref EbattleApi
+              Path: /mails
+              Method: delete
+              Auth:
+                  Authorizer: Authorizer
+        EbattleApiMailRegister:
+          Type: HttpApi
+          Properties:
+            ApiId: !Ref EbattleApi
+            Path: /mails/registermail
             Method: post
             Auth:
               Authorizer: Authorizer
