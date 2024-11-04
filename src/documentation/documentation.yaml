@@ -92,6 +92,24 @@ paths:
                 $ref: '#/components/schemas/RegisterEmailResponse'
       security:
         - authToken: [ ]
+  /mails:
+    delete:
+      tags:
+        - Emails
+      description: Deleta um email
+      operationId: deleteEmail
+      parameters:
+        - name: id
+          in: query
+          description: Id do email a ser deletado
+          schema:
+            type: integer
+            example: 1
+      responses:
+        '200':
+          description: Email deletado
+      security:
+        - authToken: [ ]
   /login:
     post:
       tags:
