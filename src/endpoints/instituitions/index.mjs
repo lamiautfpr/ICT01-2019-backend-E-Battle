@@ -30,7 +30,7 @@ export const handler = async (event) => {
                     let instituition = infos.rows[0].instituition_id
                     let permission = infos.rows[0].permission_level
                     
-                    // So gestor pode ter essas informaç~çoes da instituição
+                    // So gestor pode ter essas informações da instituição
                     if (permission > 2){
                         return {
                             statusCode: 403,
@@ -96,7 +96,6 @@ export const handler = async (event) => {
                             FROM users u
                             INNER JOIN instituitions i ON i.id = u.instituition_id
                             INNER JOIN roles r on r.id = u.role_id
-                            INNER JOIN games g on g.user = u.id
                             WHERE u.instituition_id = $1 AND u.status = 1`,
                         values: [instituition],
                     });
