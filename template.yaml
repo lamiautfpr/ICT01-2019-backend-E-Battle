@@ -421,6 +421,12 @@ Resources:
             ApiId: !Ref EbattleApi
             Path: /users
             Method: post
+        EbattleApiDelete:
+          Type: HttpApi
+          Properties:
+            ApiId: !Ref EbattleApi
+            Path: /users
+            Method: delete
   Instituitions:
     Type: AWS::Serverless::Function
     Properties:
