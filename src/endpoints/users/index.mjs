@@ -174,6 +174,70 @@ export const handler = async (event) => {
             return {statusCode: 200};
 
         }
+        case "DELETE": {
+            let user = event.requestContext.authorizer.lambda.user
+            if ((!event.queryStringParameters) || (!event.queryStringParameters.id)){
+                return {
+                    statusCode: 400,
+                    body: JSON.stringify({
+                        statusCode: 400,
+                        status: "Bad Request",
+                        errorCode: 1,
+                        error: "Falta o parametro id do usuario",
+                    }),
+                };
+            }
 
+            const userToDelete = event.queryStringParameters.id;
+
+            let users_info = await conn.query({
+                name: "selectUser",
+                text: "SELECT id, role_id, instituition_id FROM users WHERE id IN ($1,$2)",
+                values: [user, userToDelete],
+            });
+
+            if (users_info.rows.length < 2){
+                return {
+                    statusCode: 404,
+                    body: JSON.stringify({
+                        statusCode: 404,
+                        status: "Not Found",
+                        errorCode: 1,
+                        error: "Usuário não encontrado",
+                    }),
+                };
+            }
+
+            // mapear por objeto id
+            users_info = users_info.rows.reduce((acc, cur) => {
+                acc[cur.id] = cur;
+                return acc;
+            }, {});
+
+            // so gestor pode excluir usuario, exceto se for excluir ele mesmo
+            if (
+                    ((users_info[user].role_id > 2) && (users !== userToDelete)) ||
+                    (users_info[user].instituition_id !== users_info[userToDelete].instituition_id)){
+                return {
+                    statusCode: 400,
+                    body: JSON.stringify({
+                        statusCode: 403,
+                        status: "Forbidden",
+                        errorCode: 1,
+                        error: "Nivel de permissão insuficiente!",
+                    }),
+                };
+            }
+
+            results = await conn.query({
+                name: "deleteUser",
+                text: "UPDATE users SET status = 0 WHERE id = $1 RETURNING id",
+                values: [userToDelete],
+            });
+
+            return {
+                statusCode: 200,
+            };
+        }
     }
 };

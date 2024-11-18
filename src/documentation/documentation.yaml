@@ -92,6 +92,46 @@ paths:
                 $ref: '#/components/schemas/RegisterEmailResponse'
       security:
         - authToken: [ ]
+  /mails/verify:
+    get:
+      tags:
+        - Emails
+      description: Valida um email
+      operationId: validEmail
+      parameters:
+        - name: email
+          in: query
+          description: Email a ser verificado
+          schema:
+            type: string
+            example: teste@gmail.com
+      responses:
+        '200':
+          description: status do email
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VerifyEmailResponse'
+      security:
+        - authToken: [ ]
+  /mails:
+    delete:
+      tags:
+        - Emails
+      description: Deleta um email
+      operationId: deleteEmail
+      parameters:
+        - name: email
+          in: query
+          description: email a ser deletado
+          schema:
+            type: string
+            example: teste@gmail.com
+      responses:
+        '200':
+          description: Email deletado
+      security:
+        - authToken: [ ]
   /login:
     post:
       tags:
@@ -210,6 +250,16 @@ paths:
       responses:
         '200':
           description: Informações do usuário editado com sucesso.
+    delete:
+      tags:
+        - Users
+      description: Deleta um usuario
+      operationId: deleteUser
+      responses:
+        '200':
+          description: Usuario deletado
+      security:
+        - authToken: [ ]
   /instituitions:
     get:
       tags:
@@ -598,18 +648,10 @@ components:
           type: string
           description: Senha do usuário
           example: '123456'
-        institution:
-          type: string
-          description: Instituição do usuário
-          example: "Universidade Tecnológica Federal do Swagger"
         city:
           type: string
           description: Cidade do usuario
           example: "Santa helena"
-        workType:
-          type: string
-          description: Tipo de trabalho
-          example: "Estudante"
         educationLevel:
           type: string
           description: Nivel educacional
@@ -618,7 +660,6 @@ components:
         - name
         - email
         - password
-        - institution
     RegisterEmail:
       type: object
       properties:
@@ -626,9 +667,9 @@ components:
           type: string
           description: Email para registro
           example: 'teste@gmail.com'
-        Instituitions:
+        instituition:
           type: integer
-          description: Id da instituição, apenas o nivel mais alto de permissão pode enviar, caso contrario a instituição é a mesma de quem enviou
+          description: Id da instituição, apenas o nivel mais alto de permissão pode utilizar, caso contrario a instituição é a mesma de quem enviou
           example: 2
       required:
         - email
@@ -675,27 +716,17 @@ components:
           type: string
           description: Nome do usuario
           example: João
-        institution:
-          type: string
-          description: Instituição do usuário
-          example: "Universidade Tecnológica Federal do Swagger"
         city:
           type: string
           description: Cidade do usuario
           example: "Santa helena"
-        workType:
-          type: string
-          description: Tipo de trabalho
-          example: "Estudante"
         educationLevel:
           type: string
           description: Nivel educacional
           example: "Ensino medio completo"
       required:
         - name
-        - institution
         - city
-        - workType
         - educationLevel
     Category:
       type: object
@@ -799,10 +830,6 @@ components:
                   type: string
                   description: Nome do autor
                   example: Jõao
-                institution:
-                  type: string
-                  description: Instituição do autor
-                  example: "Universidade Tecnológica Federal do Parana"
             num_questions:
               type: integer
               description: Numero de questões do jogo
@@ -1126,6 +1153,7 @@ components:
           type: integer
           description: Plano da instituição
           example: 1
+
     RegisterResponse:
       type: object
       properties:
@@ -1163,6 +1191,39 @@ components:
               type: string
               description: Descrição da situação do email que foi registrado
               example: 'Email enviado'
+    VerifyEmailResponse:
+      type: object
+      properties:
+        statusCode:
+          type: integer
+          description: Status do email
+          example: 200
+        bodyEmail:
+          type: object
+          properties:
+            email:
+              type: string
+              description: Email cadastrado
+              example: teste@gmail.com
+            situation:
+              type: integer
+              description: Situação do email
+              example: 1
+            instituition:
+              type: object
+              properties:
+                id:
+                  type: integer
+                  description: id da instituição
+                  example: 1
+                name:
+                  type: string
+                  description: Nome da instituição
+                  example: Universidade Tecnologica Federal do Parana
+                acronym:
+                  type: string
+                  description: Sigla da instituição
+                  example: UTFPR
     ReSendEmailsResponse:
       type: object
       properties:
@@ -1264,6 +1325,10 @@ components:
           type: string
           description: Cidade do usuario
           example: "Santa helena"
+        created_games:
+          type: string
+          description: numero de jogos criados pelo usuario
+          example: "6"
         educationLevel:
           type: string
           description: Nivel educacional
@@ -1583,7 +1648,7 @@ components:
                   type: string
                   description: Nome do autor
                   example: Jõao
-                institution:
+                instituition:
                   type: string
                   description: Instituição do autor
                   example: "Universidade Tecnológica Federal do Parana"
@@ -1649,7 +1714,7 @@ components:
                 type: string
                 description: Nome do autor
                 example: Jõao
-              institution:
+              instituition:
                 type: string
                 description: Instituição do autor
                 example: "Universidade Tecnológica Federal do Parana"

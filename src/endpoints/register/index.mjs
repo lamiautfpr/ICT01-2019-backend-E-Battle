@@ -120,17 +120,14 @@ export const handler = async (event) => {
 
                             results = await conn.query({
                                 name: "register",
-                                text: 'INSERT INTO users ("name", "email", "password", "institution","instituition_id", "city", "work_type", "education_level", "status", "permission_level","role_id") VALUES ($1, $2, $3, $4, $5, $6, $7, $8, 1, $9, $10) RETURNING id',
+                                text: 'INSERT INTO users ("name", "email", "password","instituition_id", "city", "education_level", "status", "role_id") VALUES ($1, $2, $3, $4, $5, $6, 1, $7) RETURNING id',
                                 values: [
                                     body.name,
                                     body.email,
                                     password_hash,
-                                    body.institution,
                                     user_instituition,
                                     body.city,
-                                    body.workType,
                                     body.educationLevel,
-                                    results.rows[0].role_id+1,
                                     results.rows[0].role_id+1,
                                 ],
                             });
@@ -155,6 +152,7 @@ export const handler = async (event) => {
                                         status: "Bad Request",
                                         errorCode: 6589,
                                         error: "Um erro inesperado ocorreu, cod 6589!!",
+                                        message: e.message
                                     })
                                 };
                             }

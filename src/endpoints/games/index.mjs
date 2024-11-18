@@ -24,7 +24,7 @@ export const handler = async (event) => {
                                                'category', json_build_object('id', categories.id, 'name', categories.name),
                                                'subcategory', json_build_object('id', subcategories.id, 'name', subcategories.name),
                                                'name', games.name,
-                                               'author', json_build_object('id', author.id, 'name', author.name, 'institution', author.institution),
+                                               'author', json_build_object('id', author.id, 'name', author.name, 'instituition', instituitions.name),
                                                'visibility', games.visibility,
                                                'description', games.description,
                                                'questions', games.questions,
@@ -35,6 +35,7 @@ export const handler = async (event) => {
                                             INNER JOIN languages ON languages.id = games.language
                                             INNER JOIN teaching_levels ON teaching_levels.id = games.teaching_level
                                             INNER JOIN game_themes ON game_themes.id = games.theme
+                                            INNER JOIN instituitions ON instituitions.id = author.instituition_id
                                             LEFT JOIN categories ON categories.id = games.category
                                             LEFT JOIN subcategories ON subcategories.id = games.subcategory
                                    WHERE games.status = 1 AND games."user" = $1
@@ -53,7 +54,7 @@ export const handler = async (event) => {
                                            'category', json_build_object('id', categories.id, 'name', categories.name),
                                            'subcategory', json_build_object('id', subcategories.id, 'name', subcategories.name),
                                            'name', games.name,
-                                           'author', json_build_object('id', author.id, 'name', author.name, 'institution', author.institution),
+                                           'author', json_build_object('id', author.id, 'name', author.name, 'instituition', instituitions.name),
                                            'visibility', games.visibility,
                                            'description', games.description,
                                            'questions', games.questions,
@@ -64,6 +65,7 @@ export const handler = async (event) => {
                                         INNER JOIN languages ON languages.id = games.language
                                         INNER JOIN teaching_levels ON teaching_levels.id = games.teaching_level
                                         INNER JOIN game_themes ON game_themes.id = games.theme
+                                        INNER JOIN instituitions ON instituitions.id = author.instituition_id
                                         LEFT JOIN categories ON categories.id = games.category
                                         LEFT JOIN subcategories ON subcategories.id = games.subcategory
                                    WHERE games.status = 1 AND games."id" = $1 AND games."user" = $2`,
@@ -121,7 +123,7 @@ export const handler = async (event) => {
                                         'category', json_build_object('id', categories.id, 'name', categories.name),
                                         'subcategory', json_build_object('id', subcategories.id, 'name', subcategories.name),
                                         'name', games.name,
-                                        'author', json_build_object('id', author.id, 'name', author.name, 'institution', author.institution),
+                                        'author', json_build_object('id', author.id, 'name', author.name, 'instituition', instituitions.name),
                                         'visibility', games.visibility,
                                         'description', games.description,
                                         'questions', games.questions,
@@ -132,6 +134,7 @@ export const handler = async (event) => {
                                     INNER JOIN languages ON languages.id = games.language
                                     INNER JOIN teaching_levels ON teaching_levels.id = games.teaching_level
                                     INNER JOIN game_themes ON game_themes.id = games.theme
+                                    INNER JOIN instituitions ON instituitions.id = author.instituition_id
                                     LEFT JOIN categories ON categories.id = games.category
                                     LEFT JOIN subcategories ON subcategories.id = games.subcategory
                                WHERE games.author IN (221,276) AND games.status = 1 AND games.visibility=1 AND (
@@ -411,7 +414,7 @@ export const handler = async (event) => {
                                                    'category', json_build_object('id', categories.id, 'name', categories.name),
                                                    'subcategory', json_build_object('id', subcategories.id, 'name', subcategories.name)),
                                            'name', games.name,
-                                           'author', json_build_object('id', author.id, 'name', author.name, 'institution', author.institution),
+                                           'author', json_build_object('id', author.id, 'name', author.name, 'instituition', instituitions.name),
                                            'visibility', games.visibility,
                                            'description', games.description,
                                            'questions', games.questions,
@@ -422,6 +425,7 @@ export const handler = async (event) => {
                                         INNER JOIN languages ON languages.id = games.language
                                         INNER JOIN teaching_levels ON teaching_levels.id = games.teaching_level
                                         INNER JOIN game_themes ON game_themes.id = games.theme
+                                        INNER JOIN instituitions ON instituitions.id = author.instituition_id
                                         LEFT JOIN categories ON categories.id = games.category
                                         LEFT JOIN subcategories ON subcategories.id = games.subcategory
                                WHERE games.status = 1 AND games."id" = $1`,
@@ -735,7 +739,7 @@ export const handler = async (event) => {
                                                'category', json_build_object('id', categories.id, 'name', categories.name),
                                                'subcategory', json_build_object('id', subcategories.id, 'name', subcategories.name)),
                                        'name', games.name,
-                                       'author', json_build_object('id', author.id, 'name', author.name, 'institution', author.institution),
+                                       'author', json_build_object('id', author.id, 'name', author.name, 'instituition', instituitions.name),
                                        'visibility', games.visibility,
                                        'description', games.description,
                                        'questions', games.questions,
@@ -746,6 +750,7 @@ export const handler = async (event) => {
                                     INNER JOIN languages ON languages.id = games.language
                                     INNER JOIN teaching_levels ON teaching_levels.id = games.teaching_level
                                     INNER JOIN game_themes ON game_themes.id = games.theme
+                                    INNER JOIN instituitions ON instituitions.id = author.instituition_id
                                     LEFT JOIN categories ON categories.id = games.category
                                     LEFT JOIN subcategories ON subcategories.id = games.subcategory
                            WHERE games.status = 1 AND games."id" = $1`,

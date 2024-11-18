@@ -355,19 +355,27 @@ Resources:
       CodeUri: src/endpoints/mails/
       Role: !GetAtt LambdaRole.Arn
       Events:
-        EbattleApiMailRegister:
-          Type: HttpApi
-          Properties:
-            ApiId: !Ref EbattleApi
-            Path: /mails/registermail
-            Method: post
-            Auth:
-              Authorizer: Authorizer
         EbattleApiMailVerify:
           Type: HttpApi
           Properties:
             ApiId: !Ref EbattleApi
             Path: /mails/verify
+            Method: get
+            Auth:
+              Authorizer: Authorizer
+        EbattleApiMailDelete:
+          Type: HttpApi
+          Properties:
+              ApiId: !Ref EbattleApi
+              Path: /mails
+              Method: delete
+              Auth:
+                  Authorizer: Authorizer
+        EbattleApiMailRegister:
+          Type: HttpApi
+          Properties:
+            ApiId: !Ref EbattleApi
+            Path: /mails/registermail
             Method: post
             Auth:
               Authorizer: Authorizer
@@ -413,6 +421,12 @@ Resources:
             ApiId: !Ref EbattleApi
             Path: /users
             Method: post
+        EbattleApiDelete:
+          Type: HttpApi
+          Properties:
+            ApiId: !Ref EbattleApi
+            Path: /users
+            Method: delete
   Instituitions:
     Type: AWS::Serverless::Function
     Properties:

@@ -51,7 +51,59 @@ export const handler = async (event) => {
     let results = null;
     switch (event.requestContext.http.method) {
         case "GET": {
-            break;
+
+            if ((!event.queryStringParameters) || (!event.queryStringParameters.email)){
+                return {
+                    statusCode: 400,
+                    body: JSON.stringify({
+                        statusCode: 400,
+                        status: "Bad Request",
+                        errorCode: 1,
+                        error: "Falta o parametro email",
+                    }),
+                };
+            }
+
+            if (!validaEmail(event.queryStringParameters.email)){
+                return {
+                    statusCode: 400,
+                    body: JSON.stringify({
+                        statusCode: 400,
+                        status: "Bad Request",
+                        errorCode: 1,
+                        error: "Invalid email",
+                    }),
+                };
+            }
+
+            results = await conn.query({
+                name: "selectEmails",
+                text: `SELECT 
+                            e.email, e.situation, json_build_object('id', i.id, 'name', i.name, 'acronym', i.acronym) as instituition
+                       FROM email_controller e
+                       INNER JOIN instituitions i ON e.instituition_id = i.id
+                       WHERE situation = 1 and email = $1`,
+                values: [event.queryStringParameters.email]
+            });
+
+            if (results.rows.length == 0){
+                return {
+                    statusCode: 404,
+                    body: JSON.stringify({
+                        statusCode: 404,
+                        status: "Not Found",
+                        errorCode: 1,
+                        error: "Email não encontrado ou não esta em situação de convite",
+                    }),
+                };
+            }
+
+            return JSON.stringify({
+                statusCode: 200,
+                bodyEmail: results.rows[0],
+
+            })
+
         }
         case "POST": {
             let body;
@@ -126,7 +178,7 @@ export const handler = async (event) => {
                     if (body["instituition"] == undefined){
                         body["instituition"] = instituition_user_who_invited
                     }
-                    
+
                     if ((instituition_user_who_invited != body["instituition"]) && (permission_user_who_invited > 1)){
                         return {
                             statusCode: 403,
@@ -400,6 +452,85 @@ export const handler = async (event) => {
                     };
                 }
             }
+        }
+        case "DELETE": {
+
+            if ((!event.queryStringParameters) || (!event.queryStringParameters.email)){
+                return {
+                    statusCode: 400,
+                    body: JSON.stringify({
+                        statusCode: 400,
+                        status: "Bad Request",
+                        errorCode: 1,
+                        error: "Falta o parametro id do email",
+                    }),
+                };
+            }
+
+            let user = event.requestContext.authorizer.lambda.user
+            let email_to_delete = event.queryStringParameters.email
+
+            let user_info = await conn.query({
+                name: "selectUser",
+                text: "SELECT id, role_id, instituition_id FROM users WHERE id = $1",
+                values: [user],
+            });
+
+            let email_to_delete_info = await conn.query({
+                name: "selectMail",
+                text: "SELECT instituition_id FROM email_controller WHERE email = $1 AND situation = 1",
+                values: [email_to_delete],
+            });
+
+            if (email_to_delete_info.rows.length == 0) {
+                return {
+                    statusCode: 404,
+                    body: JSON.stringify({
+                        statusCode: 404,
+                        status: "Not Found",
+                        errorCode: 1,
+                        error: "Email não encontrado",
+                    }),
+                };
+            }
+
+            // so gestor pode excluir invite
+            if (user_info.rows[0].role_id > 2){
+                return {
+                    statusCode: 400,
+                    body: JSON.stringify({
+                        statusCode: 403,
+                        status: "Forbidden",
+                        errorCode: 1,
+                        error: "Nivel de permissão insuficiente!",
+                    }),
+                };
+            }
+
+            // gestor so pode excluir da propria instituição
+            if ((user_info.rows[0].role_id > 1) && (user_info.rows[0].instituition_id !== email_to_delete_info.rows[0].instituition_id)){
+                return {
+                    statusCode: 403,
+                    body: JSON.stringify({
+                        statusCode: 403,
+                        status: "Forbidden",
+                        errorCode: 1,
+                        error: "Nivel de permissão insuficiente, para deletar usuarios de outras instituições!",
+                    }),
+                };
+            }
+
+            results = await conn.query({
+                name: "deleteEmail",
+                text: "DELETE FROM email_controller WHERE email = $1 AND situation = 1",
+                values: [email_to_delete],
+            });
+
+            return JSON.stringify({
+                statusCode: 200,
+                message: "Email deletado com sucesso",
+            });
+
         }
     }
 };
