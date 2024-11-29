@@ -6,6 +6,20 @@ function validaEmail(email) {
     return re.test(email);
 }
 
+const QUERIES = {
+    GET_USERS: `SELECT 
+                    u.id, u.status, u.name, u.email, u.description, u."createdAt",
+                    u.city, u.education_level,
+                    json_build_object('id', i.id, 'name', i.name, 'acronym', i.acronym) as instituition,
+                    json_build_object('id', r.id, 'name', r.name) as role
+                FROM users u
+                INNER JOIN instituitions i ON i.id = u.instituition_id
+                INNER JOIN roles r on r.id = u.role_id
+                WHERE u."id" = $1;`,
+    UPDATE_USERS: `UPDATE users SET "name" = $1, "institution" = $2, "city" = $3, "work_type" = $4, "education_level" = $5 WHERE "id" = $6 RETURNING id;`,
+    DELETE_USERS: `UPDATE users SET status = 0 WHERE id = $1 RETURNING id;`
+}
+
 export const handler = async (event) => {
     const conn = await getConn();
     let results = null;
@@ -16,16 +30,7 @@ export const handler = async (event) => {
                 case "GET /users":{
                     const user = event.requestContext.authorizer.lambda.user;
                     results = await conn.query({
-                        text: `
-                            SELECT 
-                                u.id, u.status, u.name, u.email, u."createdAt",
-                                u.city, u.education_level,
-                                json_build_object('id', i.id, 'name', i.name, 'acronym', i.acronym) as instituition,
-                                json_build_object('id', r.id, 'name', r.name) as role
-                            FROM users u
-                            INNER JOIN instituitions i ON i.id = u.instituition_id
-                            INNER JOIN roles r on r.id = u.role_id
-                            WHERE u."id" = $1`,
+                        text: QUERIES.GET_USERS,
                         values: [user],
                     });
 
@@ -60,7 +65,7 @@ export const handler = async (event) => {
 
             results = await conn.query({
                 name: "update",
-                text: ' UPDATE users SET "name" = $1, "institution" = $2, "city" = $3, "work_type" = $4, "education_level" = $5 WHERE "id" = $6 RETURNING id',
+                text: QUERIES.UPDATE_USERS,
                 values: [
                     body.name,
                     body.institution,
@@ -72,7 +77,7 @@ export const handler = async (event) => {
             });
 
             results = await conn.query({
-                text: 'SELECT id, name, institution, city, work_type, education_level FROM users WHERE "id" = $1',
+                text: QUERIES.GET_USERS,
                 values: [results.rows[0].id],
             });
 
@@ -231,7 +236,7 @@ export const handler = async (event) => {
 
             results = await conn.query({
                 name: "deleteUser",
-                text: "UPDATE users SET status = 0 WHERE id = $1 RETURNING id",
+                text: QUERIES.DELETE_USERS,
                 values: [userToDelete],
             });
 
