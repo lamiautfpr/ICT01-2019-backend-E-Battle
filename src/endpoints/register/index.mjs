@@ -68,9 +68,26 @@ export const handler = async (event) => {
                         }
 
                         for (var val in body){
-                            if(body[val] == ""){
+                            if((body[val] === "") && (val !== "description")){
                                 invalid.push(val);
                             }
+                        }
+
+                        if (body['description'] === undefined || body['description'] === ""){
+                            body['description'] = null;
+                        }
+
+                        if (body['description'] != null &&
+                            typeof(body['description']) != "string"){
+                            return {
+                                statusCode: 400,
+                                body: JSON.stringify({
+                                    statusCode: 400,
+                                    status: "Bad Request",
+                                    errorCode: 3,
+                                    error: "Invalid description",
+                                }),
+                            };
                         }
 
                         if (invalid.length > 0) {
@@ -120,7 +137,7 @@ export const handler = async (event) => {
 
                             results = await conn.query({
                                 name: "register",
-                                text: 'INSERT INTO users ("name", "email", "password","instituition_id", "city", "education_level", "status", "role_id") VALUES ($1, $2, $3, $4, $5, $6, 1, $7) RETURNING id',
+                                text: 'INSERT INTO users ("name", "email", "password","instituition_id", "city", "education_level", "status", "role_id", "description") VALUES ($1, $2, $3, $4, $5, $6, 1, $7, $8) RETURNING id',
                                 values: [
                                     body.name,
                                     body.email,
@@ -129,6 +146,7 @@ export const handler = async (event) => {
                                     body.city,
                                     body.educationLevel,
                                     results.rows[0].role_id+1,
+                                    body.description
                                 ],
                             });
                         } catch (e) {

@@ -648,6 +648,10 @@ components:
           type: string
           description: Senha do usuário
           example: '123456'
+        description:
+          type: string
+          description: Descrição do usuario
+          example: "Estudante de Ciencias da computação"
         city:
           type: string
           description: Cidade do usuario
@@ -1325,6 +1329,10 @@ components:
           type: string
           description: Cidade do usuario
           example: "Santa helena"
+        description:
+          type: string
+          description: Descrição do usuario
+          example: "Estudante de Ciencias da computação"
         created_games:
           type: string
           description: numero de jogos criados pelo usuario
@@ -1360,32 +1368,7 @@ components:
               description: Sigla da instituição
               example: UTFPR
     EditUserResponse:
-      type: object
-      properties:
-        id:
-          type: integer
-          description: id do usuario que foi editado
-          example: 7
-        name:
-          type: string
-          description: Nome do usuario
-          example: João
-        institution:
-          type: string
-          description: Instituição do usuário
-          example: "Universidade Tecnológica Federal do Swagger"
-        city:
-          type: string
-          description: Cidade do usuario
-          example: "Santa helena"
-        work_type:
-          type: string
-          description: Tipo de trabalho
-          example: "Estudante"
-        education_level:
-          type: string
-          description: Nivel educacional
-          example: "Ensino medio completo"
+      $ref: '#/components/schemas/SelectUserResponse'
     SelectInstituitionResponse:
       type: object
       properties:
