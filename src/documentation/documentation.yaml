@@ -648,6 +648,10 @@ components:
           type: string
           description: Senha do usuário
           example: '123456'
+        avatar:
+            type: string
+            description: Avatar do usuario
+            example: 'avatar-01'
         description:
           type: string
           description: Descrição do usuario
@@ -1329,6 +1333,10 @@ components:
           type: string
           description: Cidade do usuario
           example: "Santa helena"
+        avatar:
+          type: string
+          description: Avatar do usuario
+          example: 'avatar-01'
         description:
           type: string
           description: Descrição do usuario

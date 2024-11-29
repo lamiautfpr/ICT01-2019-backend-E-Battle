@@ -8,7 +8,7 @@ function validaEmail(email) {
 
 const QUERIES = {
     GET_USERS: `SELECT 
-                    u.id, u.status, u.name, u.email, u.description, u."createdAt",
+                    u.id, u.status, u.name, u.email, u.avatar, u.description, u."createdAt",
                     u.city, u.education_level,
                     json_build_object('id', i.id, 'name', i.name, 'acronym', i.acronym) as instituition,
                     json_build_object('id', r.id, 'name', r.name) as role
@@ -16,7 +16,7 @@ const QUERIES = {
                 INNER JOIN instituitions i ON i.id = u.instituition_id
                 INNER JOIN roles r on r.id = u.role_id
                 WHERE u."id" = $1;`,
-    UPDATE_USERS: `UPDATE users SET "name" = $1, "institution" = $2, "city" = $3, "work_type" = $4, "education_level" = $5 WHERE "id" = $6 RETURNING id;`,
+    UPDATE_USERS: `UPDATE users SET "name" = $1, "city" = $2, "education_level" = $3, "description" = $4, "avatar" = $5 WHERE "id" = $6 RETURNING id;`,
     DELETE_USERS: `UPDATE users SET status = 0 WHERE id = $1 RETURNING id;`
 }
 
@@ -45,15 +45,14 @@ export const handler = async (event) => {
             const user = event.requestContext.authorizer.lambda.user;
             const body = JSON.parse(event.body);
 
-            if (
-                !(
-                    body.name &&
-                    body.institution &&
-                    body.city &&
-                    body.workType &&
-                    body.educationLevel
-                )
-            ) {
+            if (!(
+                body.name &&
+                body.institution &&
+                body.city &&
+                body.description &&
+                body.educationLevel &&
+                body.avatar
+            )) {
                 return {
                     statusCode: 400,
                     body: JSON.stringify({
@@ -68,10 +67,10 @@ export const handler = async (event) => {
                 text: QUERIES.UPDATE_USERS,
                 values: [
                     body.name,
-                    body.institution,
                     body.city,
-                    body.workType,
                     body.educationLevel,
+                    body.description,
+                    body.avatar,
                     user,
                 ],
             });
