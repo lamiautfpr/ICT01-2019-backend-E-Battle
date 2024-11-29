@@ -1,5 +1,5 @@
 
-ENVIRONMENT = dev# dev, qa, prod | NAO COLOCA ESPAÇO A MAIS
+ENVIRONMENT = qa# dev, qa, prod | NAO COLOCA ESPAÇO A MAIS
 
 ifneq (,$(wildcard ../ebattle_environments/$(ENVIRONMENT).env))
     include ../ebattle_environments/$(ENVIRONMENT).env
