@@ -1,7 +1,11 @@
 
-ifneq (,$(wildcard ../.env))
-    include ../.env
+ENVIRONMENT = dev# dev, qa, prod | NAO COLOCA ESPAÇO A MAIS
+
+ifneq (,$(wildcard ../ebattle_environments/$(ENVIRONMENT).env))
+    include ../ebattle_environments/$(ENVIRONMENT).env
     export
+else
+    $(error "Arquivo .env nao encontrado para o ambiente: $(ENVIRONMENT)")
 endif
 
 deploy:
@@ -16,7 +20,7 @@ deploy:
 	@echo "Deploying the application..."
 	@echo "----------------------------"
 
-	@"C:\Program Files\Amazon\AWSSAMCLI\bin\sam.cmd" deploy --stack-name EbattleApiDev --s3-bucket $(BUCKET) --capabilities CAPABILITY_NAMED_IAM CAPABILITY_IAM --parameter-overrides DBPassword=$(DBPASSWORD) --profile $(PROFILE) --region $(REGION)
+	@"C:\Program Files\Amazon\AWSSAMCLI\bin\sam.cmd" deploy --stack-name $(STACK) --s3-bucket $(BUCKET) --capabilities CAPABILITY_NAMED_IAM CAPABILITY_IAM --parameter-overrides DBPassword=$(DBPASSWORD) --profile $(PROFILE) --region $(REGION)
 
 	@echo "Application deployed successfully"
 	@echo "----------------------------"
