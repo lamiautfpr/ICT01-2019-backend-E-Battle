@@ -4,7 +4,7 @@ Transform: AWS::Serverless-2016-10-31
 Parameters:
   Environment:
     Type: String
-    Default: dev
+    Default: prod
     AllowedValues:
       - dev
       - staging
@@ -18,7 +18,7 @@ Parameters:
     Default: ebattle
   DBName:
     Type: String
-    Default: ebattle_dev
+    Default: ebattle_prod
   DBHost:
     Type: String
     Default: lamiadb1.ceoy3jbkraru.us-east-1.rds.amazonaws.com
