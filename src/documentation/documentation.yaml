@@ -53,7 +53,7 @@ paths:
       tags:
         - Emails
       description: Envia o convite para emails ja registrados a lista
-      operationId: emailRegister
+      operationId: emailRegister2
       requestBody:
         description: Email a registrar
         content:

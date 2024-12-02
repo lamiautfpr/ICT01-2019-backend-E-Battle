@@ -1,5 +1,5 @@
 
-ENVIRONMENT = qa# dev, qa, prod | NAO COLOCA ESPAÇO A MAIS
+ENVIRONMENT = qa# dev, qa, prod | NAO COLOCA ESPAÇO A MAIS DEPOIS DO #
 
 ifneq (,$(wildcard ../ebattle_environments/$(ENVIRONMENT).env))
     include ../ebattle_environments/$(ENVIRONMENT).env
@@ -9,26 +9,49 @@ else
 endif
 
 deploy:
-	@echo "Deploying the application"
-	@echo "----------------------------"
-	
+	@echo "----------------------------------------"
 	@echo "Building the application..."
-	@echo "----------------------------"
+	@echo "----------------------------------------"
 
-	@"C:\Program Files\Amazon\AWSSAMCLI\bin\sam.cmd" build --parameter-overrides DBPassword=$(DBPASSWORD) --profile $(PROFILE)
+	@"C:\Program Files\Amazon\AWSSAMCLI\bin\sam.cmd" build \
+	  --parameter-overrides \
+	    Environment=$(ENVIRONMENT) \
+		DBPassword=$(DBPASSWORD) \
+		DBUser=$(DBUSER) \
+		DBName=$(DBNAME) \
+		DBHost=$(DBHOST) \
+		SupportEmail=$(SUPPORT_EMAIL) \
+		RedirectLink=$(REDIRECT_LINK) \
+	  --profile $(PROFILE)
 
+	@echo "----------------------------------------"
 	@echo "Deploying the application..."
-	@echo "----------------------------"
+	@echo "----------------------------------------"
 
-	@"C:\Program Files\Amazon\AWSSAMCLI\bin\sam.cmd" deploy --stack-name $(STACK) --s3-bucket $(BUCKET) --capabilities CAPABILITY_NAMED_IAM CAPABILITY_IAM --parameter-overrides DBPassword=$(DBPASSWORD) --profile $(PROFILE) --region $(REGION)
+	@"C:\Program Files\Amazon\AWSSAMCLI\bin\sam.cmd" deploy \
+	  --stack-name $(STACK) \
+	  --s3-bucket $(BUCKET) \
+	  --capabilities CAPABILITY_NAMED_IAM CAPABILITY_IAM \
+	  --parameter-overrides \
+		Environment=$(ENVIRONMENT) \
+		DBPassword=$(DBPASSWORD) \
+		DBUser=$(DBUSER) \
+		DBName=$(DBNAME) \
+		DBHost=$(DBHOST) \
+		SupportEmail=$(SUPPORT_EMAIL) \
+		RedirectLink=$(REDIRECT_LINK) \
+	  --profile $(PROFILE) \
+	  --region $(REGION)
 
+	@echo "----------------------------------------"
 	@echo "Application deployed successfully"
-	@echo "----------------------------"
+	@echo "----------------------------------------"
 
 vars:
+	@echo "----------------------------------------"
 	@echo "Printing the environment variables"
-	@echo "----------------------------"
+	@echo "----------------------------------------"
 	@echo "BUCKET: $(BUCKET)"
 	@echo "PROFILE: $(PROFILE)"
 	@echo "REGION: $(REGION)"
-	@echo "----------------------------"
+	@echo "----------------------------------------"
