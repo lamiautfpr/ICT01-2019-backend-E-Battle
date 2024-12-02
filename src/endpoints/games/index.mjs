@@ -75,10 +75,9 @@ export const handler = async (event) => {
 
                     if (results.rows.length == 0){
                         return {
-                            statusCode: 400,
+                            statusCode: 200,
                             body: JSON.stringify({
-                                errorCode: 2,
-                                errorMessage: "Nenhum jogo não encontrado",
+                                message: "Nenhum jogo encontrado",
                             }),
                         };
                     }
