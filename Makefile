@@ -15,15 +15,36 @@ deploy:
 	@echo "Building the application..."
 	@echo "----------------------------"
 
-	@"C:\Program Files\Amazon\AWSSAMCLI\bin\sam.cmd" build --parameter-overrides DBPassword=$(DBPASSWORD) --profile $(PROFILE)
+	@"C:\Program Files\Amazon\AWSSAMCLI\bin\sam.cmd" build \
+	  --parameter-overrides \
+	    Environment=$(ENVIRONMENT) \
+	    DBPassword=$(DBPASSWORD) \
+	    DBUser=$(DBUSER) \
+	    DBName=$(DBNAME) \
+	    DBHost=$(DBHOST) \
+	    SupportEmail=$(SUPPORTEMAIL) \
+	    RedirectLink=$(REDIRECTLINK) \
+	  --profile $(PROFILE)
 
 	@echo "Deploying the application..."
 	@echo "----------------------------"
 
-	@"C:\Program Files\Amazon\AWSSAMCLI\bin\sam.cmd" deploy --stack-name $(STACK) --s3-bucket $(BUCKET) --capabilities CAPABILITY_NAMED_IAM CAPABILITY_IAM --parameter-overrides DBPassword=$(DBPASSWORD) --profile $(PROFILE) --region $(REGION)
-
-	@echo "Application deployed successfully"
-	@echo "----------------------------"
+	@"C:\Program Files\Amazon\AWSSAMCLI\bin\sam.cmd" deploy \
+		  --stack-name $(STACK) \
+		  --s3-bucket $(BUCKET) \
+		  --capabilities CAPABILITY_NAMED_IAM CAPABILITY_IAM \
+		  --parameter-overrides \
+			Environment=$(ENVIRONMENT) \
+			DBPassword=$(DBPASSWORD) \
+			DBUser=$(DBUSER) \
+			DBName=$(DBNAME) \
+			DBHost=$(DBHOST) \
+			SupportEmail=$(SUPPORTEMAIL) \
+			RedirectLink=$(REDIRECTLINK) \
+		  --profile $(PROFILE) \
+		  --region $(REGION)
+		@echo "Application deployed successfully"
+		@echo "----------------------------"
 
 vars:
 	@echo "Printing the environment variables"

@@ -4,7 +4,6 @@ Transform: AWS::Serverless-2016-10-31
 Parameters:
   Environment:
     Type: String
-    Default: prod
     AllowedValues:
       - dev
       - staging
@@ -15,19 +14,17 @@ Parameters:
     NoEcho: true
   DBUser:
     Type: String
-    Default: ebattle
+    NoEcho: true
   DBName:
     Type: String
-    Default: ebattle_prod
+    NoEcho: true
   DBHost:
     Type: String
-    Default: lamiadb1.ceoy3jbkraru.us-east-1.rds.amazonaws.com
+    NoEcho: true
   SupportEmail:
     Type: String
-    Default: support_ebattle@lamia-edu.com
   RedirectLink:
     Type: String
-    Default: https://ebattle.lamia-edu.com
 
 Globals:
   Function:
