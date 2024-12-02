@@ -237,6 +237,14 @@ export const handler = async (event) => {
                         };
                     }
 
+                    // caso sejam undefined
+                    if (category.category === undefined){
+                        category.category = null;
+                    }
+                    if (category.subcategory === undefined){
+                        category.subcategory = null;
+                    }
+
                     // Convertendo strings vazias para null
                     if (typeof category.category == "string"){
                         category.category = category.category.trim() || null;
