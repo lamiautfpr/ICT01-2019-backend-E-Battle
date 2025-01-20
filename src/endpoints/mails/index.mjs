@@ -26,7 +26,7 @@ async function bodyEmail(target, email){
 
     try {
         // Crie um comando para obter o objeto (arquivo) do S3
-        const getObjectCommand = new GetObjectCommand({Bucket: 'ebattle-api-static-dev',Key: `backend_assets/${target}/index.html`});
+        const getObjectCommand = new GetObjectCommand({Bucket: `ebattle-api-static-${process.env.ENVIRONMENT}`,Key: `backend_assets/${target}/index.html`});
 
         // Execute o comando para obter o objeto do S3
         const { Body } = await s3Client.send(getObjectCommand);
@@ -38,6 +38,10 @@ async function bodyEmail(target, email){
         let update_content = (target == 'invite_email') ? 'href="https://ebattle.lamia-edu.com/register?email="' : 'href="https://ebattle.lamia-edu.com/resetPassword?email="'
         let target_content = update_content.replace('email=',`email=${email}`)
         htmlContent = htmlContent.replace(update_content,target_content);
+
+        // Substituir as urls utilizadas de acordo com o ambiente
+        update_content = 'https://static.api.ebattle.lamia-edu.com/'+process.env.ENVIRONMENT+'/'
+        htmlContent = htmlContent.replace('https://static.api.ebattle.lamia-edu.com/', update_content);
 
         return htmlContent;
     } catch (error) {
@@ -245,11 +249,11 @@ export const handler = async (event) => {
 
                     try {
                         const sendEmailCommand = new SendEmailCommand({
-                            Source: `Suporte E-Battle <${fromMail}>`,
+                            Source: `Suporte Duoeduca <${fromMail}>`,
                             ReplyToAddresses: [fromMail],
                             Destination: { ToAddresses: [body["email"]] },
                             Message: {
-                                Subject: { Data: 'Bem vindo ao E-Battle' },
+                                Subject: { Data: 'Bem vindo ao Duoeduca' },
                                 Body: {Html: { Data: corpoEmail } },
                             },
                         });
@@ -331,11 +335,11 @@ export const handler = async (event) => {
                     //return body['emails']
                     try {
                         const sendEmailCommand = new SendEmailCommand({
-                            Source: `Suporte E-Battle <${fromMail}>`,
+                            Source: `Suporte Duoeduca <${fromMail}>`,
                             ReplyToAddresses: [fromMail],
                             Destination: { ToAddresses: toMails },
                             Message: {
-                                Subject: { Data: 'Bem vindo ao E-Battle' },
+                                Subject: { Data: 'Bem vindo ao Duoeduca' },
                                 Body: {Html: { Data: corpoEmail } },
                             },
                         });
@@ -410,7 +414,7 @@ export const handler = async (event) => {
                     const corpoEmail = await bodyEmail('recovery_email', body['email'])
                     try {
                         const sendEmailCommand = new SendEmailCommand({
-                            Source: `Suporte E-Battle <${fromMail}>`,
+                            Source: `Suporte Duoeduca <${fromMail}>`,
                             ReplyToAddresses: [fromMail],
                             Destination: { ToAddresses: [body["email"]] },
                             Message: {
