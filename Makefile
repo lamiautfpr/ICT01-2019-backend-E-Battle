@@ -1,5 +1,5 @@
 
-ENVIRONMENT = dev# dev, qa, prod | NAO COLOCA ESPAÇO A MAIS DEPOIS DO #
+ENVIRONMENT = prod# dev, qa, prod | NAO COLOCA ESPAÇO A MAIS DEPOIS DO #
 
 ifneq (,$(wildcard ../ebattle_environments/$(ENVIRONMENT).env))
     include ../ebattle_environments/$(ENVIRONMENT).env
@@ -8,7 +8,7 @@ else
     $(error "Arquivo .env nao encontrado para o ambiente: $(ENVIRONMENT)")
 endif
 
-deploy:
+deploy: mail_template_update
 	@echo "----------------------------------------"
 	@echo "Building the application..."
 	@echo "----------------------------------------"
@@ -45,6 +45,15 @@ deploy:
 
 	@echo "----------------------------------------"
 	@echo "Application deployed successfully"
+	@echo "----------------------------------------"
+
+mail_template_update:
+	@echo "----------------------------------------"
+	@echo "Deploying mails templates..."
+	@echo "----------------------------------------"
+	@aws s3 cp src/endpoints/mails/mail_templates/ s3://$(STATIC_BUCKET)/backend_assets/ --recursive --profile $(PROFILE) --region $(REGION)
+	@echo "----------------------------------------"
+	@echo "Mail templates deployed successfully"
 	@echo "----------------------------------------"
 
 vars:

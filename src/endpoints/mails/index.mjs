@@ -26,7 +26,7 @@ async function bodyEmail(target, email){
 
     try {
         // Crie um comando para obter o objeto (arquivo) do S3
-        const getObjectCommand = new GetObjectCommand({Bucket: 'ebattle-api-static-dev',Key: `backend_assets/${target}/index.html`});
+        const getObjectCommand = new GetObjectCommand({Bucket: `ebattle-api-static-${process.env.ENVIRONMENT}`,Key: `backend_assets/${target}/index.html`});
 
         // Execute o comando para obter o objeto do S3
         const { Body } = await s3Client.send(getObjectCommand);
@@ -245,11 +245,11 @@ export const handler = async (event) => {
 
                     try {
                         const sendEmailCommand = new SendEmailCommand({
-                            Source: `Suporte E-Battle <${fromMail}>`,
+                            Source: `Suporte Duoeduca <${fromMail}>`,
                             ReplyToAddresses: [fromMail],
                             Destination: { ToAddresses: [body["email"]] },
                             Message: {
-                                Subject: { Data: 'Bem vindo ao E-Battle' },
+                                Subject: { Data: 'Bem vindo ao Duoeduca' },
                                 Body: {Html: { Data: corpoEmail } },
                             },
                         });
@@ -331,11 +331,11 @@ export const handler = async (event) => {
                     //return body['emails']
                     try {
                         const sendEmailCommand = new SendEmailCommand({
-                            Source: `Suporte E-Battle <${fromMail}>`,
+                            Source: `Suporte Duoeduca <${fromMail}>`,
                             ReplyToAddresses: [fromMail],
                             Destination: { ToAddresses: toMails },
                             Message: {
-                                Subject: { Data: 'Bem vindo ao E-Battle' },
+                                Subject: { Data: 'Bem vindo ao Duoeduca' },
                                 Body: {Html: { Data: corpoEmail } },
                             },
                         });
@@ -410,7 +410,7 @@ export const handler = async (event) => {
                     const corpoEmail = await bodyEmail('recovery_email', body['email'])
                     try {
                         const sendEmailCommand = new SendEmailCommand({
-                            Source: `Suporte E-Battle <${fromMail}>`,
+                            Source: `Suporte Duoeduca <${fromMail}>`,
                             ReplyToAddresses: [fromMail],
                             Destination: { ToAddresses: [body["email"]] },
                             Message: {
