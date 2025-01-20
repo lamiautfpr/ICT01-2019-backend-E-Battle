@@ -34,7 +34,7 @@ Globals:
     Handler: index.handler
     Layers:
       - !Ref DatabaseLayer
-    Timeout: 3
+    Timeout: 60
     Tags:
       Project: Ebattle
       Team: Api
