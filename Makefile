@@ -1,5 +1,4 @@
 
-
 ENVIRONMENT = prod# dev, qa, prod | NAO COLOCA ESPAÇO A MAIS DEPOIS DO #
 
 ifneq (,$(wildcard ../ebattle_environments/$(ENVIRONMENT).env))
