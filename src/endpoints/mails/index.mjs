@@ -39,6 +39,10 @@ async function bodyEmail(target, email){
         let target_content = update_content.replace('email=',`email=${email}`)
         htmlContent = htmlContent.replace(update_content,target_content);
 
+        // Substituir as urls utilizadas de acordo com o ambiente
+        update_content = 'https://static.api.ebattle.lamia-edu.com/'+process.env.ENVIRONMENT+'/'
+        htmlContent = htmlContent.replace('https://static.api.ebattle.lamia-edu.com/', update_content);
+
         return htmlContent;
     } catch (error) {
         return error.message
