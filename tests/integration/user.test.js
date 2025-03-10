@@ -10,6 +10,10 @@ const safeJSONParse = (text) => {
     }
 };
 
+                    /* Recomendaçõas: */
+// 1. O teste é completo execute sempre tudo e nao apenas uma parte
+// 2. Se tiver dando erro tente apagar do banco todo registro desse user cicd0001@gmail.com
+// 3. Ao final do processo esse usuario é deletado realmente do banco
 
 describe('Fluxo de Criação de Usuário', () => {
     const email = 'cicd0001@gmail.com';
