@@ -424,6 +424,8 @@ Resources:
             ApiId: !Ref EbattleApi
             Path: /users
             Method: delete
+            Auth:
+              Authorizer: Authorizer
   Instituitions:
     Type: AWS::Serverless::Function
     Properties:

@@ -329,7 +329,7 @@ paths:
   /roles:
       get:
         tags:
-            - Roles
+            - Creation options
         description: Mostra as roles disponiveis
         operationId: selectRoles
         responses:
