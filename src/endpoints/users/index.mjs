@@ -253,7 +253,7 @@ export const handler = async (event) => {
             }
 
             results = await conn.query({
-                name: "deleteUser",
+                name: "deleteUserSingle",
                 text: QUERIES.DELETE_USERS,
                 values: [userToDelete],
             });
