@@ -38,10 +38,10 @@ export const handler = async (event) => {
                     missing.push(field);
                 }
                 if (body[field] && body[field].length < 2) {
-                    invalid.push(`"${field}" deve ter pelo menos 2 caracteres`);
+                    invalid.push(`'${field}' deve ter pelo menos 2 caracteres`);
                 }
                 if (field === "email" && body[field] && !validaEmail(body[field])) {
-                    invalid.push(`"${field}" deve ser um email válido`);
+                    invalid.push(`'${field}' deve ser um email válido`);
                 }
             }
 
