@@ -58,14 +58,23 @@ export const handler = async (event) => {
                     }),
                 };
             }
-
-            // Cria o contato
-            await conn.query({
-                name: "contact_create",
-                text: `INSERT INTO contacts (name, email, message) VALUES ($1, $2, $3)`,
-                values: [body.name, body.email, body.message]
-            });
-
+            try{
+                // Cria o contato
+                await conn.query({
+                    name: "contact_create",
+                    text: `INSERT INTO user_contacts (name, email, message) VALUES ($1, $2, $3)`,
+                    values: [body.name, body.email, body.message]
+                });
+            } catch (err) {
+                console.error("Erro ao inserir contato:", err);
+                return {
+                    statusCode: 500,
+                    body: JSON.stringify({
+                        error: "Erro ao inserir contato no banco de dados",
+                        details: err.message,
+                    }),
+                }
+            }
             return {
                 statusCode: 200,
                 body: JSON.stringify({
