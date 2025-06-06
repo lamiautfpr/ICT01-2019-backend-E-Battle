@@ -6,6 +6,26 @@ info:
 servers:
   - url: 'https://api.ebattle.lamia-edu.com/{{env}}'
 paths:
+  /contact:
+    post:
+      tags:
+        - Contact
+      description: Envia uma mensagem de contato para o suporte
+      operationId: contact
+      requestBody:
+        description: Mensagem a ser enviada
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Contact'
+        required: true
+      responses:
+        '200':
+          description: Mensagem enviada com sucesso
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ContactResponse'
   /register:
     post:
       tags:
@@ -633,6 +653,25 @@ components:
       name: Authorization
       in: header
   schemas:
+    Contact:
+      type: object
+      properties:
+        name:
+          type: string
+          description: Nome do usuario
+          example: 'Julio'
+        email:
+          type: string
+          description: Email do usuário
+          example: 'teste@gmail.com'
+        message:
+          type: string
+          description: Mensagem de contato
+          example: 'Me interessei pela plataforma'
+      required:
+        - name
+        - email
+        - message
     Register:
       type: object
       properties:
@@ -1161,6 +1200,14 @@ components:
           type: integer
           description: Plano da instituição
           example: 1
+
+    ContactResponse:
+      type: object
+      properties:
+        message:
+          type: string
+          description: Mensagem de sucesso
+          example: "Obrigado por entrar em contato conosco. Nossa equipe irá analisar sua mensagem e responder o mais breve possível."
 
     RegisterResponse:
       type: object
