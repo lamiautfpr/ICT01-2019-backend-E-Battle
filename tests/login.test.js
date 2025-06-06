@@ -5,11 +5,13 @@ const stage = process.env.stage ?? 'dev';
 const endpoint = '/'+stage+'/login';
 
 describe('Login', function () {
+    const email = "cicd@test.com"
+    const password = "CiCd@1.2,3"
 
     it('should executed successfully', async () => {
         const response = await request
             .post(endpoint)
-            .send({"email": "cicd@test.com", "password": "CiCd@1.2,3"});
+            .send({"email": email, "password": password});
 
         expect(response.status).toEqual(200);
         expect(() => JSON.parse(response.text)).not.toThrow();
@@ -24,7 +26,7 @@ describe('Login', function () {
         expect(body.name).toBeDefined();
         expect(body.name).toBe("CI/CD");
         expect(body.email).toBeDefined();
-        expect(body.email).toBe("cicd@test.com");
+        expect(body.email).toBe(email);
         expect(body.work_type).toBeDefined();
         expect(body.work_type).toBe("Estudante");
 
@@ -34,7 +36,7 @@ describe('Login', function () {
     it('should fail with incorrect passord', async () => {
         const response = await request
             .post(endpoint)
-            .send({"email": "cicd@test.com", "password": "wrong"});
+            .send({"email": email, "password": "wrong"});
 
         expect(response.status).toEqual(401);
         expect(response.text).toEqual(JSON.stringify({statusCode: 401, status: 'Unauthorized'}));
@@ -43,7 +45,7 @@ describe('Login', function () {
     it('should fail with incorrect email', async () => {
         const response = await request
             .post(endpoint)
-            .send({"email": "wrong@test.com", "password": "CiCd@1.2,3"});
+            .send({"email": "wrong@test.com", "password": password});
 
         expect(response.status).toEqual(401);
         expect(response.text).toEqual(JSON.stringify({statusCode: 401, status: 'Unauthorized'}));
@@ -61,7 +63,7 @@ describe('Login', function () {
     it('should fail only if password is sent', async () => {
         const response = await request
             .post(endpoint)
-            .send({"password": "CiCd@1.2,3"});
+            .send({"password": password});
 
         expect(response.status).toEqual(400);
         expect(response.text).toEqual(JSON.stringify({statusCode: 400, status: 'Bad Request', errorCode: 1, error: "Missing or invalid parameters", missing: ['email'], invalid: []}));

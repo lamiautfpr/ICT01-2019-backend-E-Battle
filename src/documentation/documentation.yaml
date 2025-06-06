@@ -771,10 +771,20 @@ components:
           type: string
           description: Nivel educacional
           example: "Ensino medio completo"
+        description:
+          type: string
+          description: Descrição do usuario
+          example: "Estudante de Ciencias da computação"
+        avatar:
+          type: string
+          description: Avatar do usuario
+          example: 'avatar-01'
       required:
         - name
         - city
         - educationLevel
+        - description
+        - avatar
     Category:
       type: object
       properties:
