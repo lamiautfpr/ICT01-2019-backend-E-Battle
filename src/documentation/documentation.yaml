@@ -19,6 +19,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ContactsListResponse'
+      security:
+        - authToken: [ ]
     post:
       tags:
         - Contact
