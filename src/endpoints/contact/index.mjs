@@ -5,23 +5,37 @@ function validaEmail(email) {
     return re.test(email);
 }
 
+function sanitize(input) {
+    if (!input || typeof input !== "string") {
+        return null;
+    }
+    return input
+        .normalize("NFD")                       // Separa letras de acentos
+        .replace(/[\u0300-\u036f]/g, "")       // Remove acentos
+        .replace(/[\s\/]+/g, "-")              // Substitui espaço e / por -
+        .toUpperCase();                        // Converte para MAIÚSCULO
+}
+
+
 export const handler = async (event) => {
     const conn = await getConn();
+    const user = event.requestContext?.authorizer?.lambda?.user || null;
+    const VALID_REASONS = ["DUVIDA", "SUGESTAO","FEEDBACK", "ERRO-BUG", "PARCERIA","SUPORTE-TECNICO","OUTROS"]
 
     let results;
     let missing = []
     let invalid = []
+
 
     switch (event.requestContext.http.method) {
         case "GET": {
             break;
         }
         case "POST": {
-
             let body;
-            let required = ["name","email","message"]
+            let required = ["name","email","reason","message"]
 
-            try {
+            try{
                 body = JSON.parse(event.body);
             } catch (err) {
                 return {
@@ -35,7 +49,7 @@ export const handler = async (event) => {
 
             for (const field of required) {
                 if (!body[field]) {
-                    missing.push(field);
+                    missing.push(`'${field}' não pode estar vazio ou ausente`);
                 }
                 if (body[field] && body[field].length < 2) {
                     invalid.push(`'${field}' deve ter pelo menos 2 caracteres`);
@@ -43,6 +57,11 @@ export const handler = async (event) => {
                 if (field === "email" && body[field] && !validaEmail(body[field])) {
                     invalid.push(`'${field}' deve ser um email válido`);
                 }
+            }
+
+            let reason = sanitize(body.reason)
+            if (reason && !VALID_REASONS.includes(reason)) {
+                invalid.push(`'reason' invalido (${body.reason}), deve ser um dos seguintes valores: ${VALID_REASONS.join(", ")}`);
             }
 
             if (missing.length > 0 || invalid.length > 0) {
@@ -58,13 +77,21 @@ export const handler = async (event) => {
                     }),
                 };
             }
+
             try{
                 // Cria o contato
                 await conn.query({
                     name: "contact_create",
-                    text: `INSERT INTO user_contacts (name, email, message) VALUES ($1, $2, $3)`,
-                    values: [body.name, body.email, body.message]
+                    text: `INSERT INTO user_contacts (user_id, name, email, reason, message) VALUES ($1, $2, $3, $4, $5)`,
+                    values: [
+                        user || null,
+                        body.name,
+                        body.email,
+                        reason,
+                        body.message
+                    ]
                 });
+
             } catch (err) {
                 console.error("Erro ao inserir contato:", err);
                 return {

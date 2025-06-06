@@ -664,6 +664,10 @@ components:
           type: string
           description: Email do usuário
           example: 'teste@gmail.com'
+        reason:
+          type: string
+          description: Motivo do contato
+          example: 'Dúvida'
         message:
           type: string
           description: Mensagem de contato
@@ -672,6 +676,7 @@ components:
         - name
         - email
         - message
+        - reason
     Register:
       type: object
       properties:
