@@ -47,7 +47,6 @@ export const handler = async (event) => {
 
             if (!(
                 body.name &&
-                body.institution &&
                 body.city &&
                 body.description &&
                 body.educationLevel &&
