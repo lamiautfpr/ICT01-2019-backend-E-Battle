@@ -7,14 +7,14 @@ function validaEmail(email) {
 }
 
 const QUERIES = {
-    GET_USERS: `SELECT 
+    GET_USERS: `SELECT
                     u.id, u.status, u.name, u.email, u.avatar, u.description, u."createdAt",
                     u.city, u.education_level,
                     json_build_object('id', i.id, 'name', i.name, 'acronym', i.acronym) as instituition,
                     json_build_object('id', r.id, 'name', r.name) as role
                 FROM users u
-                INNER JOIN instituitions i ON i.id = u.instituition_id
-                INNER JOIN roles r on r.id = u.role_id
+                         INNER JOIN instituitions i ON i.id = u.instituition_id
+                         INNER JOIN roles r on r.id = u.role_id
                 WHERE u."id" = $1;`,
     UPDATE_USERS: `UPDATE users SET "name" = $1, "city" = $2, "education_level" = $3, "description" = $4, "avatar" = $5 WHERE "id" = $6 RETURNING id;`,
     DELETE_USERS: `UPDATE users SET status = 0 WHERE id = $1 RETURNING id;`
@@ -47,7 +47,6 @@ export const handler = async (event) => {
 
             if (!(
                 body.name &&
-                body.institution &&
                 body.city &&
                 body.description &&
                 body.educationLevel &&
@@ -193,10 +192,11 @@ export const handler = async (event) => {
             }
 
             const userToDelete = event.queryStringParameters.id;
+            const realDelete = (event.queryStringParameters.realDelete == "true") ? true : false;
 
             let users_info = await conn.query({
                 name: "selectUser",
-                text: "SELECT id, role_id, instituition_id FROM users WHERE id IN ($1,$2)",
+                text: "SELECT id, role_id, email, instituition_id FROM users WHERE id IN ($1,$2)",
                 values: [user, userToDelete],
             });
 
@@ -220,8 +220,8 @@ export const handler = async (event) => {
 
             // so gestor pode excluir usuario, exceto se for excluir ele mesmo
             if (
-                    ((users_info[user].role_id > 2) && (users !== userToDelete)) ||
-                    (users_info[user].instituition_id !== users_info[userToDelete].instituition_id)){
+                ((users_info[user].role_id > 2) && (users !== userToDelete)) ||
+                (users_info[user].instituition_id !== users_info[userToDelete].instituition_id)){
                 return {
                     statusCode: 400,
                     body: JSON.stringify({
@@ -233,8 +233,26 @@ export const handler = async (event) => {
                 };
             }
 
+            if (realDelete){
+                results = await conn.query({
+                    name: "deleteUser",
+                    text: `DELETE FROM users WHERE id = $1 RETURNING id`,
+                    values: [userToDelete],
+                });
+
+                results = await conn.query({
+                    name: "deleteUserMail",
+                    text: `DELETE FROM email_controller WHERE email = $1 RETURNING email`,
+                    values: [users_info[userToDelete].email],
+                });
+
+                return {
+                    statusCode: 200,
+                }
+            }
+
             results = await conn.query({
-                name: "deleteUser",
+                name: "deleteUserSingle",
                 text: QUERIES.DELETE_USERS,
                 values: [userToDelete],
             });
@@ -242,6 +260,7 @@ export const handler = async (event) => {
             return {
                 statusCode: 200,
             };
+
         }
     }
 };
