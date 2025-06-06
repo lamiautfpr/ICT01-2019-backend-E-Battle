@@ -1,6 +1,6 @@
 
-GIT_BRANCH   := $(shell git rev-parse --abbrev-ref HEAD)
-ENVIRONMENT := $(if $(filter prod,$(GIT_BRANCH)),prod,dev))
+GIT_BRANCH  := $(shell git rev-parse --abbrev-ref HEAD)
+ENVIRONMENT := $(if $(filter prod,$(GIT_BRANCH)),prod,dev)
 
 ifneq (,$(wildcard ../ebattle_environments/$(ENVIRONMENT).env))
     include ../ebattle_environments/$(ENVIRONMENT).env
