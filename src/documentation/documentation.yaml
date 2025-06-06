@@ -7,6 +7,18 @@ servers:
   - url: 'https://api.ebattle.lamia-edu.com/{{env}}'
 paths:
   /contact:
+    get:
+      tags:
+        - Contact
+      description: Retorna os contatos realizados
+      operationId: getContact
+      responses:
+        '200':
+          description: Informações de contato
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ContactsListResponse'
     post:
       tags:
         - Contact
@@ -25,7 +37,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ContactResponse'
+                $ref: '#/components/schemas/ContactsResponse'
   /register:
     post:
       tags:
@@ -1216,13 +1228,49 @@ components:
           description: Plano da instituição
           example: 1
 
-    ContactResponse:
+    ContactsResponse:
       type: object
       properties:
         message:
           type: string
           description: Mensagem de sucesso
           example: "Obrigado por entrar em contato conosco. Nossa equipe irá analisar sua mensagem e responder o mais breve possível."
+    ContactsListResponse:
+      type: array
+      items:
+        type: object
+        properties:
+          name:
+            type: string
+            description: Nome do usuario
+            example: 'Julio'
+          email:
+            type: string
+            description: Email do usuário
+            example: 'teste@gmail.com'
+          reason:
+            type: string
+            description: Motivo do contato
+            example: 'Dúvida'
+          message:
+            type: string
+            description: Mensagem de contato
+            example: 'Me interessei pela plataforma'
+          user_id:
+            type: integer
+            description: ID do usuário que enviou a mensagem
+            example: 1
+          handled_by:
+            type: string
+            description: Usuario que tratou a mensagem
+          status:
+            type: string
+            description: Status da mensagem
+            example: 'OPEN'
+          created_at:
+            type: string
+            description: Data de criação da mensagem
+            example: '2025-06-06T13:27:21.869Z'
 
     RegisterResponse:
       type: object

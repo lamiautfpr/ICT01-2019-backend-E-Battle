@@ -352,7 +352,15 @@ Resources:
       CodeUri: src/endpoints/contact/
       Role: !GetAtt LambdaRole.Arn
       Events:
-        EbattleApi:
+        EbattleApiGetContacts:
+          Type: HttpApi
+          Properties:
+            ApiId: !Ref EbattleApi
+            Path: /contact
+            Method: get
+            Auth:
+              Authorizer: Authorizer
+        EbattleApiCreateContact:
           Type: HttpApi
           Properties:
             ApiId: !Ref EbattleApi

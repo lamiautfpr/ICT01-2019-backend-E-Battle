@@ -26,10 +26,29 @@ export const handler = async (event) => {
     let missing = []
     let invalid = []
 
-
     switch (event.requestContext.http.method) {
         case "GET": {
-            break;
+
+            // Apenas suporte do lamia pode ver
+            if (user && user !== 276) {
+                return {
+                    statusCode: 403,
+                    body: JSON.stringify({
+                        error: "Acesso negado",
+                        details: "Apenas usuários com permissões de suporte podem acessar esta rota.",
+                    }),
+                };
+            }
+
+            let result = await conn.query({
+                name: "contact_get",
+                text: `SELECT name, email, reason, message, user_id, handled_by, status, created_at FROM user_contacts ORDER BY created_at DESC`
+            });
+
+            return {
+                statusCode: 200,
+                body: JSON.stringify(result.rows || []),
+            };
         }
         case "POST": {
             let body;
