@@ -167,7 +167,7 @@ Resources:
         EbattleApi:
           Type: HttpApi
           Properties:
-            ApiId: !Ref EbattleApi
+            ApiId: !Ref EbattleHttpApi
             Path: /log
             Method: ANY
   AuthorizerLog:
@@ -179,7 +179,7 @@ Resources:
         EbattleApi:
           Type: HttpApi
           Properties:
-            ApiId: !Ref EbattleApi
+            ApiId: !Ref EbattleHttpApi
             Path: /log/auth
             Method: ANY
             Auth:
@@ -196,7 +196,7 @@ Resources:
         EbattleApi:
           Type: HttpApi
           Properties:
-            ApiId: !Ref EbattleApi
+            ApiId: !Ref EbattleHttpApi
             Path: /docs/api
             Method: GET
   Games:
@@ -209,7 +209,7 @@ Resources:
         EbattleApiGet:
           Type: HttpApi
           Properties:
-            ApiId: !Ref EbattleApi
+            ApiId: !Ref EbattleHttpApi
             Path: /games
             Method: get
             Auth:
@@ -217,7 +217,7 @@ Resources:
         EbattleApiCreate:
           Type: HttpApi
           Properties:
-            ApiId: !Ref EbattleApi
+            ApiId: !Ref EbattleHttpApi
             Path: /games
             Method: post
             Auth:
@@ -225,7 +225,7 @@ Resources:
         EbattleApiCommunity:
           Type: HttpApi
           Properties:
-            ApiId: !Ref EbattleApi
+            ApiId: !Ref EbattleHttpApi
             Path: /games/community
             Method: get
             Auth:
@@ -233,7 +233,7 @@ Resources:
         EbattleApiUpdateVisibility:
           Type: HttpApi
           Properties:
-            ApiId: !Ref EbattleApi
+            ApiId: !Ref EbattleHttpApi
             Path: /games/visibility
             Method: post
             Auth:
@@ -241,7 +241,7 @@ Resources:
         EbattleApiGetVisibility:
           Type: HttpApi
           Properties:
-            ApiId: !Ref EbattleApi
+            ApiId: !Ref EbattleHttpApi
             Path: /games/visibility
             Method: get
             Auth:
@@ -249,7 +249,7 @@ Resources:
         EbattleApiDuplicate:
           Type: HttpApi
           Properties:
-            ApiId: !Ref EbattleApi
+            ApiId: !Ref EbattleHttpApi
             Path: /games/duplicate
             Method: post
             Auth:
@@ -257,7 +257,7 @@ Resources:
         EbattleApiUpdate:
           Type: HttpApi
           Properties:
-            ApiId: !Ref EbattleApi
+            ApiId: !Ref EbattleHttpApi
             Path: /games
             Method: put
             Auth:
@@ -265,7 +265,7 @@ Resources:
         EbattleApiDelete:
           Type: HttpApi
           Properties:
-            ApiId: !Ref EbattleApi
+            ApiId: !Ref EbattleHttpApi
             Path: /games
             Method: delete
             Auth:
@@ -279,7 +279,7 @@ Resources:
         EbattleApiGet:
           Type: HttpApi
           Properties:
-            ApiId: !Ref EbattleApi
+            ApiId: !Ref EbattleHttpApi
             Path: /matches
             Method: get
             Auth:
@@ -287,7 +287,7 @@ Resources:
         EbattleApiGetResult:
           Type: HttpApi
           Properties:
-            ApiId: !Ref EbattleApi
+            ApiId: !Ref EbattleHttpApi
             Path: /matches/result
             Method: get
             Auth:
@@ -295,7 +295,7 @@ Resources:
         EbattleApiPut:
           Type: HttpApi
           Properties:
-            ApiId: !Ref EbattleApi
+            ApiId: !Ref EbattleHttpApi
             Path: /matches
             Method: post
             Auth:
@@ -303,7 +303,7 @@ Resources:
         EbattleApiPost:
           Type: HttpApi
           Properties:
-            ApiId: !Ref EbattleApi
+            ApiId: !Ref EbattleHttpApi
             Path: /matches/start
             Method: post
             Auth:
@@ -317,7 +317,7 @@ Resources:
         EbattleApi:
           Type: HttpApi
           Properties:
-            ApiId: !Ref EbattleApi
+            ApiId: !Ref EbattleHttpApi
             Path: /languages
             Method: get
             Auth:
@@ -331,7 +331,7 @@ Resources:
         EbattleApi:
           Type: HttpApi
           Properties:
-            ApiId: !Ref EbattleApi
+            ApiId: !Ref EbattleHttpApi
             Path: /login
             Method: post
   Register:
@@ -343,7 +343,7 @@ Resources:
         EbattleApi:
           Type: HttpApi
           Properties:
-            ApiId: !Ref EbattleApi
+            ApiId: !Ref EbattleHttpApi
             Path: /register
             Method: post
   Contact:
@@ -355,7 +355,7 @@ Resources:
         EbattleApiGetContacts:
           Type: HttpApi
           Properties:
-            ApiId: !Ref EbattleApi
+            ApiId: !Ref EbattleHttpApi
             Path: /contact
             Method: get
             Auth:
@@ -363,7 +363,7 @@ Resources:
         EbattleApiCreateContact:
           Type: HttpApi
           Properties:
-            ApiId: !Ref EbattleApi
+            ApiId: !Ref EbattleHttpApi
             Path: /contact
             Method: post
   Emails:
@@ -375,7 +375,7 @@ Resources:
         EbattleApiMailVerify:
           Type: HttpApi
           Properties:
-            ApiId: !Ref EbattleApi
+            ApiId: !Ref EbattleHttpApi
             Path: /mails/verify
             Method: get
             Auth:
@@ -383,7 +383,7 @@ Resources:
         EbattleApiMailDelete:
           Type: HttpApi
           Properties:
-              ApiId: !Ref EbattleApi
+              ApiId: !Ref EbattleHttpApi
               Path: /mails
               Method: delete
               Auth:
@@ -391,7 +391,7 @@ Resources:
         EbattleApiMailRegister:
           Type: HttpApi
           Properties:
-            ApiId: !Ref EbattleApi
+            ApiId: !Ref EbattleHttpApi
             Path: /mails/registermail
             Method: post
             Auth:
@@ -399,7 +399,7 @@ Resources:
         EbattleApiMailInvite:
           Type: HttpApi
           Properties:
-            ApiId: !Ref EbattleApi
+            ApiId: !Ref EbattleHttpApi
             Path: /mails/invite
             Method: post
             Auth:
@@ -407,7 +407,7 @@ Resources:
         EbattleApiMailRecovery:
           Type: HttpApi
           Properties:
-            ApiId: !Ref EbattleApi
+            ApiId: !Ref EbattleHttpApi
             Path: /mails/recovery
             Method: post
   Users:
@@ -419,7 +419,7 @@ Resources:
         EbattleApiGet:
           Type: HttpApi
           Properties:
-            ApiId: !Ref EbattleApi
+            ApiId: !Ref EbattleHttpApi
             Path: /users
             Method: get
             Auth:
@@ -427,7 +427,7 @@ Resources:
         EbattleApiPut:
           Type: HttpApi
           Properties:
-            ApiId: !Ref EbattleApi
+            ApiId: !Ref EbattleHttpApi
             Path: /users
             Method: put
             Auth:
@@ -435,13 +435,13 @@ Resources:
         EbattleApiPost:
           Type: HttpApi
           Properties:
-            ApiId: !Ref EbattleApi
+            ApiId: !Ref EbattleHttpApi
             Path: /users
             Method: post
         EbattleApiDelete:
           Type: HttpApi
           Properties:
-            ApiId: !Ref EbattleApi
+            ApiId: !Ref EbattleHttpApi
             Path: /users
             Method: delete
             Auth:
@@ -455,7 +455,7 @@ Resources:
         EbattleApiGet:
           Type: HttpApi
           Properties:
-            ApiId: !Ref EbattleApi
+            ApiId: !Ref EbattleHttpApi
             Path: /instituitions
             Method: get
             Auth:
@@ -463,7 +463,7 @@ Resources:
         EbattleApiGetAllUsers:
           Type: HttpApi
           Properties:
-            ApiId: !Ref EbattleApi
+            ApiId: !Ref EbattleHttpApi
             Path: /instituitions/users
             Method: get
             Auth:
@@ -471,7 +471,7 @@ Resources:
         EbattleApiGetAllMails:
           Type: HttpApi
           Properties:
-            ApiId: !Ref EbattleApi
+            ApiId: !Ref EbattleHttpApi
             Path: /instituitions/mails
             Method: get
             Auth:
@@ -479,7 +479,7 @@ Resources:
         EbattleApiPost:
           Type: HttpApi
           Properties:
-            ApiId: !Ref EbattleApi
+            ApiId: !Ref EbattleHttpApi
             Path: /instituitions
             Method: post
             Auth:
@@ -493,7 +493,7 @@ Resources:
         EbattleApiGet:
           Type: HttpApi
           Properties:
-            ApiId: !Ref EbattleApi
+            ApiId: !Ref EbattleHttpApi
             Path: /roles
             Method: get
             Auth:
@@ -507,12 +507,12 @@ Resources:
         EbattleApi:
           Type: HttpApi
           Properties:
-            ApiId: !Ref EbattleApi
+            ApiId: !Ref EbattleHttpApi
             Path: /categories
             Method: get
             Auth:
               Authorizer: Authorizer
-  EbattleApi:
+  EbattleHttpApi:
     Type: AWS::Serverless::HttpApi
     DeletionPolicy: Retain
     Properties:
