@@ -35,7 +35,7 @@ async function bodyEmail(target, email){
         let htmlContent = await streamToString(Body); // Implemente a função 'streamToString' para converter o stream em uma string
 
         // Substituir o link no conteúdo HTML
-        let update_content = (target == 'invite_email') ? 'href="https://ebattle.lamia-edu.com/register?email="' : 'href="https://ebattle.lamia-edu.com/resetPassword?email="'
+        let update_content = (target == 'invite_email') ? 'href="https://duoeduca.lamia-edu.com/register?email="' : 'href="https://duoeduca.lamia-edu.com/resetPassword?email="'
         let target_content = update_content.replace('email=',`email=${email}`)
         htmlContent = htmlContent.replace(update_content,target_content);
 
