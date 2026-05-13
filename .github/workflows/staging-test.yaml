@@ -32,12 +32,15 @@ jobs:
         run: sam build
 
       - name: Deploy sam
-        run: sam deploy --stack-name EbattleApiStaging --s3-bucket ebattle-api-staging --capabilities CAPABILITY_IAM CAPABILITY_NAMED_IAM --no-confirm-changeset --no-fail-on-empty-changeset --on-failure DELETE --parameter-overrides DBName=ebattle_dev DBPassword=${{ secrets.DB_STAGING_PASSWORD }} Environment=staging
+        run: sam deploy --stack-name EbattleApiStaging --s3-bucket ebattle-api-staging --capabilities CAPABILITY_IAM CAPABILITY_NAMED_IAM --no-confirm-changeset --no-fail-on-empty-changeset --on-failure DELETE --parameter-overrides DBName=ebattle_dev DBUser=ebattle DBHost=lamiadb1.ceoy3jbkraru.us-east-1.rds.amazonaws.com DBPassword=${{ secrets.DB_STAGING_PASSWORD }} SupportEmail=supportduoeduca@lamia-edu.com RedirectLink=https://duoeduca.lamia-edu.com Environment=staging
 
       - name: Npm install
         run: npm i
 
       - name: Run tests
+        env:
+          CICD_MASTER_EMAIL: ${{ secrets.CICD_MASTER_EMAIL }}
+          CICD_MASTER_PASSWORD: ${{ secrets.CICD_MASTER_PASSWORD }}
         run: NODE_ENV=staging npm run test
 
       - name: Delete sam

@@ -396,18 +396,25 @@ export const handler = async (event) => {
                         });
 
                     } catch (e) {
-
-                        if (create_game_errors.hasOwnProperty(e.message.split('constraint ')[1])){
+                        if (
+                            create_game_errors.hasOwnProperty(
+                                e.message.split("constraint ")[1],
+                            )
+                        ) {
                             return {
                                 statusCode: 400,
                                 body: JSON.stringify({
                                     errorCode: 1,
-                                    errorMessage: `${create_game_errors[e.message.split('constraint ')[1]]} inexistente`,
+                                    errorMessage: `${
+                                        create_game_errors[
+                                            e.message.split("constraint ")[1]
+                                        ]
+                                    } inexistente`,
                                 }),
                             };
                         }
 
-                        return e.message
+                        return e.message;
                     }
 
                     results = await conn.query({
@@ -546,13 +553,13 @@ export const handler = async (event) => {
         case "PUT": {
             try{
                 const body = JSON.parse(event.body);
-                const category = body.category
+                const category = body.category;
                 if (
                     !(
-                        body.language        &&
-                        category.teaching_level  &&
-                        category.theme           &&
-                        body.name            &&
+                        body.language &&
+                        category.teaching_level &&
+                        category.theme &&
+                        body.name &&
                         body.questions
                     )
                 ) {
@@ -581,27 +588,97 @@ export const handler = async (event) => {
                     category.category = category.category.trim() || null;
                 }
 
-                if (typeof category.subcategory == "string"){
+                if (typeof category.subcategory == "string") {
                     category.subcategory = category.subcategory.trim() || null;
                 }
 
-                if (category.category == null && category.subcategory != null){
+                if (category.category == null && category.subcategory != null) {
                     return {
                         statusCode: 400,
                         body: JSON.stringify({
                             errorCode: 1,
                             errorMessage: "Argumentos invalidos, revise a documentação",
                         }),
-                    }
+                    };
                 }
 
-                if ((category.category !== null && (typeof category.category !== 'number' || !Number.isInteger(category.category))) ||
-                    (category.subcategory !== null && (typeof category.subcategory !== 'number' || !Number.isInteger(category.subcategory)))) {
+                if (
+                    (category.category !== null &&
+                        (typeof category.category !== "number" ||
+                            !Number.isInteger(category.category))) ||
+                    (category.subcategory !== null &&
+                        (typeof category.subcategory !== "number" ||
+                            !Number.isInteger(category.subcategory)))
+                ) {
                     return {
                         statusCode: 404,
                         body: JSON.stringify({
                             errorCode: 1,
-                            errorMessage: "Algum dos elementos [Categoria, Subcategoria] estão inválidos, revise a documentação",
+                            errorMessage:
+                                "Algum dos elementos [Categoria, Subcategoria] estão inválidos, revise a documentação",
+                        }),
+                    };
+                }
+
+                results = await conn.query({
+                    name: "gameseditfkcheck",
+                    text: `SELECT
+                        EXISTS (SELECT 1 FROM languages WHERE id = $1) AS ok_lang,
+                        EXISTS (SELECT 1 FROM teaching_levels WHERE id = $2) AS ok_tl,
+                        EXISTS (SELECT 1 FROM game_themes WHERE id = $3) AS ok_theme,
+                        ($4::integer IS NULL OR EXISTS (SELECT 1 FROM categories WHERE id = $4)) AS ok_cat,
+                        ($5::integer IS NULL OR EXISTS (SELECT 1 FROM subcategories WHERE id = $5)) AS ok_sub`,
+                    values: [
+                        body.language,
+                        category.teaching_level,
+                        category.theme,
+                        category.category ?? null,
+                        category.subcategory ?? null,
+                    ],
+                });
+                const fkRow = results.rows[0];
+                if (!fkRow.ok_lang) {
+                    return {
+                        statusCode: 400,
+                        body: JSON.stringify({
+                            errorCode: 1,
+                            errorMessage: "Linguagem inexistente",
+                        }),
+                    };
+                }
+                if (!fkRow.ok_tl) {
+                    return {
+                        statusCode: 400,
+                        body: JSON.stringify({
+                            errorCode: 1,
+                            errorMessage: "Nivel de ensino inexistente",
+                        }),
+                    };
+                }
+                if (!fkRow.ok_theme) {
+                    return {
+                        statusCode: 400,
+                        body: JSON.stringify({
+                            errorCode: 1,
+                            errorMessage: "Tema inexistente",
+                        }),
+                    };
+                }
+                if (!fkRow.ok_cat) {
+                    return {
+                        statusCode: 400,
+                        body: JSON.stringify({
+                            errorCode: 1,
+                            errorMessage: "Categoria inexistente",
+                        }),
+                    };
+                }
+                if (!fkRow.ok_sub) {
+                    return {
+                        statusCode: 400,
+                        body: JSON.stringify({
+                            errorCode: 1,
+                            errorMessage: "Subcategoria inexistente",
                         }),
                     };
                 }
@@ -769,8 +846,25 @@ export const handler = async (event) => {
                     body: JSON.stringify(results.rows[0].game),
                 };
                 break;
-            } catch(e){
-                return e.message
+            } catch (e) {
+                const put_fk = {
+                    '"games_categories_fk"': "Categoria",
+                    '"games_subcategory_fk"': "Subcategoria",
+                    '"games_languages_fk"': "Linguagem",
+                    '"games_teaching_level_fk"': "Nivel de ensino",
+                    '"games_theme_fk"': "Tema",
+                };
+                const ckey = e.message.split("constraint ")[1];
+                if (put_fk.hasOwnProperty(ckey)) {
+                    return {
+                        statusCode: 400,
+                        body: JSON.stringify({
+                            errorCode: 1,
+                            errorMessage: `${put_fk[ckey]} inexistente`,
+                        }),
+                    };
+                }
+                return e.message;
             }
         }
         case "DELETE": {
