@@ -38,6 +38,9 @@ jobs:
         run: npm i
 
       - name: Run tests
+        env:
+          CICD_MASTER_EMAIL: ${{ secrets.CICD_MASTER_EMAIL }}
+          CICD_MASTER_PASSWORD: ${{ secrets.CICD_MASTER_PASSWORD }}
         run: NODE_ENV=staging npm run test
 
       - name: Delete sam
